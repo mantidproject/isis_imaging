@@ -1,8 +1,10 @@
 from typing import Callable
 
+from PyQt5.QtWidgets import QMessageBox
+
 from mantidimaging.core.utility.progress_reporting import Progress
 from mantidimaging.gui.mvp_base import BaseDialogView
-from .presenter import AsyncTaskDialogPresenter
+from .presenter import AsyncTaskDialogPresenter, Notification
 
 from PyQt5 import Qt
 
@@ -21,9 +23,10 @@ class AsyncTaskDialogView(BaseDialogView):
         self.progress_text = self.infoText.text()
 
     def reject(self):
-        # Do not close the dialog when processing is still ongoing
         if not self.presenter.task_is_running:
             super(AsyncTaskDialogView, self).reject()
+        else:
+            self.presenter.notify(Notification.CANCEL)
 
     def handle_completion(self, successful):
         """
@@ -48,6 +51,13 @@ class AsyncTaskDialogView(BaseDialogView):
 
         # Update progress bar
         self.progressBar.setValue(progress * 1000)
+
+    def ask_user_if_they_are_sure_destructive(self):
+        response = QMessageBox.warning(
+            self, "Destructive Action",
+            "Cancelling a task in progress has the potential to cause unknown side effects, "
+            "and destroy data, are you sure?", QMessageBox.No | QMessageBox.Yes, QMessageBox.No)
+        return response == QMessageBox.Yes
 
 
 def start_async_task_view(parent: 'Qt.QMainWindow', task: Callable, on_complete: Callable, kwargs=None):

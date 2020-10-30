@@ -1,6 +1,5 @@
-import traceback
 from logging import getLogger
-from enum import Enum
+from enum import Enum, auto
 from PyQt5 import Qt
 
 from mantidimaging.core.utility.progress_reporting import ProgressHandler
@@ -9,7 +8,8 @@ from .model import AsyncTaskDialogModel
 
 
 class Notification(Enum):
-    START = 1
+    START = auto()
+    CANCEL = auto()
 
 
 class AsyncTaskDialogPresenter(Qt.QObject, ProgressHandler):
@@ -28,10 +28,15 @@ class AsyncTaskDialogPresenter(Qt.QObject, ProgressHandler):
         try:
             if signal == Notification.START:
                 self.do_start_processing()
-
+            elif signal == Notification.CANCEL:
+                self.do_cancel_processing()
         except Exception as e:
-            self.show_error(e, traceback.format_exc())
-            getLogger(__name__).exception("Notification handler failed")
+            getLogger(__name__).exception("Notification handler failed: " + str(e))
+
+    def do_cancel_processing(self):
+        # Ensure the user is sure this is what they want to do
+        if self.view.ask_user_if_they_are_sure_destructive():
+            self.model.do_cancel_task()
 
     def set_task(self, f):
         self.model.task.task_function = f

@@ -19,6 +19,14 @@ class AsyncTaskDialogModel(Qt.QObject):
 
         self.on_complete_function: Callable = lambda: None
 
+    def do_cancel_task(self):
+        try:
+            self.task.terminate()
+            self.task.wait()
+        except Exception as e:
+            # This is going to throw
+            getLogger(__name__).exception("Terminated thread: " + str(e))
+
     def do_execute_async(self):
         """
         Start asynchronous execution.
