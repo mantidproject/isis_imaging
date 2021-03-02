@@ -3,11 +3,14 @@
 
 import operator
 from functools import partial
+from typing import Callable, Dict, Any
 
 import numpy as np
 import scipy.ndimage as scipy_ndimage
+from PyQt5.QtWidgets import QFormLayout
 
 from mantidimaging.core.data import Images
+from mantidimaging.core.gpu import utility as gpu
 from mantidimaging.core.operations.base_filter import BaseFilter, FilterGroup
 from mantidimaging.core.parallel import shared as ps
 from mantidimaging.core.utility.progress_reporting import Progress
@@ -50,7 +53,8 @@ class OutliersFilter(BaseFilter):
                     radius=_default_radius,
                     mode=_default_mode,
                     cores=None,
-                    progress: Progress = None):
+                    progress: Progress = None,
+                    force_cpu=True) -> Images:
         """
         :param images: Input data
         :param diff: Pixel value difference above which to crop bright pixels
@@ -58,20 +62,30 @@ class OutliersFilter(BaseFilter):
         :param mode: Whether to remove bright or dark outliers
                     One of [OUTLIERS_BRIGHT, OUTLIERS_DARK]
         :param cores: The number of cores that will be used to process the data.
+        :param progress: The progress object.
+        :param force_cpu: Force execution on CPU rather than GPU.
 
-        :return: The processed 3D numpy.ndarray
+        :return: The processed Images object
         """
         if diff and radius and diff > 0 and radius > 0:
-            func = ps.create_partial(OutliersFilter._execute, ps.return_to_self, diff=diff, radius=radius, mode=mode)
-            ps.shared_list = [images.data]
-            ps.execute(func,
-                       images.num_projections,
-                       progress=progress,
-                       msg=f"Outliers with threshold {diff} and kernel {radius}")
+            if force_cpu or not gpu.gpu_available():
+                func = ps.create_partial(OutliersFilter._execute,
+                                         ps.return_to_self,
+                                         diff=diff,
+                                         radius=radius,
+                                         mode=mode)
+                ps.shared_list = [images.data]
+                ps.execute(func,
+                           images.num_projections,
+                           progress=progress,
+                           msg=f"Outliers with threshold {diff} and kernel {radius}")
+            else:
+                data = OutliersFilter._execute_gpu(images, diff, radius, mode, progress)
+                images.data = data
         return images
 
     @staticmethod
-    def register_gui(form, on_change, view):
+    def register_gui(form: 'QFormLayout', on_change: Callable, view) -> Dict[str, Any]:
         _, diff_field = add_property_to_form('Difference',
                                              'float',
                                              1000,
@@ -97,19 +111,38 @@ class OutliersFilter(BaseFilter):
                                              on_change=on_change,
                                              tooltip="Whether to remove bright or dark outliers")
 
-        return {'diff_field': diff_field, 'size_field': size_field, 'mode_field': mode_field}
+        _, gpu_field = add_property_to_form('Use GPU',
+                                            Type.BOOL,
+                                            default_value=False,
+                                            tooltip='Run the remove outliers filter on the GPU',
+                                            form=form,
+                                            on_change=on_change)
+
+        return {'diff_field': diff_field, 'size_field': size_field, 'mode_field': mode_field, 'gpu_field': gpu_field}
 
     @staticmethod
-    def execute_wrapper(diff_field=None, size_field=None, mode_field=None):
-
+    def execute_wrapper(diff_field=None, size_field=None, mode_field=None, gpu_field=None):
         return partial(OutliersFilter.filter_func,
                        diff=diff_field.value(),
                        radius=size_field.value(),
-                       mode=mode_field.currentText())
+                       mode=mode_field.currentText(),
+                       force_cpu=not gpu_field.isChecked())
 
     @staticmethod
     def group_name() -> FilterGroup:
         return FilterGroup.Basic
+
+    @staticmethod
+    def _execute_gpu(images: Images, diff, radius, mode, progress):
+        data = images.data
+        progress = Progress.ensure_instance(progress, num_steps=data.shape[0], task_name="Remove outlier GPU")
+        cuda = gpu.CudaExecuter(data.dtype)
+
+        with progress:
+            progress.update(msg="Applying GPU outliers with threshold: {0} and " "radius {1}".format(diff, radius))
+            data[:] = cuda.remove_outlier(data, diff, radius, mode, progress)
+
+        return data
 
 
 def modes():

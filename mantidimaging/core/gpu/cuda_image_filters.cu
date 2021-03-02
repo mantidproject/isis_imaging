@@ -111,7 +111,7 @@ __global__ void two_dimensional_median_filter(float *data_array,
                                             id_x, id_y, filter_size);
 }
 /**
-  Applies a remove light outliers filter to all the pixels in a 2D array.
+  Applies a remove bright outliers filter to all the pixels in a 2D array.
   This function should be used asynchronously with a stack of 2D images.
 
   @param data_array       The original data array.
@@ -122,11 +122,9 @@ __global__ void two_dimensional_median_filter(float *data_array,
   @param diff             The difference required to replace the original pixel
                           value with the median.
  */
-__global__ void two_dimensional_remove_light_outliers(float *data_array,
-                                                      const float *padded_array,
-                                                      const int X, const int Y,
-                                                      const int filter_size,
-                                                      const float diff) {
+__global__ void two_dimensional_remove_bright_outliers(
+    float *data_array, const float *padded_array, const int X, const int Y,
+    const int filter_size, const float diff) {
   unsigned int id_x = blockIdx.x * blockDim.x + threadIdx.x;
   unsigned int id_y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -143,7 +141,7 @@ __global__ void two_dimensional_remove_light_outliers(float *data_array,
     data_array[index] = median;
 }
 /**
-  Applies a remove light outliers filter to all the pixels in a 2D array.
+  Applies a remove dark outliers filter to all the pixels in a 2D array.
   This function should be used asynchronously with a stack of 2D images.
 
   @param data_array       The original data array.
@@ -171,7 +169,7 @@ __global__ void two_dimensional_remove_dark_outliers(float *data_array,
   float median = find_neighbour_median(padded_array, padded_img_width, id_x,
                                        id_y, filter_size);
 
-  if (median - data_array[index] >= diff)
+  if (data_array[index] - median <= diff)
     data_array[index] = median;
 }
 }

@@ -18,12 +18,19 @@ MAX_CUPY_MEMORY_FRACTION = 0.8
 MAX_GPU_SLICES = 100
 KERNEL_FILENAME = "cuda_image_filters.cu"
 
-EQUIVALENT_PAD_MODE = {
+EQUIVALENT_MEDIAN_PAD_MODE = {
     "reflect": "symmetric",
     "constant": "constant",
     "nearest": "edge",
     "mirror": "reflect",
     "wrap": "wrap",
+}
+
+OUTLIER_PADDING_MODE = "symmetric"
+
+DIFF_CONVERSION = {
+    np.dtype('float32'): np.single,
+    np.dtype('float64'): np.double,
 }
 
 
@@ -135,7 +142,7 @@ def _send_arrays_to_gpu_with_pinned_memory(cpu_arrays, streams):
         return gpu_arrays
 
     except cp.cuda.memory.OutOfMemoryError:
-        getLogger(__name__).error("Unable to send arrays to GPU. Median filter not performed.")
+        getLogger(__name__).error("Unable to send arrays to GPU. Image filter not performed.")
         _free_memory_pool(gpu_arrays)
         return []
 
@@ -153,17 +160,16 @@ def _create_block_and_grid_args(data):
     return block_size, grid_size
 
 
-def _create_padded_array(data, filter_size, scipy_mode):
+def _create_padded_array(data, filter_size, padding_mode):
     """
     Creates the padded array on the CPU for the median filter.
     :param data: The data array to be padded.
     :param filter_size: The size of the filter that will be applied to the data array.
-    :param scipy_mode: The desired mode for the scipy median filter.
+    :param padding_mode: The desired mode for the padding.
     :return: An padded version of the data array.
     """
-    # Use the 'mode' argument that is ordinarily given to 'scipy' and determine its numpy.pad equivalent.
     pad_size = _get_padding_value(filter_size)
-    return np.pad(data, pad_width=((pad_size, pad_size), (pad_size, pad_size)), mode=EQUIVALENT_PAD_MODE[scipy_mode])
+    return np.pad(data, pad_width=((pad_size, pad_size), (pad_size, pad_size)), mode=padding_mode)
 
 
 def _replace_gpu_array_contents(gpu_array, cpu_array, stream):
@@ -185,20 +191,67 @@ def _get_padding_value(filter_size):
     return filter_size // 2
 
 
+def _get_slice_limit(n_images):
+    """
+    Determine the number of array slices that will be sent to the GPU. If the number of images in the stack is smaller
+    than MAX_GPU_SLICES than the size of the stack is used, otherwise MAX_GPU_SLICES is used.
+    :param n_images: The number of images in the input data.
+    :return: The maximum number of images that will be on the GPU at any one time.
+    """
+    if n_images > MAX_GPU_SLICES:
+        return MAX_GPU_SLICES
+    return n_images
+
+
+def _create_padded_image_stack(data, filter_size, padding_mode):
+    """
+    Creates an array of padded 2D images for use with the median and remove outlier filters.
+    :param data: The input data.
+    :param filter_size: The size of the filter. Used to determine the size of padding needed.
+    :param padding_mode: The mode argument that is passed to numpy's pad method.
+    :return: A list of padded 2D images.
+    """
+    return [_create_padded_array(data_slice, filter_size, padding_mode) for data_slice in data]
+
+
+def _create_stream_list(n_streams):
+    """
+    Creates a list of non-blocking CUDA streams.
+    :param n_streams: The number of streams needed for the operation.
+    :return: A list of n_streams many non-blokcing CUDA streams.
+    """
+    return [cp.cuda.Stream(non_blocking=True) for _ in range(n_streams)]
+
+
+def _convert_diff(diff, dtype):
+    """
+    Converts the remove outlier diff value from a Python value to a numpy float/double. This is needed for the CUDA
+    kernel input when passing float arguments (as opposed to arrays of floats) to the GPU.
+    :return: The numpy equivalent of the float with the appropriate precision.
+    """
+    return DIFF_CONVERSION[dtype](diff)
+
+
 class CudaExecuter:
     def __init__(self, dtype):
+        import cupy as cp
 
         # Load the CUDA kernel through cupy
         loaded_from_source = _load_cuda_kernel(dtype)
-        median_filter_module = cp.RawModule(code=loaded_from_source)
-        self.single_image_median_filter = median_filter_module.get_function("two_dimensional_median_filter")
+        imaging_filter_module = cp.RawModule(code=loaded_from_source)
+        self.single_image_median_filter = imaging_filter_module.get_function("two_dimensional_median_filter")
+        self.single_image_remove_bright_outlier_filter = imaging_filter_module.get_function(
+            "two_dimensional_remove_bright_outliers")
+        self.single_image_remove_dark_outlier_filter = imaging_filter_module.get_function(
+            "two_dimensional_remove_dark_outliers")
 
         # Warm up the CUDA functions
         self._warm_up(dtype)
 
     def _warm_up(self, dtype):
         """
-        Runs the median filter on a small test array in order to allow it to compile then deleted the GPU arrays.
+        Runs the median and remove outlier filters on a small test array in order to allow it to compile then deletes
+        the GPU arrays.
         :param dtype: The data type of the input array.
         """
         filter_size = 3
@@ -210,6 +263,10 @@ class CudaExecuter:
         block_size, grid_size = _create_block_and_grid_args(test_data[0])
         self._cuda_single_image_median_filter(test_data, test_padding, filter_size, grid_size, block_size)
 
+        diff = 0.5
+        self._cuda_single_image_remove_bright_outlier(test_data, test_padding, filter_size, diff, grid_size, block_size)
+        self._cuda_single_image_remove_dark_outlier(test_data, test_padding, filter_size, diff, grid_size, block_size)
+
         # Clear the test arrays
         _free_memory_pool([test_data, test_padding])
 
@@ -219,6 +276,8 @@ class CudaExecuter:
         :param input_data: A 2D GPU data array.
         :param padded_data: The corresponding padded GPU array.
         :param filter_size: The size of the filter.
+        :param grid_size: The grid size for carrying out the CUDa operation.
+        :param block_size: The block size for carrying out the CUDA operation.
         """
         self.single_image_median_filter(
             grid_size,
@@ -232,6 +291,45 @@ class CudaExecuter:
             ),
         )
 
+    def _cuda_single_image_remove_bright_outlier(self, input_data, padded_data, filter_size, diff, grid_size,
+                                                 block_size):
+        """
+        Run the remove bright outlier filter on a single 2D image using CUDA.
+        :param input_data: A 2D GPU data array.
+        :param padded_data: The corresponding padded GPU array.
+        :param filter_size: The size of the filter.
+        :param diff: The diff threshold for replacing the pixel value with its neighbour median.
+        :param grid_size: The grid size for carrying out the CUDa operation.
+        :param block_size: The block size for carrying out the CUDA operation.
+        """
+        self.single_image_remove_bright_outlier_filter(grid_size, block_size, (
+            input_data,
+            padded_data,
+            input_data.shape[0],
+            input_data.shape[1],
+            filter_size,
+            _convert_diff(diff, input_data.dtype),
+        ))
+
+    def _cuda_single_image_remove_dark_outlier(self, input_data, padded_data, filter_size, diff, grid_size, block_size):
+        """
+        Run the remove dark outlier filter on a single 2D image using CUDA.
+        :param input_data: A 2D GPU data array.
+        :param padded_data: The corresponding padded GPU array.
+        :param filter_size: The size of the filter.
+        :param diff: The diff threshold for replacing the pixel value with its neighbour median.
+        :param grid_size: The grid size for carrying out the CUDa operation.
+        :param block_size: The block size for carrying out the CUDA operation.
+        """
+        self.single_image_remove_dark_outlier_filter(grid_size, block_size, (
+            input_data,
+            padded_data,
+            input_data.shape[0],
+            input_data.shape[1],
+            filter_size,
+            _convert_diff(diff, input_data.dtype),
+        ))
+
     def median_filter(self, data, filter_size, mode, progress):
         """
         Runs the median filter on a stack of 2D images asynchronously.
@@ -241,7 +339,7 @@ class CudaExecuter:
 
         :param data: The CPU data array containing a stack of 2D images.
         :param filter_size: The filter size.
-        :param mode: The mode for the filter. Determines how the edge value are managed.
+        :param mode: The mode for the filter. Determines how the edge values are managed.
         :param progress: An object for displaying the filter progress.
         :return: Data with median filter applied on success, else unaltered input array
         """
@@ -252,15 +350,11 @@ class CudaExecuter:
         n_images = data.shape[0]
 
         # Set the maximum number of images that will be on the GPU at a time
-        if n_images > MAX_GPU_SLICES:
-            slice_limit = MAX_GPU_SLICES
-        else:
-            # If the number of images is smaller than the slice limit, use that instead
-            slice_limit = n_images
+        slice_limit = _get_slice_limit(n_images)
 
-        cpu_padded_images = [_create_padded_array(data_slice, filter_size, mode) for data_slice in data]
+        cpu_padded_images = _create_padded_image_stack(data, filter_size, EQUIVALENT_MEDIAN_PAD_MODE[mode])
 
-        streams = [cp.cuda.Stream(non_blocking=True) for _ in range(slice_limit)]
+        streams = _create_stream_list(slice_limit)
 
         # Send the data arrays and padded arrays to the GPU in slices
         gpu_data_slices = _send_arrays_to_gpu_with_pinned_memory(data[:slice_limit], streams)
@@ -294,6 +388,81 @@ class CudaExecuter:
                                                   filter_size, grid_size, block_size)
 
             # Synchronise to ensure that the GPU median filter has completed
+            streams[i % slice_limit].synchronize()
+
+            # Transfer the GPU result to a CPU array
+            data[i][:] = gpu_data_slices[i % slice_limit].get(streams[i % slice_limit])
+
+            progress.update()
+
+        progress.mark_complete()
+
+        # Free memory once the operation is complete
+        _free_memory_pool(gpu_data_slices + gpu_padded_data)
+
+        return data
+
+    def remove_outlier(self, data, diff, filter_size, mode, progress):
+        """
+        Runs the remove outlier filter on a stack of 2D images asynchronously.
+        :param data: The CPU data array containing a stack of 2D images.
+        :param diff: The diff threshold for replacing the pixel value with its neighbour median.
+        :param filter_size: The filter size.
+        :param mode: The mode for the filter. Determines if bright or dark outliers are removed.
+        :param progress: An object for displaying the filter progress.
+        :return: The data array with the remove outlier filter applied to it provided the GPU didn't run out of space,
+                 otherwise it returns the unaltered input array.
+        """
+
+        # Try to free memory
+        _free_memory_pool()
+
+        n_images = data.shape[0]
+
+        # Set the maximum number of images that will be on the GPU at a time
+        slice_limit = _get_slice_limit(n_images)
+
+        cpu_padded_images = _create_padded_image_stack(data, filter_size, OUTLIER_PADDING_MODE)
+
+        streams = _create_stream_list(slice_limit)
+
+        # Send the data arrays and padded arrays to the GPU in slices
+        gpu_data_slices = _send_arrays_to_gpu_with_pinned_memory(data[:slice_limit], streams)
+        gpu_padded_data = _send_arrays_to_gpu_with_pinned_memory(cpu_padded_images[:slice_limit], streams)
+
+        # Return if the data transfer was not successful
+        if not gpu_data_slices or not gpu_padded_data:
+            return data
+
+        block_size, grid_size = _create_block_and_grid_args(gpu_data_slices[0])
+
+        if mode == "bright":
+            cuda_single_image_remove_outlier_filter = self._cuda_single_image_remove_bright_outlier
+        else:
+            cuda_single_image_remove_outlier_filter = self._cuda_single_image_remove_dark_outlier
+
+        for i in range(n_images):
+
+            # Use the current stream
+            streams[i % slice_limit].use()
+
+            # Overwrite the contents of the GPU arrays
+            if i >= slice_limit:
+                _replace_gpu_array_contents(gpu_data_slices[i % slice_limit], data[i], streams[i % slice_limit])
+                _replace_gpu_array_contents(
+                    gpu_padded_data[i % slice_limit],
+                    cpu_padded_images[i],
+                    streams[i % slice_limit],
+                )
+
+            # Synchronise the current stream to ensure that the overwriting is complete
+            streams[i % slice_limit].synchronize()
+
+            # Apply the median filter on the individual image
+            cuda_single_image_remove_outlier_filter(gpu_data_slices[i % slice_limit], gpu_padded_data[i % slice_limit],
+                                                    filter_size, diff, grid_size, block_size)
+
+            # Synchronise to ensure that the GPU remove outlier filter has completed
             streams[i % slice_limit].synchronize()
 
             # Transfer the GPU result to a CPU array

@@ -30,7 +30,13 @@ class MedianFilter(BaseFilter):
     filter_name = "Median"
 
     @staticmethod
-    def filter_func(data: Images, size=None, mode="reflect", cores=None, chunksize=None, progress=None, force_cpu=True):
+    def filter_func(data: Images,
+                    size=None,
+                    mode="reflect",
+                    cores=None,
+                    chunksize=None,
+                    progress=None,
+                    force_cpu=True) -> Images:
         """
         :param data: Input data as an Images object.
         :param size: Size of the kernel
@@ -49,7 +55,7 @@ class MedianFilter(BaseFilter):
         h.check_data_stack(data)
 
         if size and size > 1:
-            if not force_cpu:
+            if not force_cpu and gpu.gpu_available():
                 data = _execute_gpu(data.data, size, mode, progress)
             else:
                 _execute(data.data, size, mode, cores, chunksize, progress)
@@ -80,14 +86,14 @@ class MedianFilter(BaseFilter):
                                             form=form,
                                             on_change=on_change)
 
-        return {'size_field': size_field, 'mode_field': mode_field, 'use_gpu_field': gpu_field}
+        return {'size_field': size_field, 'mode_field': mode_field, 'gpu_field': gpu_field}
 
     @staticmethod
-    def execute_wrapper(size_field=None, mode_field=None, use_gpu_field=None):
+    def execute_wrapper(size_field=None, mode_field=None, gpu_field=None):
         return partial(MedianFilter.filter_func,
                        size=size_field.value(),
                        mode=mode_field.currentText(),
-                       force_cpu=not use_gpu_field.isChecked())
+                       force_cpu=not gpu_field.isChecked())
 
 
 def modes():
