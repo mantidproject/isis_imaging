@@ -13,7 +13,7 @@ install-run-requirements:
 install-build-requirements:
 	@echo "Installing packages required for starting the build process"
 	conda create -n build-env
-	$(CONDA_ACTIVATE) build-env ; conda install --yes conda-build
+	$(CONDA_ACTIVATE) build-env ; conda install --yes conda-build anaconda-client conda-verify
 
 install-dev-requirements:
 	conda env create -f environment-dev.yml
