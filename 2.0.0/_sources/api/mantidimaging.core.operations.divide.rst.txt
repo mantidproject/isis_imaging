@@ -1,0 +1,15 @@
+mantidimaging.core.operations.divide package
+============================================
+
+.. automodule:: mantidimaging.core.operations.divide
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.operations.divide.divide

@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.reconstruct.tomopy_reconstruction module - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.reconstruct.utility module" href="mantidimaging.core.reconstruct.utility.html" />
+    <link rel="prev" title="mantidimaging.core.reconstruct.test.utility_test module" href="mantidimaging.core.reconstruct.test.utility_test.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.reconstruct.utility.html" title="mantidimaging.core.reconstruct.utility module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.reconstruct.test.utility_test.html" title="mantidimaging.core.reconstruct.test.utility_test module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.reconstruct.html" accesskey="U">mantidimaging.core.reconstruct package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.reconstruct.tomopy_reconstruction module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.reconstruct.tomopy_reconstruction">
+<span id="mantidimaging-core-reconstruct-tomopy-reconstruction-module"></span><h1>mantidimaging.core.reconstruct.tomopy_reconstruction module<a class="headerlink" href="#module-mantidimaging.core.reconstruct.tomopy_reconstruction" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="mantidimaging.core.reconstruct.tomopy_reconstruction.reconstruct">
+<code class="sig-prename descclassname">mantidimaging.core.reconstruct.tomopy_reconstruction.</code><code class="sig-name descname">reconstruct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample</span></em>, <em class="sig-param"><span class="n">cor</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">proj_angles</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ncores</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/reconstruct/tomopy_reconstruction.html#reconstruct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.reconstruct.tomopy_reconstruction.reconstruct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a volume reconstruction using sample data provided as sinograms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample</strong> – Array of sinogram images</p></li>
+<li><p><strong>cor</strong> – Array of centre of rotation values</p></li>
+<li><p><strong>proj_angles</strong> – Array of projection angles</p></li>
+<li><p><strong>ncores</strong> – Number of CPU cores to execute on, defaults to all</p></li>
+<li><p><strong>progress</strong> – Optional progress reporter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>3D image data for reconstructed volume</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.reconstruct.tomopy_reconstruction.reconstruct_single_preview">
+<code class="sig-prename descclassname">mantidimaging.core.reconstruct.tomopy_reconstruction.</code><code class="sig-name descname">reconstruct_single_preview</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample</span></em>, <em class="sig-param"><span class="n">slice_idx</span></em>, <em class="sig-param"><span class="n">cor</span></em>, <em class="sig-param"><span class="n">proj_angles</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/reconstruct/tomopy_reconstruction.html#reconstruct_single_preview"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.reconstruct.tomopy_reconstruction.reconstruct_single_preview" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a preview of a single slice/sinogram from a 3D volume provided as
+a stack of projections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample</strong> – 3D projection data</p></li>
+<li><p><strong>slice_idx</strong> – Index of slice/sinogram to reconstruct</p></li>
+<li><p><strong>cor</strong> – Centre of rotation value</p></li>
+<li><p><strong>proj_angles</strong> – Array of projection angles</p></li>
+<li><p><strong>progress</strong> – Optional progress reporter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>2D image data for reconstructed slice</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.reconstruct.tomopy_reconstruction.reconstruct_single_preview_from_sinogram">
+<code class="sig-prename descclassname">mantidimaging.core.reconstruct.tomopy_reconstruction.</code><code class="sig-name descname">reconstruct_single_preview_from_sinogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample</span></em>, <em class="sig-param"><span class="n">cor</span></em>, <em class="sig-param"><span class="n">proj_angles</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/reconstruct/tomopy_reconstruction.html#reconstruct_single_preview_from_sinogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.reconstruct.tomopy_reconstruction.reconstruct_single_preview_from_sinogram" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample</strong> – 2D sinogram data</p></li>
+<li><p><strong>cor</strong> – Centre of rotation value</p></li>
+<li><p><strong>proj_angles</strong> – Array of projection angles</p></li>
+<li><p><strong>progress</strong> – Optional progress reporter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>2D image data for reconstructed slice</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.reconstruct.test.utility_test.html"
+                        title="previous chapter">mantidimaging.core.reconstruct.test.utility_test module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.reconstruct.utility.html"
+                        title="next chapter">mantidimaging.core.reconstruct.utility module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="mantidimaging.core.reconstruct.tomopy_reconstruction.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.reconstruct.utility.html" title="mantidimaging.core.reconstruct.utility module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.reconstruct.test.utility_test.html" title="mantidimaging.core.reconstruct.test.utility_test module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.reconstruct.html" >mantidimaging.core.reconstruct package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.reconstruct.tomopy_reconstruction module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

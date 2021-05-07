@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Setting up - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Troubleshooting" href="troubleshooting.html" />
+    <link rel="prev" title="User Guide" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="troubleshooting.html" title="Troubleshooting"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="User Guide"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">User Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Setting up</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="setting-up">
+<h1>Setting up<a class="headerlink" href="#setting-up" title="Permalink to this headline">¶</a></h1>
+<section id="obtaining-the-package">
+<h2>Obtaining the package<a class="headerlink" href="#obtaining-the-package" title="Permalink to this headline">¶</a></h2>
+<p>A copy of the <code class="code docutils literal notranslate"><span class="pre">mantidimaging</span></code> package can be obtained by either cloning
+the Git repository:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/mantidproject/mantidimaging.git</span></code></p>
+<p>Or downloading a Zip archive of the repository contents:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">wget</span> <span class="pre">https://github.com/mantidproject/mantidimaging/archive/master.zip</span></code>
+<code class="code docutils literal notranslate"><span class="pre">unzip</span> <span class="pre">mantidimaging-master.zip</span></code></p>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>MantidImaging requires you to have an Anaconda distribution setup. If you do not
+already have one then install Miniconda.</p>
+</section>
+<section id="environment">
+<h2>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h2>
+<p>Create a virtual environment to run MantidImaging within using the command:
+<code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">create</span> <span class="pre">-n</span> <span class="pre">mantidimaging</span> <span class="pre">python=3.5</span> <span class="pre">anaconda</span></code> (note that you can
+replace <code class="code docutils literal notranslate"><span class="pre">mantidimaging</span></code> with whatever name you would prefer).</p>
+<p>The virtual environment can then be activated using the command <code class="code docutils literal notranslate"><span class="pre">source</span>
+<span class="pre">activate</span> <span class="pre">mantidimaging</span></code>, this must be done before the <code class="code docutils literal notranslate"><span class="pre">mantidimaging</span></code>
+package can be used (even after installation).</p>
+</section>
+<section id="installing-the-package">
+<h2>Installing the package<a class="headerlink" href="#installing-the-package" title="Permalink to this headline">¶</a></h2>
+<p>The package can be installed using the following command inside the
+<code class="code docutils literal notranslate"><span class="pre">mantidimaging</span></code> directory:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></p>
+<p>Alternatively, it can be useful to install in development mode if you plan on
+frequently updating or modifying the package:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code></p>
+</section>
+<section id="starting-the-package">
+<h2>Starting the package<a class="headerlink" href="#starting-the-package" title="Permalink to this headline">¶</a></h2>
+<p>Once the package is installed it can be launched via either of the following
+commands:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Command line: <code class="code docutils literal notranslate"><span class="pre">mantidimaging.sh</span> <span class="pre">&lt;args...&gt;</span></code></p></li>
+<li><p>IPython: <code class="code docutils literal notranslate"><span class="pre">mantidimaging-ipython.sh</span> <span class="pre">&lt;args...&gt;</span></code></p></li>
+<li><p>GUI: <code class="code docutils literal notranslate"><span class="pre">mantidimaging-gui.sh</span> <span class="pre">&lt;args...&gt;</span></code></p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Setting up</a><ul>
+<li><a class="reference internal" href="#obtaining-the-package">Obtaining the package</a></li>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#environment">Environment</a></li>
+<li><a class="reference internal" href="#installing-the-package">Installing the package</a></li>
+<li><a class="reference internal" href="#starting-the-package">Starting the package</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">User Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="troubleshooting.html"
+                        title="next chapter">Troubleshooting</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="setting_up.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="troubleshooting.html" title="Troubleshooting"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="User Guide"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" >User Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Setting up</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

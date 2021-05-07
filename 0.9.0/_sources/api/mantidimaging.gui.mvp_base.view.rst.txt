@@ -1,0 +1,7 @@
+mantidimaging.gui.mvp\_base.view module
+=======================================
+
+.. automodule:: mantidimaging.gui.mvp_base.view
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+mantidimaging.core.reconstruct.base\_recon module
+=================================================
+
+.. automodule:: mantidimaging.core.reconstruct.base_recon
+   :members:
+   :undoc-members:
+   :show-inheritance:

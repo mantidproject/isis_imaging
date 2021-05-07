@@ -1,0 +1,15 @@
+mantidimaging.core.net package
+==============================
+
+.. automodule:: mantidimaging.core.net
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.net.help_pages

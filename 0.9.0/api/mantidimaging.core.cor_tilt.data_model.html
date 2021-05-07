@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.cor_tilt.data_model module - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.cor_tilt.workflow module" href="mantidimaging.core.cor_tilt.workflow.html" />
+    <link rel="prev" title="mantidimaging.core.cor_tilt.auto module" href="mantidimaging.core.cor_tilt.auto.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.cor_tilt.workflow.html" title="mantidimaging.core.cor_tilt.workflow module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.cor_tilt.auto.html" title="mantidimaging.core.cor_tilt.auto module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.cor_tilt.html" accesskey="U">mantidimaging.core.cor_tilt package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.cor_tilt.data_model module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.cor_tilt.data_model">
+<span id="mantidimaging-core-cor-tilt-data-model-module"></span><h1>mantidimaging.core.cor_tilt.data_model module<a class="headerlink" href="#module-mantidimaging.core.cor_tilt.data_model" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.core.cor_tilt.data_model.</code><code class="sig-name descname">CorTiltDataModel</code><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Data model for COR/Tilt finding from (slice index, centre of rotation) data
+pairs.</p>
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.add_point">
+<code class="sig-name descname">add_point</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idx</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">slice_idx</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">cor</span><span class="o">=</span><span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.add_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.add_point" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.angle_rad">
+<em class="property">property </em><code class="sig-name descname">angle_rad</code><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.angle_rad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.c">
+<em class="property">property </em><code class="sig-name descname">c</code><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.c" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.clear_points">
+<code class="sig-name descname">clear_points</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.clear_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.clear_points" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.clear_results">
+<code class="sig-name descname">clear_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.clear_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.clear_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.cors">
+<em class="property">property </em><code class="sig-name descname">cors</code><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.cors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.empty">
+<em class="property">property </em><code class="sig-name descname">empty</code><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.get_cor_for_slice">
+<code class="sig-name descname">get_cor_for_slice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slice_idx</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.get_cor_for_slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.get_cor_for_slice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.get_cor_for_slice_from_regression">
+<code class="sig-name descname">get_cor_for_slice_from_regression</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slice_idx</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.get_cor_for_slice_from_regression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.get_cor_for_slice_from_regression" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.has_results">
+<em class="property">property </em><code class="sig-name descname">has_results</code><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.has_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.linear_regression">
+<code class="sig-name descname">linear_regression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.linear_regression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.linear_regression" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.m">
+<em class="property">property </em><code class="sig-name descname">m</code><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.num_points">
+<em class="property">property </em><code class="sig-name descname">num_points</code><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.num_points" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.point">
+<code class="sig-name descname">point</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idx</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.point" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.populate_slice_indices">
+<code class="sig-name descname">populate_slice_indices</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">begin</span></em>, <em class="sig-param"><span class="n">end</span></em>, <em class="sig-param"><span class="n">count</span></em>, <em class="sig-param"><span class="n">cor</span><span class="o">=</span><span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.populate_slice_indices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.populate_slice_indices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.remove_point">
+<code class="sig-name descname">remove_point</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idx</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.remove_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.remove_point" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.set_cor_at_slice">
+<code class="sig-name descname">set_cor_at_slice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slice_idx</span></em>, <em class="sig-param"><span class="n">cor</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.set_cor_at_slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.set_cor_at_slice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.set_point">
+<code class="sig-name descname">set_point</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idx</span></em>, <em class="sig-param"><span class="n">slice_idx</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cor</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.set_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.set_point" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.slices">
+<em class="property">property </em><code class="sig-name descname">slices</code><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.slices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.sort_points">
+<code class="sig-name descname">sort_points</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#CorTiltDataModel.sort_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.sort_points" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.stack_properties">
+<em class="property">property </em><code class="sig-name descname">stack_properties</code><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel.stack_properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="mantidimaging.core.cor_tilt.data_model.Field">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.core.cor_tilt.data_model.</code><code class="sig-name descname">Field</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/cor_tilt/data_model.html#Field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.Field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="mantidimaging.core.cor_tilt.data_model.Field.CENTRE_OF_ROTATION">
+<code class="sig-name descname">CENTRE_OF_ROTATION</code><em class="property"> = 1</em><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.Field.CENTRE_OF_ROTATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="mantidimaging.core.cor_tilt.data_model.Field.SLICE_INDEX">
+<code class="sig-name descname">SLICE_INDEX</code><em class="property"> = 0</em><a class="headerlink" href="#mantidimaging.core.cor_tilt.data_model.Field.SLICE_INDEX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.cor_tilt.auto.html"
+                        title="previous chapter">mantidimaging.core.cor_tilt.auto module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.cor_tilt.workflow.html"
+                        title="next chapter">mantidimaging.core.cor_tilt.workflow module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="mantidimaging.core.cor_tilt.data_model.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.cor_tilt.workflow.html" title="mantidimaging.core.cor_tilt.workflow module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.cor_tilt.auto.html" title="mantidimaging.core.cor_tilt.auto module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.cor_tilt.html" >mantidimaging.core.cor_tilt package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.cor_tilt.data_model module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

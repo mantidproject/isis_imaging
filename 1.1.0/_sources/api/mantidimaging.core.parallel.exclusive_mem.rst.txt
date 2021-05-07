@@ -1,0 +1,7 @@
+mantidimaging.core.parallel.exclusive\_mem module
+=================================================
+
+.. automodule:: mantidimaging.core.parallel.exclusive_mem
+   :members:
+   :undoc-members:
+   :show-inheritance:

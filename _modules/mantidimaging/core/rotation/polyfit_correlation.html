@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.rotation.polyfit_correlation &#8212; MantidImaging 2.1.0 documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.rotation.polyfit_correlation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.rotation.polyfit_correlation</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">utility</span> <span class="k">as</span> <span class="n">pu</span><span class="p">,</span> <span class="n">shared</span> <span class="k">as</span> <span class="n">ps</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.data_containers</span> <span class="kn">import</span> <span class="n">Degrees</span><span class="p">,</span> <span class="n">ScalarCoR</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="do_calculate_correlation_err"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.polyfit_correlation.html#mantidimaging.core.rotation.polyfit_correlation.do_calculate_correlation_err">[docs]</a><span class="k">def</span> <span class="nf">do_calculate_correlation_err</span><span class="p">(</span><span class="n">store</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">search_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p0_and_180</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+                                 <span class="n">image_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates squared sum error in the difference between the projection at 0 degrees, and the one at 180 degrees</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">store</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">p0_and_180</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">search_index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">p0_and_180</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">image_width</span></div>
+
+
+<div class="viewcode-block" id="find_center"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.polyfit_correlation.html#mantidimaging.core.rotation.polyfit_correlation.find_center">[docs]</a><span class="k">def</span> <span class="nf">find_center</span><span class="p">(</span><span class="n">images</span><span class="p">:</span> <span class="n">Images</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="n">Progress</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ScalarCoR</span><span class="p">,</span> <span class="n">Degrees</span><span class="p">]:</span>
+    <span class="c1"># assume the ROI is the full image, i.e. the slices are ALL rows of the image</span>
+    <span class="n">slices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+    <span class="n">shift</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_array</span><span class="p">((</span><span class="n">images</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="p">))</span>
+
+    <span class="n">search_range</span> <span class="o">=</span> <span class="n">get_search_range</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+    <span class="n">min_correlation_error</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_array</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">search_range</span><span class="p">),</span> <span class="n">images</span><span class="o">.</span><span class="n">height</span><span class="p">))</span>
+    <span class="n">shared_search_range</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_array</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">search_range</span><span class="p">),</span> <span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">shared_search_range</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">search_range</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">_calculate_correlation_error</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">shared_search_range</span><span class="p">,</span> <span class="n">min_correlation_error</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+
+    <span class="c1"># Originally the output of do_search is stored in dimensions</span>
+    <span class="c1"># corresponding to (search_range, square sum). This is awkward to navigate</span>
+    <span class="c1"># we transpose store to make the array hold (square sum, search range)</span>
+    <span class="c1"># so that each store[row] accesses the information for the row&#39;s square sum across all search ranges</span>
+    <span class="n">_find_shift</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">search_range</span><span class="p">,</span> <span class="n">min_correlation_error</span><span class="p">,</span> <span class="n">shift</span><span class="p">)</span>
+
+    <span class="n">par</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">slices</span><span class="p">,</span> <span class="n">shift</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;m=</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">, q=</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">Degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">m</span><span class="p">)))</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">images</span><span class="o">.</span><span class="n">height</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">q</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;found offset: </span><span class="si">{</span><span class="o">-</span><span class="n">offset</span><span class="si">}</span><span class="s2"> and tilt </span><span class="si">{</span><span class="n">theta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ScalarCoR</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">h_middle</span> <span class="o">+</span> <span class="o">-</span><span class="n">offset</span><span class="p">),</span> <span class="n">theta</span></div>
+
+
+<span class="k">def</span> <span class="nf">_calculate_correlation_error</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">shared_search_range</span><span class="p">,</span> <span class="n">min_correlation_error</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+    <span class="c1"># if the projections are passed in the partial they are copied to every process on every iteration</span>
+    <span class="c1"># this makes the multiprocessing significantly slower</span>
+    <span class="c1"># so they are copied into a shared array to avoid that copying</span>
+    <span class="n">shared_projections</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_array</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+    <span class="n">shared_projections</span><span class="p">[</span><span class="mi">0</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">projection</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">shared_projections</span><span class="p">[</span><span class="mi">1</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">proj180deg</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">do_search_partial</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span><span class="n">do_calculate_correlation_err</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">inplace3</span><span class="p">,</span> <span class="n">image_width</span><span class="o">=</span><span class="n">images</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+
+    <span class="n">ps</span><span class="o">.</span><span class="n">shared_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">min_correlation_error</span><span class="p">,</span> <span class="n">shared_search_range</span><span class="p">,</span> <span class="n">shared_projections</span><span class="p">]</span>
+    <span class="n">ps</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">do_search_partial</span><span class="p">,</span>
+               <span class="n">num_operations</span><span class="o">=</span><span class="n">min_correlation_error</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+               <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span>
+               <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Finding correlation on row&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_find_shift</span><span class="p">(</span><span class="n">images</span><span class="p">:</span> <span class="n">Images</span><span class="p">,</span> <span class="n">search_range</span><span class="p">:</span> <span class="nb">range</span><span class="p">,</span> <span class="n">min_correlation_error</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">shift</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+    <span class="n">min_correlation_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">min_correlation_error</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">height</span><span class="p">):</span>
+        <span class="c1"># then we just find the index of the minimum one (minimum error)</span>
+        <span class="n">min_arg_positions</span> <span class="o">=</span> <span class="n">min_correlation_error</span><span class="p">[</span><span class="n">row</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+        <span class="c1"># argmin returns a list of where the minimum argument is found</span>
+        <span class="c1"># just in case that happens - get the first minimum one, should be close enough</span>
+        <span class="n">min_arg</span> <span class="o">=</span> <span class="n">min_arg_positions</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">min_arg_positions</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span> <span class="k">else</span> <span class="n">min_arg_positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># and we get which search range is at that index</span>
+        <span class="c1"># that is the number that we then pass into polyfit</span>
+        <span class="n">shift</span><span class="p">[</span><span class="n">row</span><span class="p">]</span> <span class="o">=</span> <span class="n">search_range</span><span class="p">[</span><span class="n">min_arg</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="get_search_range"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.polyfit_correlation.html#mantidimaging.core.rotation.polyfit_correlation.get_search_range">[docs]</a><span class="k">def</span> <span class="nf">get_search_range</span><span class="p">(</span><span class="n">width</span><span class="p">):</span>
+    <span class="n">tmin</span> <span class="o">=</span> <span class="o">-</span><span class="n">width</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">tmax</span> <span class="o">=</span> <span class="n">width</span> <span class="o">-</span> <span class="n">width</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">search_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">search_range</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../index.html">Latest</a></li>
+  <li><a href="../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.rotation.polyfit_correlation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

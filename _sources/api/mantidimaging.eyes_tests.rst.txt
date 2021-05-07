@@ -1,0 +1,22 @@
+mantidimaging.eyes\_tests package
+=================================
+
+.. automodule:: mantidimaging.eyes_tests
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.eyes_tests.base_eyes
+   mantidimaging.eyes_tests.eyes_manager
+   mantidimaging.eyes_tests.test_compare_images_window
+   mantidimaging.eyes_tests.test_load_dialog
+   mantidimaging.eyes_tests.test_main_window
+   mantidimaging.eyes_tests.test_operations_window
+   mantidimaging.eyes_tests.test_reconstruct_window
+   mantidimaging.eyes_tests.test_welcome_window

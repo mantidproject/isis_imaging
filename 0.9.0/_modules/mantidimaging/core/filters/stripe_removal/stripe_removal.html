@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.filters.stripe_removal.stripe_removal - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.stripe_removal.stripe_removal</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.filters.stripe_removal.stripe_removal</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">mantidimaging.core.tools</span> <span class="kn">import</span> <span class="n">importer</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+
+<span class="k">def</span> <span class="nf">_cli_register</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--stripe-removal-wf&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Stripe removal using wavelett-fourier method. &quot;</span>
+        <span class="s2">&quot;Available parameters:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;level (default: None, int, optional) &quot;</span>
+        <span class="s2">&quot;Number of discrete wavelet transform levels.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;wname (default: &#39;db5&#39;, str, optional) &quot;</span>
+        <span class="s2">&quot;Type of the wavelet filter. &#39;haar&#39;, &#39;db5&#39;, &#39;sym5&#39;, etc.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;sigma (default: 2, float, optional) &quot;</span>
+        <span class="s2">&quot;Damping parameter in Fourier space.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;pad (default: True, bool, optional) &quot;</span>
+        <span class="s2">&quot;If True, extend the size of the sinogram by padding with zeros.&quot;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--stripe-removal-ti&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Stripe removal using Titarenko&#39;s approach. &quot;</span>
+        <span class="s2">&quot;Available parameters:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;nblock (default: 0, int, optional) Number of blocks.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;alpha (default: 1.5, float, optional) Damping factor.&quot;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--stripe-removal-sf&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Stripe removal using smoothing-filter method. &quot;</span>
+        <span class="s2">&quot;Available parameters:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;size (default:5, int, optional) Size of the smoothing filter.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span>
+
+
+<div class="viewcode-block" id="methods"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.filters.stripe_removal.stripe_removal.html#mantidimaging.core.filters.stripe_removal.stripe_removal.methods">[docs]</a><span class="k">def</span> <span class="nf">methods</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="s1">&#39;wf&#39;</span><span class="p">,</span> <span class="s1">&#39;wavelet-fourier&#39;</span><span class="p">,</span> <span class="s1">&#39;ti&#39;</span><span class="p">,</span> <span class="s1">&#39;titarenko&#39;</span><span class="p">,</span> <span class="s1">&#39;sf&#39;</span><span class="p">,</span> <span class="s1">&#39;smoothing-filter&#39;</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="wavelet_names"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.filters.stripe_removal.stripe_removal.html#mantidimaging.core.filters.stripe_removal.stripe_removal.wavelet_names">[docs]</a><span class="k">def</span> <span class="nf">wavelet_names</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="s1">&#39;haar&#39;</span><span class="p">,</span> <span class="s1">&#39;db5&#39;</span><span class="p">,</span> <span class="s1">&#39;sym5&#39;</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../../user_guide/filters/stripe_removal.html#mantidimaging.core.filters.stripe_removal.stripe_removal.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">wf</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">sf</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Execute stripe removal filters.</span>
+
+<span class="sd">    Multiple filters can be executed, if they are specified on the command</span>
+<span class="sd">    line.</span>
+
+<span class="sd">    The order for that execution will always be: wavelett-fourier, titarenko,</span>
+<span class="sd">    smoothing-filter.</span>
+
+<span class="sd">    :param data: Sample data which is to be processed. Expected in radiograms</span>
+
+<span class="sd">    :param wf: Specify parameters for the wavelett-fourier filter.</span>
+<span class="sd">               Acceptable keywords are:</span>
+
+<span class="sd">                    level (default None, type int, optional parameter)</span>
+<span class="sd">                            Number of discrete wavelet transform levels.</span>
+
+<span class="sd">                    wname (default &#39;db5&#39;, type str, optional parameter)</span>
+<span class="sd">                            Type of the wavelet filter. &#39;haar&#39;, &#39;db5&#39;, &#39;sym5&#39;.</span>
+
+<span class="sd">                    sigma (default 2, type float, optional parameter)</span>
+<span class="sd">                            Damping parameter in Fourier space.</span>
+
+<span class="sd">                    pad (default True, type bool, optional parameter)</span>
+<span class="sd">                            If True, extend the size of the sinogram by</span>
+<span class="sd">                            padding with zeros.</span>
+
+<span class="sd">    :param ti: Specify parameters for the titarenko filter.</span>
+<span class="sd">               Acceptable keywords are:</span>
+
+<span class="sd">                    nblock (default:0, int, optional) Number of blocks.</span>
+
+<span class="sd">                    alpha (default: 1.5, int, optional) Damping factor.</span>
+
+<span class="sd">    :param sf: Specify parameters for the smoothing-filter.</span>
+<span class="sd">               Acceptable keywords are:</span>
+
+<span class="sd">                    size (default: 5, int, optional)</span>
+<span class="sd">                        Size of the smoothing filter.</span>
+
+<span class="sd">    :return: Processed data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                        <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Stripe Removal&#39;</span><span class="p">)</span>
+
+    <span class="c1"># get the first one, the rest will be processed</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Starting removal of stripes/ring artifacts using method &#39;</span><span class="si">{0}</span><span class="s2">&#39;...&quot;</span>
+
+    <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">wf</span><span class="p">:</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Wavelett-Fourier&#39;</span><span class="p">))</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">_wf</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">wf</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">ti</span><span class="p">:</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Titarenko&#39;</span><span class="p">))</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">_ti</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">sf</span><span class="p">:</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Smoothing-Filter&#39;</span><span class="p">))</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">_sf</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sf</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_params</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">params</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">),</span> <span class="n">params</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_wf</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">):</span>
+    <span class="n">tomopy</span> <span class="o">=</span> <span class="n">importer</span><span class="o">.</span><span class="n">do_importing</span><span class="p">(</span><span class="s1">&#39;tomopy&#39;</span><span class="p">)</span>
+
+    <span class="c1"># creating a dictionary with all possible params for this func</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">wname</span><span class="o">=</span><span class="sa">u</span><span class="s1">&#39;db5&#39;</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">pad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">ncore</span><span class="o">=</span><span class="n">cores</span><span class="p">,</span>
+        <span class="n">nchunk</span><span class="o">=</span><span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="c1"># process the input parameters</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">_get_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># dict.get returns a None if the keyword arg is not found</span>
+    <span class="c1"># this means if the user hasn&#39;t passed anything that matches the string</span>
+    <span class="c1"># then the default is used</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;level&#39;</span><span class="p">]</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;wname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wname&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wname&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;wname&#39;</span><span class="p">]</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">]</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;pad&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pad&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pad&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;pad&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">tomopy</span><span class="o">.</span><span class="n">prep</span><span class="o">.</span><span class="n">stripe</span><span class="o">.</span><span class="n">remove_stripe_fw</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="c1"># TODO find where this is from? iprep?</span>
+    <span class="c1"># data = iprep.filters.remove_stripes_ring_artifacts(</span>
+    <span class="c1">#     data, &#39;wavelet-fourier&#39;)</span>
+
+
+<span class="k">def</span> <span class="nf">_ti</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">):</span>
+    <span class="n">tomopy</span> <span class="o">=</span> <span class="n">importer</span><span class="o">.</span><span class="n">do_importing</span><span class="p">(</span><span class="s1">&#39;tomopy&#39;</span><span class="p">)</span>
+
+    <span class="c1"># creating a dictionary with all possible params for this func</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nblock</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">ncore</span><span class="o">=</span><span class="n">cores</span><span class="p">,</span> <span class="n">nchunk</span><span class="o">=</span><span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="c1"># process the input parameters</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">_get_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># dict.get returns a None if the keyword arg is not found</span>
+    <span class="c1"># this means if the user hasn&#39;t passed anything that matches the string</span>
+    <span class="c1"># then the default is used</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;nblock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nblock&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nblock&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;nblock&#39;</span><span class="p">]</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">tomopy</span><span class="o">.</span><span class="n">prep</span><span class="o">.</span><span class="n">stripe</span><span class="o">.</span><span class="n">remove_stripe_ti</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_sf</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">):</span>
+    <span class="n">tomopy</span> <span class="o">=</span> <span class="n">importer</span><span class="o">.</span><span class="n">do_importing</span><span class="p">(</span><span class="s1">&#39;tomopy&#39;</span><span class="p">)</span>
+
+    <span class="c1"># creating a dictionary with all possible params for this func</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncore</span><span class="o">=</span><span class="n">cores</span><span class="p">,</span> <span class="n">nchunk</span><span class="o">=</span><span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="c1"># process the input parameters</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">_get_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># dict.get returns a None if the keyword arg is not found</span>
+    <span class="c1"># this means if the user hasn&#39;t passed anything that matches the string</span>
+    <span class="c1"># then the default is used</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;size&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;size&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">tomopy</span><span class="o">.</span><span class="n">prep</span><span class="o">.</span><span class="n">stripe</span><span class="o">.</span><span class="n">remove_stripe_sf</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="stripe_removal.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.stripe_removal.stripe_removal</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

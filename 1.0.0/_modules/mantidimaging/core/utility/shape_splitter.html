@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.utility.shape_splitter - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.shape_splitter</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.utility.shape_splitter</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility</span> <span class="kn">import</span> <span class="n">size_calculator</span>
+
+
+<span class="k">def</span> <span class="nf">_calculate_ratio</span><span class="p">(</span><span class="n">current_size</span><span class="p">,</span> <span class="n">max_memory</span><span class="p">,</span> <span class="n">reconstruction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the ratio of the current size to the maximum allowed memory.</span>
+
+<span class="sd">    :param current_size: The size in megabytes</span>
+<span class="sd">    :param max_memory: The maximum allowed memory</span>
+
+<span class="sd">    :returns: The calculated ratio</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># we are using sinograms, so the reconstructed shape will be exactly the</span>
+    <span class="c1"># same, thus we double the size of the reconstruction</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">reconstruction</span><span class="p">:</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">current_size</span> <span class="o">/</span> <span class="n">max_memory</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">current_size</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">max_memory</span>
+    <span class="k">return</span> <span class="n">ratio</span>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.shape_splitter.html#mantidimaging.core.utility.shape_splitter.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">max_memory</span><span class="p">,</span> <span class="n">max_ratio</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">reconstruction</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the necessary split to fit into the maximum allowed memory.</span>
+
+<span class="sd">    :param shape: The shape of the data</span>
+
+<span class="sd">    :param axis: The axis on which we are traversing</span>
+
+<span class="sd">    :param dtype: The data type</span>
+
+<span class="sd">    :param max_memory: The maximum allowed memory usage</span>
+
+<span class="sd">    :param max_ratio: The maximum allowed ratio of data size per split to the</span>
+<span class="sd">                      max_memory</span>
+
+<span class="sd">    :param reconstruction: Account for reconstruction data (double the usage)</span>
+<span class="sd">                           or not</span>
+
+<span class="sd">    :returns: Tuple containing list of split indices and step.</span>
+<span class="sd">              - split: List of start and end indices.</span>
+<span class="sd">                       This should be traversed two elements at a time.</span>
+<span class="sd">              - step: The step between each index in the split list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">axis</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span>
+        <span class="n">shape</span><span class="p">),</span> <span class="s2">&quot;The required axis is outside the shape of the data!&quot;</span>
+
+    <span class="c1"># length will be the shape across the axis we&#39;re traversing</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span>
+
+    <span class="c1"># decorate the functions to avoid repeating parameters</span>
+    <span class="n">calculate_full_size</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">size_calculator</span><span class="o">.</span><span class="n">full_size_MB</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">calculate_ratio</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_calculate_ratio</span><span class="p">,</span> <span class="n">max_memory</span><span class="o">=</span><span class="n">max_memory</span><span class="p">,</span>
+                              <span class="n">reconstruction</span><span class="o">=</span><span class="n">reconstruction</span><span class="p">)</span>
+
+    <span class="n">full_size</span> <span class="o">=</span> <span class="n">calculate_full_size</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># get the first ratio to be a whole number</span>
+    <span class="n">number_of_indice_splits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">calculate_ratio</span><span class="p">(</span><span class="n">full_size</span><span class="p">)))</span>
+
+    <span class="c1"># if number_of_indice_splits is == 1 then numpy linspace returns just [0.]</span>
+    <span class="c1"># and a step of NaN</span>
+    <span class="k">if</span> <span class="n">number_of_indice_splits</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">number_of_indice_splits</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">split</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">number_of_indice_splits</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">retstep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># build the new shape around the axis we&#39;re traversing</span>
+    <span class="c1"># if we&#39;re traversing along axis 0, with a shape (15,300,400)</span>
+    <span class="c1"># this will create the new shape (step, 300, 400). If we&#39;re</span>
+    <span class="c1"># traversing along axis 1, then it will be (15, step, 400)</span>
+    <span class="n">new_shape</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[:</span><span class="n">axis</span><span class="p">]</span> <span class="o">+</span> \
+        <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">step</span><span class="p">),)</span> <span class="o">+</span> <span class="n">shape</span><span class="p">[</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">while</span> <span class="n">calculate_ratio</span><span class="p">(</span><span class="n">calculate_full_size</span><span class="p">(</span><span class="n">new_shape</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">max_ratio</span><span class="p">:</span>
+        <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="n">calculate_ratio</span><span class="p">(</span><span class="n">calculate_full_size</span><span class="p">(</span><span class="n">new_shape</span><span class="p">)))</span>
+
+        <span class="n">split</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">number_of_indice_splits</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">retstep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[:</span><span class="n">axis</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">step</span><span class="p">),</span> <span class="p">)</span> <span class="o">+</span> <span class="n">shape</span><span class="p">[</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+
+        <span class="c1"># we increase the number_of_indice_splits until we get a ratio that is</span>
+        <span class="c1"># acceptable this means we split the data in 2, 3, 4 runs</span>
+        <span class="n">number_of_indice_splits</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Data step: </span><span class="si">{0}</span><span class="s2">, with a ratio to memory: </span><span class="si">{1}</span><span class="s2">, indices: </span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">step</span><span class="p">,</span> <span class="n">calculate_ratio</span><span class="p">(</span><span class="n">calculate_full_size</span><span class="p">(</span><span class="n">new_shape</span><span class="p">)),</span> <span class="n">split</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">split</span><span class="p">,</span> <span class="n">step</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="shape_splitter.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.shape_splitter</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

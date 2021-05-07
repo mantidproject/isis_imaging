@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.parallel.exclusive_mem module - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.parallel.shared_mem module" href="mantidimaging.core.parallel.shared_mem.html" />
+    <link rel="prev" title="mantidimaging.core.parallel.test.utility_test module" href="mantidimaging.core.parallel.test.utility_test.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.shared_mem.html" title="mantidimaging.core.parallel.shared_mem module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.test.utility_test.html" title="mantidimaging.core.parallel.test.utility_test module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.parallel.html" accesskey="U">mantidimaging.core.parallel package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.exclusive_mem module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.parallel.exclusive_mem">
+<span id="mantidimaging-core-parallel-exclusive-mem-module"></span><h1>mantidimaging.core.parallel.exclusive_mem module<a class="headerlink" href="#module-mantidimaging.core.parallel.exclusive_mem" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.exclusive_mem.create_partial">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.exclusive_mem.</code><code class="sig-name descname">create_partial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/parallel/exclusive_mem.html#create_partial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.exclusive_mem.create_partial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a partial using functools.partial, to forward the kwargs to the
+parallel execution of imap.</p>
+<p>This version does not have a forwarding function, because one is not
+necessary.</p>
+<p>The data is copied regardless of it being forwarded or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> – Function that will be executed</p></li>
+<li><p><strong>kwargs</strong> – kwargs to forward to the function func that will be executed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a constructed partial object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.exclusive_mem.execute">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.exclusive_mem.</code><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partial_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cores</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">chunksize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'Progress'</span></em>, <em class="sig-param"><span class="n">output_data</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/parallel/exclusive_mem.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.exclusive_mem.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes a function in parallel, but does not share the memory between
+processes.</p>
+<p>Every process will copy-on-read/write the data to its own virtual memory
+region, perform the calculation and return the result to the main process,
+where it will be moved (not copied) to the original container.</p>
+<ul class="simple">
+<li><p>imap_unordered gives the images back in random order!</p></li>
+<li><p>map and map_async cannot replace the data in place and end up</p></li>
+</ul>
+<p>doubling the memory. They do not improve speed performance either
+- imap seems to be the best choice</p>
+<p>This also means that this class potentially uses MUCH more memory, and
+performs a lot slower.</p>
+<dl class="simple">
+<dt>If you get a similar error:</dt><dd><p>output_data[i] = res_data[:]</p>
+</dd>
+</dl>
+<p>TypeError: ‘NoneType’ object has no attribute ‘__getitem__’</p>
+<p>It means that the forwarded function is not returning anything and it
+should!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – the data array that will be processed in parallel</p></li>
+<li><p><strong>partial_func</strong> – a function constructed using partial to pass the
+correct arguments</p></li>
+<li><p><strong>cores</strong> – number of cores that the processing will use</p></li>
+<li><p><strong>chunksize</strong> – chunk of work per process(worker)</p></li>
+<li><p><strong>name</strong> – name of the task used in progress reporting</p></li>
+<li><p><strong>output_data</strong> – the output array in which the results will be stored</p></li>
+<li><p><strong>progress</strong> – Progress instance to use for progress reporting (optional)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed output data</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.parallel.test.utility_test.html"
+                        title="previous chapter">mantidimaging.core.parallel.test.utility_test module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.parallel.shared_mem.html"
+                        title="next chapter">mantidimaging.core.parallel.shared_mem module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="mantidimaging.core.parallel.exclusive_mem.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.shared_mem.html" title="mantidimaging.core.parallel.shared_mem module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.test.utility_test.html" title="mantidimaging.core.parallel.test.utility_test module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.parallel.html" >mantidimaging.core.parallel package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.exclusive_mem module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

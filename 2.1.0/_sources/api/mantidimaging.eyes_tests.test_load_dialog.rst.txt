@@ -1,0 +1,7 @@
+mantidimaging.eyes\_tests.test\_load\_dialog module
+===================================================
+
+.. automodule:: mantidimaging.eyes_tests.test_load_dialog
+   :members:
+   :undoc-members:
+   :show-inheritance:

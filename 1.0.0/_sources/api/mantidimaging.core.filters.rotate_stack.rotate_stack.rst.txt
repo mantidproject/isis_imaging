@@ -1,0 +1,7 @@
+mantidimaging.core.filters.rotate\_stack.rotate\_stack module
+=============================================================
+
+.. automodule:: mantidimaging.core.filters.rotate_stack.rotate_stack
+   :members:
+   :undoc-members:
+   :show-inheritance:

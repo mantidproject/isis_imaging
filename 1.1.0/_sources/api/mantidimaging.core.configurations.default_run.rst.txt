@@ -1,0 +1,7 @@
+mantidimaging.core.configurations.default\_run module
+=====================================================
+
+.. automodule:: mantidimaging.core.configurations.default_run
+   :members:
+   :undoc-members:
+   :show-inheritance:

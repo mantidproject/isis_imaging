@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.windows.cor_tilt.model - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.cor_tilt.model</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.windows.cor_tilt.model</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.cor_tilt</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">run_auto_finding_on_images</span><span class="p">,</span> <span class="n">update_image_operations</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.reconstruct</span> <span class="kn">import</span> <span class="n">tomopy_reconstruct_preview</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.projection_angles</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">generate</span> <span class="k">as</span> <span class="n">generate_projection_angles</span><span class="p">)</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CORTiltWindowModel"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.model.html#mantidimaging.gui.windows.cor_tilt.model.CORTiltWindowModel">[docs]</a><span class="k">class</span> <span class="nc">CORTiltWindowModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_projection_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_slice_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projection_indices</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_result</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">has_results</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">images</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">images</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cor_for_current_preview_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_cor_for_slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">preview_slice_idx</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CORTiltWindowModel.initial_select_data"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.model.html#mantidimaging.gui.windows.cor_tilt.model.CORTiltWindowModel.initial_select_data">[docs]</a>    <span class="k">def</span> <span class="nf">initial_select_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stack</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">clear_results</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="n">stack</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_projection_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_slice_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">stack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">image_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proj_angles</span> <span class="o">=</span> <span class="n">generate_projection_angles</span><span class="p">(</span>
+                    <span class="mi">360</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowModel.update_roi_from_stack"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.model.html#mantidimaging.gui.windows.cor_tilt.model.CORTiltWindowModel.update_roi_from_stack">[docs]</a>    <span class="k">def</span> <span class="nf">update_roi_from_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">clear_results</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">current_roi</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowModel.calculate_slices"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.model.html#mantidimaging.gui.windows.cor_tilt.model.CORTiltWindowModel.calculate_slices">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">clear_results</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">populate_slice_indices</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowModel.calculate_projections"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.model.html#mantidimaging.gui.windows.cor_tilt.model.CORTiltWindowModel.calculate_projections">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">clear_results</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sample_proj_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">downsample_proj_count</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sample_proj_count</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">projection_indices</span> <span class="o">=</span> \
+                <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_proj_count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">downsample_proj_count</span><span class="p">,</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowModel.run_finding_automatic"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.model.html#mantidimaging.gui.windows.cor_tilt.model.CORTiltWindowModel.run_finding_automatic">[docs]</a>    <span class="k">def</span> <span class="nf">run_finding_automatic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="c1"># Ensure we have some sample data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No image stack is provided&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No region of interest is defined&#39;</span><span class="p">)</span>
+
+        <span class="n">run_auto_finding_on_images</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">projection_indices</span><span class="p">,</span>
+                <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
+
+        <span class="c1"># Cache last result</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">stack_properties</span>
+
+        <span class="c1"># Async task needs a non-None result of some sort</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowModel.run_finding_manual"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.model.html#mantidimaging.gui.windows.cor_tilt.model.CORTiltWindowModel.run_finding_manual">[docs]</a>    <span class="k">def</span> <span class="nf">run_finding_manual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="c1"># Ensure we have some sample data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No image stack is provided&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No region of interest is defined&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">linear_regression</span><span class="p">()</span>
+        <span class="n">update_image_operations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+
+        <span class="c1"># Cache last result</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">stack_properties</span>
+
+        <span class="c1"># Async task needs a non-None result of some sort</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowModel.run_preview_recon"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.model.html#mantidimaging.gui.windows.cor_tilt.model.CORTiltWindowModel.run_preview_recon">[docs]</a>    <span class="k">def</span> <span class="nf">run_preview_recon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slice_idx</span><span class="p">,</span> <span class="n">cor</span><span class="p">):</span>
+        <span class="c1"># Ensure we have some sample data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No sample to use for preview reconstruction&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Perform single slice reconstruction</span>
+        <span class="k">return</span> <span class="n">tomopy_reconstruct_preview</span><span class="p">(</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="n">slice_idx</span><span class="p">,</span> <span class="n">cor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_angles</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">preview_tilt_line_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">cors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">slices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">slices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span> \
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">has_results</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">preview_fit_y_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">m</span> <span class="o">*</span> <span class="n">s</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">c</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">slices</span><span class="p">]</span> \
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">has_results</span> <span class="k">else</span> <span class="kc">None</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="model.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.cor_tilt.model</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

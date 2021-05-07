@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.tools.tomopy_tool - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.tools.tomopy_tool</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.tools.tomopy_tool</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging</span> <span class="kn">import</span> <span class="n">helper</span> <span class="k">as</span> <span class="n">h</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.tools.abstract_tool</span> <span class="kn">import</span> <span class="n">AbstractTool</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility</span> <span class="kn">import</span> <span class="n">projection_angles</span>
+
+
+<div class="viewcode-block" id="run_reconstruct"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.tomopy_tool.html#mantidimaging.core.tools.tomopy_tool.run_reconstruct">[docs]</a><span class="k">def</span> <span class="nf">run_reconstruct</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">proj_angles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module function for running a reconstruction.</span>
+
+<span class="sd">    It will create the tomopy tool object at runtime.</span>
+
+<span class="sd">    :param sample: The sample image data as a 3D numpy.ndarray</span>
+
+<span class="sd">    :param config: A ReconstructionConfig with all the necessary parameters</span>
+<span class="sd">                   to run a reconstruction. The Centers of Rotation</span>
+<span class="sd">                    must be interpolated independently!</span>
+
+<span class="sd">    :param proj_angles: The projection angle for each slice.</span>
+<span class="sd">                        If not provided equidistant angles will be generated</span>
+
+<span class="sd">    :param kwargs: Any keyword arguments will be forwarded to the TomoPy</span>
+<span class="sd">                   reconstruction function</span>
+
+<span class="sd">    :return: The reconstructed volume</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tool</span> <span class="o">=</span> <span class="n">TomoPyTool</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">tool</span><span class="o">.</span><span class="n">run_reconstruct</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">proj_angles</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TomoPyTool"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.tomopy_tool.html#mantidimaging.core.tools.tomopy_tool.TomoPyTool">[docs]</a><span class="k">class</span> <span class="nc">TomoPyTool</span><span class="p">(</span><span class="n">AbstractTool</span><span class="p">):</span>
+<div class="viewcode-block" id="TomoPyTool.tool_supported_methods"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.tomopy_tool.html#mantidimaging.core.tools.tomopy_tool.TomoPyTool.tool_supported_methods">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">tool_supported_methods</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s1">&#39;art&#39;</span><span class="p">,</span> <span class="s1">&#39;bart&#39;</span><span class="p">,</span> <span class="s1">&#39;fbp&#39;</span><span class="p">,</span> <span class="s1">&#39;gridrec&#39;</span><span class="p">,</span> <span class="s1">&#39;mlem&#39;</span><span class="p">,</span> <span class="s1">&#39;osem&#39;</span><span class="p">,</span> <span class="s1">&#39;ospml_hybrid&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ospml_quad&#39;</span><span class="p">,</span> <span class="s1">&#39;pml_hybrid&#39;</span><span class="p">,</span> <span class="s1">&#39;pml_quad&#39;</span><span class="p">,</span> <span class="s1">&#39;sirt&#39;</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="TomoPyTool.check_algorithm_compatibility"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.tomopy_tool.html#mantidimaging.core.tools.tomopy_tool.TomoPyTool.check_algorithm_compatibility">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check_algorithm_compatibility</span><span class="p">(</span><span class="n">algorithm</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">algorithm</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">TomoPyTool</span><span class="o">.</span><span class="n">tool_supported_methods</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The selected algorithm </span><span class="si">{0}</span><span class="s2"> is not supported by TomoPy.&quot;</span><span class="o">.</span>
+                <span class="nb">format</span><span class="p">(</span><span class="n">algorithm</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">AbstractTool</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tomopy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_self</span><span class="p">()</span>
+        <span class="kn">import</span> <span class="nn">tomopy.prep</span>
+        <span class="kn">import</span> <span class="nn">tomopy.recon</span>
+        <span class="kn">import</span> <span class="nn">tomopy.misc</span>
+
+        <span class="c1"># pretend we have the functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tomopy</span><span class="o">.</span><span class="n">find_center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_center_vo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tomopy</span><span class="o">.</span><span class="n">find_center_vo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">circ_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tomopy</span><span class="o">.</span><span class="n">circ_mask</span>
+
+        <span class="c1"># make all tomopy methods available</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">misc</span> <span class="o">=</span> <span class="n">tomopy</span><span class="o">.</span><span class="n">misc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prep</span> <span class="o">=</span> <span class="n">tomopy</span><span class="o">.</span><span class="n">prep</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon</span> <span class="o">=</span> <span class="n">tomopy</span><span class="o">.</span><span class="n">recon</span>
+
+<div class="viewcode-block" id="TomoPyTool.import_self"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.tomopy_tool.html#mantidimaging.core.tools.tomopy_tool.TomoPyTool.import_self">[docs]</a>    <span class="k">def</span> <span class="nf">import_self</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">tomopy</span>
+            <span class="kn">import</span> <span class="nn">tomopy.prep</span>
+            <span class="kn">import</span> <span class="nn">tomopy.recon</span>
+            <span class="kn">import</span> <span class="nn">tomopy.misc</span>
+
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not import the tomopy package and its subpackages. &quot;</span>
+                <span class="s2">&quot;Details: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">tomopy</span></div>
+
+<div class="viewcode-block" id="TomoPyTool.run_reconstruct"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.tomopy_tool.html#mantidimaging.core.tools.tomopy_tool.TomoPyTool.run_reconstruct">[docs]</a>    <span class="k">def</span> <span class="nf">run_reconstruct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">proj_angles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run a reconstruction with TomoPy, using the CPU algorithms they</span>
+<span class="sd">        provide.</span>
+
+<span class="sd">        Information for each reconstruction method is available at</span>
+<span class="sd">            http://tomopy.readthedocs.io/en/latest/api/tomopy.recon.algorithm.html</span>
+
+<span class="sd">        :param sample: The sample image data as a 3D numpy.ndarray</span>
+
+<span class="sd">        :param config: A ReconstructionConfig with all the necessary parameters</span>
+<span class="sd">                       to run a reconstruction. The Centers of Rotation</span>
+<span class="sd">                        must be interpolated independently!</span>
+
+<span class="sd">        :param proj_angles: The projection angle for each slice.</span>
+<span class="sd">                            If not provided equidistant angles will be</span>
+<span class="sd">                            generated</span>
+
+<span class="sd">        :param kwargs: Any keyword arguments will be forwarded to the TomoPy</span>
+<span class="sd">                       reconstruction function</span>
+
+<span class="sd">        :return: The reconstructed volume</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;TomoPy&#39;</span><span class="p">)</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="n">h</span><span class="o">.</span><span class="n">check_config_integrity</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">proj_angles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">num_radiograms</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">proj_angles</span> <span class="o">=</span> <span class="n">projection_angles</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">max_angle</span><span class="p">,</span>
+                                                     <span class="n">num_radiograms</span><span class="p">)</span>
+
+        <span class="n">alg</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">algorithm</span>
+        <span class="n">num_iter</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">num_iter</span>
+        <span class="n">cores</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cores</span>
+        <span class="n">cors</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cors</span><span class="p">)</span> <span class="o">==</span> <span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>\
+            <span class="s2">&quot;The provided number of CORs does not match the slice number! </span><span class="se">\</span>
+<span class="s2">            A Center of rotation must be provided for each slice. Usually </span><span class="se">\</span>
+<span class="s2">            that is done via core.utility.cor_interpolate&quot;</span>
+
+        <span class="n">iterative_algorithm</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">alg</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gridrec&#39;</span><span class="p">,</span> <span class="s1">&#39;fbp&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">True</span>
+
+        <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">iterative_algorithm</span><span class="p">:</span>  <span class="c1"># run the iterative algorithms</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Iterative method with TomoPy&quot;</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Avg Center of Rotation: </span><span class="si">{0}</span><span class="s2">, Algorithm: </span><span class="si">{1}</span><span class="s2">, number &quot;</span>
+                         <span class="s2">&quot;of iterations: </span><span class="si">{2}</span><span class="s2">...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                             <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">cors</span><span class="p">),</span> <span class="n">alg</span><span class="p">,</span> <span class="n">num_iter</span><span class="p">))</span>
+
+                <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">num_iter</span><span class="o">=</span><span class="n">num_iter</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># run the non-iterative algorithms</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Non-iterative method with TomoPy&quot;</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Mean COR: </span><span class="si">{0}</span><span class="s2">, Number of CORs provided </span><span class="si">{1}</span><span class="s2">, &quot;</span>
+                         <span class="s2">&quot;Algorithm: </span><span class="si">{2}</span><span class="s2">...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                             <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">cors</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cors</span><span class="p">),</span> <span class="n">alg</span><span class="p">))</span>
+
+            <span class="c1"># TODO need to expose the filters to CLI</span>
+            <span class="c1"># filter_name=&#39;parzen&#39;,</span>
+            <span class="c1"># filter_par=[5.],</span>
+            <span class="n">recon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tomopy</span><span class="o">.</span><span class="n">recon</span><span class="p">(</span>
+                <span class="n">tomo</span><span class="o">=</span><span class="n">sample</span><span class="p">,</span>
+                <span class="n">theta</span><span class="o">=</span><span class="n">proj_angles</span><span class="p">,</span>
+                <span class="n">center</span><span class="o">=</span><span class="n">cors</span><span class="p">,</span>
+                <span class="n">ncore</span><span class="o">=</span><span class="n">cores</span><span class="p">,</span>
+                <span class="n">algorithm</span><span class="o">=</span><span class="n">alg</span><span class="p">,</span>
+                <span class="n">sinogram_order</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reconstructed 3D volume. Shape: </span><span class="si">{0}</span><span class="s2">, and pixel data type: &quot;</span>
+                 <span class="s2">&quot;</span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">recon</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">recon</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">recon</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="tomopy_tool.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.tools.tomopy_tool</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

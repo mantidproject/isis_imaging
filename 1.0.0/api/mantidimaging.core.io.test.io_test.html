@@ -1,0 +1,434 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.io.test.io_test module - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.io.test.utility_test module" href="mantidimaging.core.io.test.utility_test.html" />
+    <link rel="prev" title="mantidimaging.core.io.test package" href="mantidimaging.core.io.test.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.test.utility_test.html" title="mantidimaging.core.io.test.utility_test module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.test.html" title="mantidimaging.core.io.test package"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.io.html" >mantidimaging.core.io package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.core.io.test.html" accesskey="U">mantidimaging.core.io.test package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.test.io_test module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.io.test.io_test">
+<span id="mantidimaging-core-io-test-io-test-module"></span><h1>mantidimaging.core.io.test.io_test module<a class="headerlink" href="#module-mantidimaging.core.io.test.io_test" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.core.io.test.io_test.IOTest">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.core.io.test.io_test.</code><code class="sig-name descname">IOTest</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="mantidimaging.core.testing.file_outputting_test_case.html#mantidimaging.core.testing.file_outputting_test_case.FileOutputtingTestCase" title="mantidimaging.core.testing.file_outputting_test_case.FileOutputtingTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">mantidimaging.core.testing.file_outputting_test_case.FileOutputtingTestCase</span></code></a></p>
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.assert_files_exist">
+<code class="sig-name descname">assert_files_exist</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">base_name</span></em>, <em class="sig-param"><span class="n">file_format</span></em>, <em class="sig-param"><span class="n">stack</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">num_images</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">indices</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.assert_files_exist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.assert_files_exist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.create_saver">
+<code class="sig-name descname">create_saver</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.create_saver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.create_saver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.do_preproc">
+<code class="sig-name descname">do_preproc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_format</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">loader_indices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expected_len</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">saver_indices</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.do_preproc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.do_preproc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.do_preproc_nxs">
+<code class="sig-name descname">do_preproc_nxs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">save_out_img_format</span><span class="o">=</span><span class="default_value">'nxs'</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">loader_indices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expected_len</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.do_preproc_nxs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.do_preproc_nxs" title="Permalink to this definition">¶</a></dt>
+<dd><p>There are no tests with saver indices, because
+this only saves out one file,
+and the saver indices are only used for enumeration,
+so it doesn’t make sense to test it</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.do_recon">
+<code class="sig-name descname">do_recon</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_format</span></em>, <em class="sig-param"><span class="n">horiz_slices</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">saver_indices</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.do_recon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.do_recon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note: saver_indices doesn’t work with horiz_slices</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_construct_sinograms">
+<code class="sig-name descname">test_construct_sinograms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_construct_sinograms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_construct_sinograms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_do_recon_fits">
+<code class="sig-name descname">test_do_recon_fits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_do_recon_fits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_do_recon_fits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_do_recon_fits_horiz">
+<code class="sig-name descname">test_do_recon_fits_horiz</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_do_recon_fits_horiz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_do_recon_fits_horiz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_do_recon_fits_indices_0_8">
+<code class="sig-name descname">test_do_recon_fits_indices_0_8</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_do_recon_fits_indices_0_8"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_do_recon_fits_indices_0_8" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_do_recon_tiff">
+<code class="sig-name descname">test_do_recon_tiff</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_do_recon_tiff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_do_recon_tiff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_do_recon_tiff_horiz">
+<code class="sig-name descname">test_do_recon_tiff_horiz</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_do_recon_tiff_horiz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_do_recon_tiff_horiz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_do_recon_tiff_indices_0_4">
+<code class="sig-name descname">test_do_recon_tiff_indices_0_4</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_do_recon_tiff_indices_0_4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_do_recon_tiff_indices_0_4" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_load_from_config">
+<code class="sig-name descname">test_load_from_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_load_from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_load_from_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_load_sample_flat_and_dark">
+<code class="sig-name descname">test_load_sample_flat_and_dark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_format</span><span class="o">=</span><span class="default_value">'tiff'</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">loader_indices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expected_len</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">saver_indices</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_load_sample_flat_and_dark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_load_sample_flat_and_dark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_metadata_round_trip">
+<code class="sig-name descname">test_metadata_round_trip</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_metadata_round_trip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_metadata_round_trip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par">
+<code class="sig-name descname">test_preproc_fits_par</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_par"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_loader_indices_0_7">
+<code class="sig-name descname">test_preproc_fits_par_loader_indices_0_7</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_par_loader_indices_0_7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_loader_indices_0_7" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_loader_indices_3_9">
+<code class="sig-name descname">test_preproc_fits_par_loader_indices_3_9</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_par_loader_indices_3_9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_loader_indices_3_9" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_loader_indices_4_5">
+<code class="sig-name descname">test_preproc_fits_par_loader_indices_4_5</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_par_loader_indices_4_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_loader_indices_4_5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_loader_indices_5_9">
+<code class="sig-name descname">test_preproc_fits_par_loader_indices_5_9</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_par_loader_indices_5_9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_loader_indices_5_9" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_saver_indices_0_2">
+<code class="sig-name descname">test_preproc_fits_par_saver_indices_0_2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_par_saver_indices_0_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_saver_indices_0_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_saver_indices_0_5">
+<code class="sig-name descname">test_preproc_fits_par_saver_indices_0_5</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_par_saver_indices_0_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_saver_indices_0_5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_saver_indices_3_10">
+<code class="sig-name descname">test_preproc_fits_par_saver_indices_3_10</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_par_saver_indices_3_10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_saver_indices_3_10" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_saver_indices_7_10">
+<code class="sig-name descname">test_preproc_fits_par_saver_indices_7_10</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_par_saver_indices_7_10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_par_saver_indices_7_10" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq">
+<code class="sig-name descname">test_preproc_fits_seq</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_seq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_loader_indices_0_7">
+<code class="sig-name descname">test_preproc_fits_seq_loader_indices_0_7</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_seq_loader_indices_0_7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_loader_indices_0_7" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_loader_indices_3_9">
+<code class="sig-name descname">test_preproc_fits_seq_loader_indices_3_9</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_seq_loader_indices_3_9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_loader_indices_3_9" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_loader_indices_4_5">
+<code class="sig-name descname">test_preproc_fits_seq_loader_indices_4_5</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_seq_loader_indices_4_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_loader_indices_4_5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_loader_indices_5_9">
+<code class="sig-name descname">test_preproc_fits_seq_loader_indices_5_9</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_seq_loader_indices_5_9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_loader_indices_5_9" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_saver_indices_0_2">
+<code class="sig-name descname">test_preproc_fits_seq_saver_indices_0_2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_seq_saver_indices_0_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_saver_indices_0_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_saver_indices_0_5">
+<code class="sig-name descname">test_preproc_fits_seq_saver_indices_0_5</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_seq_saver_indices_0_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_saver_indices_0_5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_saver_indices_3_10">
+<code class="sig-name descname">test_preproc_fits_seq_saver_indices_3_10</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_seq_saver_indices_3_10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_saver_indices_3_10" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_saver_indices_7_10">
+<code class="sig-name descname">test_preproc_fits_seq_saver_indices_7_10</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_fits_seq_saver_indices_7_10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_fits_seq_saver_indices_7_10" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par">
+<code class="sig-name descname">test_preproc_tiff_par</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_par"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_loader_indices_0_7">
+<code class="sig-name descname">test_preproc_tiff_par_loader_indices_0_7</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_par_loader_indices_0_7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_loader_indices_0_7" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_loader_indices_3_9">
+<code class="sig-name descname">test_preproc_tiff_par_loader_indices_3_9</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_par_loader_indices_3_9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_loader_indices_3_9" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_loader_indices_4_5">
+<code class="sig-name descname">test_preproc_tiff_par_loader_indices_4_5</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_par_loader_indices_4_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_loader_indices_4_5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_loader_indices_5_9">
+<code class="sig-name descname">test_preproc_tiff_par_loader_indices_5_9</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_par_loader_indices_5_9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_loader_indices_5_9" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_saver_indices_0_2">
+<code class="sig-name descname">test_preproc_tiff_par_saver_indices_0_2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_par_saver_indices_0_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_saver_indices_0_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_saver_indices_0_5">
+<code class="sig-name descname">test_preproc_tiff_par_saver_indices_0_5</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_par_saver_indices_0_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_saver_indices_0_5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_saver_indices_3_10">
+<code class="sig-name descname">test_preproc_tiff_par_saver_indices_3_10</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_par_saver_indices_3_10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_saver_indices_3_10" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_saver_indices_7_10">
+<code class="sig-name descname">test_preproc_tiff_par_saver_indices_7_10</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_par_saver_indices_7_10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_par_saver_indices_7_10" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq">
+<code class="sig-name descname">test_preproc_tiff_seq</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_seq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_loader_indices_0_7">
+<code class="sig-name descname">test_preproc_tiff_seq_loader_indices_0_7</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_seq_loader_indices_0_7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_loader_indices_0_7" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_loader_indices_3_9">
+<code class="sig-name descname">test_preproc_tiff_seq_loader_indices_3_9</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_seq_loader_indices_3_9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_loader_indices_3_9" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_loader_indices_4_5">
+<code class="sig-name descname">test_preproc_tiff_seq_loader_indices_4_5</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_seq_loader_indices_4_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_loader_indices_4_5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_loader_indices_5_9">
+<code class="sig-name descname">test_preproc_tiff_seq_loader_indices_5_9</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_seq_loader_indices_5_9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_loader_indices_5_9" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_saver_indices_0_2">
+<code class="sig-name descname">test_preproc_tiff_seq_saver_indices_0_2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_seq_saver_indices_0_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_saver_indices_0_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_saver_indices_0_5">
+<code class="sig-name descname">test_preproc_tiff_seq_saver_indices_0_5</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_seq_saver_indices_0_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_saver_indices_0_5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_saver_indices_3_10">
+<code class="sig-name descname">test_preproc_tiff_seq_saver_indices_3_10</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_seq_saver_indices_3_10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_saver_indices_3_10" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_saver_indices_7_10">
+<code class="sig-name descname">test_preproc_tiff_seq_saver_indices_7_10</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_preproc_tiff_seq_saver_indices_7_10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_preproc_tiff_seq_saver_indices_7_10" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_read_in_shape_from_config">
+<code class="sig-name descname">test_read_in_shape_from_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_read_in_shape_from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_read_in_shape_from_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_par">
+<code class="sig-name descname">test_save_nxs_par</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_save_nxs_par"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_par" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_par_indices_3_4">
+<code class="sig-name descname">test_save_nxs_par_indices_3_4</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_save_nxs_par_indices_3_4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_par_indices_3_4" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_par_indices_6_7">
+<code class="sig-name descname">test_save_nxs_par_indices_6_7</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_save_nxs_par_indices_6_7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_par_indices_6_7" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_seq">
+<code class="sig-name descname">test_save_nxs_seq</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_save_nxs_seq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_seq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_seq_indices_0_4">
+<code class="sig-name descname">test_save_nxs_seq_indices_0_4</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_save_nxs_seq_indices_0_4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_seq_indices_0_4" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_seq_indices_5_9">
+<code class="sig-name descname">test_save_nxs_seq_indices_5_9</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/test/io_test.html#IOTest.test_save_nxs_seq_indices_5_9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.test.io_test.IOTest.test_save_nxs_seq_indices_5_9" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.io.test.html"
+                        title="previous chapter">mantidimaging.core.io.test package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.io.test.utility_test.html"
+                        title="next chapter">mantidimaging.core.io.test.utility_test module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="mantidimaging.core.io.test.io_test.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.test.utility_test.html" title="mantidimaging.core.io.test.utility_test module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.test.html" title="mantidimaging.core.io.test package"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.io.html" >mantidimaging.core.io package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.core.io.test.html" >mantidimaging.core.io.test package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.test.io_test module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

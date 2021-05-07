@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.tools.importer module - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.tools.tomopy_tool module" href="mantidimaging.core.tools.tomopy_tool.html" />
+    <link rel="prev" title="mantidimaging.core.tools.astra_tool module" href="mantidimaging.core.tools.astra_tool.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.tools.tomopy_tool.html" title="mantidimaging.core.tools.tomopy_tool module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.tools.astra_tool.html" title="mantidimaging.core.tools.astra_tool module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.tools.html" accesskey="U">mantidimaging.core.tools package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.tools.importer module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.tools.importer">
+<span id="mantidimaging-core-tools-importer-module"></span><h1>mantidimaging.core.tools.importer module<a class="headerlink" href="#module-mantidimaging.core.tools.importer" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="mantidimaging.core.tools.importer.do_importing">
+<code class="sig-prename descclassname">mantidimaging.core.tools.importer.</code><code class="sig-name descname">do_importing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tool</span></em>, <em class="sig-param"><span class="n">alg</span><span class="o">=</span><span class="default_value">'fbp'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/tools/importer.html#do_importing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.tools.importer.do_importing" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main importing function.</p>
+<p>Does the decision on which tool to import based on the input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tool</strong> – The name of the tool to be imported</p></li>
+<li><p><strong>alg</strong> – The algorithm that will be used. This is only done the ensure
+that it is actually supported.
+If no algorithm is provided, the default is ‘fbp’, because it’s
+supported by all tools.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the tool reference</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.tools.importer.timed_import">
+<code class="sig-prename descclassname">mantidimaging.core.tools.importer.</code><code class="sig-name descname">timed_import</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/tools/importer.html#timed_import"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.tools.importer.timed_import" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps the importing function in a timer.</p>
+<p>This function should not be used from the filters as it will add a lot of
+clutter to the stdout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> – A ReconstructionConfig with all the necessary parameters to
+run a reconstruction.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the imported tool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.tools.astra_tool.html"
+                        title="previous chapter">mantidimaging.core.tools.astra_tool module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.tools.tomopy_tool.html"
+                        title="next chapter">mantidimaging.core.tools.tomopy_tool module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="mantidimaging.core.tools.importer.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.tools.tomopy_tool.html" title="mantidimaging.core.tools.tomopy_tool module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.tools.astra_tool.html" title="mantidimaging.core.tools.astra_tool module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.tools.html" >mantidimaging.core.tools package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.tools.importer module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

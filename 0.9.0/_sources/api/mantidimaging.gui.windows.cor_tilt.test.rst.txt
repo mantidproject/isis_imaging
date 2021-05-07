@@ -1,0 +1,16 @@
+mantidimaging.gui.windows.cor\_tilt.test package
+================================================
+
+.. automodule:: mantidimaging.gui.windows.cor_tilt.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.cor_tilt.test.model_test
+   mantidimaging.gui.windows.cor_tilt.test.presenter_test

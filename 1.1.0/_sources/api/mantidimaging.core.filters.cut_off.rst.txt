@@ -1,0 +1,24 @@
+mantidimaging.core.filters.cut\_off package
+===========================================
+
+.. automodule:: mantidimaging.core.filters.cut_off
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.cut_off.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.cut_off.cut_off
+   mantidimaging.core.filters.cut_off.cut_off_gui

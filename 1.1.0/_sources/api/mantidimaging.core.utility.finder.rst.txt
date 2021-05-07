@@ -1,0 +1,7 @@
+mantidimaging.core.utility.finder module
+========================================
+
+.. automodule:: mantidimaging.core.utility.finder
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.reconstruct.astra_recon - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../reconstruct.html" accesskey="U">mantidimaging.core.reconstruct</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.reconstruct.astra_recon</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.reconstruct.astra_recon</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Generator</span>
+
+<span class="kn">import</span> <span class="nn">astra</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.reconstruct.base_recon</span> <span class="kn">import</span> <span class="n">BaseRecon</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.cuda_check</span> <span class="kn">import</span> <span class="n">CudaChecker</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.data_containers</span> <span class="kn">import</span> <span class="n">ScalarCoR</span><span class="p">,</span> <span class="n">ProjectionAngles</span><span class="p">,</span> <span class="n">ReconstructionParameters</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="c1"># Full credit for following code to Daniil Kazantzev</span>
+<span class="c1"># Source:</span>
+<span class="c1"># https://github.com/dkazanc/ToMoBAR/blob/5990aaa264e2f08bd9b0069c8847e5021fbf2ee2/src/Python/tomobar/supp/astraOP.py#L20-L70</span>
+<div class="viewcode-block" id="rotation_matrix2d"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.astra_recon.html#mantidimaging.core.reconstruct.astra_recon.rotation_matrix2d">[docs]</a><span class="k">def</span> <span class="nf">rotation_matrix2d</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)]])</span></div>
+
+
+<div class="viewcode-block" id="vec_geom_init2d"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.astra_recon.html#mantidimaging.core.reconstruct.astra_recon.vec_geom_init2d">[docs]</a><span class="k">def</span> <span class="nf">vec_geom_init2d</span><span class="p">(</span><span class="n">angles_rad</span><span class="p">:</span> <span class="n">ProjectionAngles</span><span class="p">,</span> <span class="n">detector_spacing_x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">center_rot_offset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+    <span class="n">angles_value</span> <span class="o">=</span> <span class="n">angles_rad</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">s0</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>  <span class="c1"># source</span>
+    <span class="n">u0</span> <span class="o">=</span> <span class="p">[</span><span class="n">detector_spacing_x</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>  <span class="c1"># detector coordinates</span>
+    <span class="n">vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">angles_value</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">theta</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">angles_value</span><span class="p">):</span>
+        <span class="n">d0</span> <span class="o">=</span> <span class="p">[</span><span class="n">center_rot_offset</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>  <span class="c1"># detector</span>
+        <span class="n">vectors</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rotation_matrix2d</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">s0</span><span class="p">)[:]</span>  <span class="c1"># ray position</span>
+        <span class="n">vectors</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rotation_matrix2d</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">d0</span><span class="p">)[:]</span>  <span class="c1"># center of detector position</span>
+        <span class="n">vectors</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rotation_matrix2d</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">u0</span><span class="p">)[:]</span>  <span class="c1"># detector pixel (0,0) to (0,1).</span>
+    <span class="k">return</span> <span class="n">vectors</span></div>
+
+
+<span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">_managed_recon</span><span class="p">(</span><span class="n">sino</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">proj_geom</span><span class="p">,</span> <span class="n">vol_geom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+    <span class="n">proj_id</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">sino_id</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">rec_id</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">alg_id</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">proj_type</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">CudaChecker</span><span class="p">()</span><span class="o">.</span><span class="n">cuda_is_present</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;line&#39;</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using projection type </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">proj_type</span><span class="p">))</span>
+
+        <span class="n">proj_id</span> <span class="o">=</span> <span class="n">astra</span><span class="o">.</span><span class="n">create_projector</span><span class="p">(</span><span class="n">proj_type</span><span class="p">,</span> <span class="n">proj_geom</span><span class="p">,</span> <span class="n">vol_geom</span><span class="p">)</span>
+        <span class="n">sino_id</span> <span class="o">=</span> <span class="n">astra</span><span class="o">.</span><span class="n">data2d</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s1">&#39;-sino&#39;</span><span class="p">,</span> <span class="n">proj_geom</span><span class="p">,</span> <span class="n">sino</span><span class="p">)</span>
+        <span class="n">rec_id</span> <span class="o">=</span> <span class="n">astra</span><span class="o">.</span><span class="n">data2d</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s1">&#39;-vol&#39;</span><span class="p">,</span> <span class="n">vol_geom</span><span class="p">)</span>
+
+        <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;ReconstructionDataId&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec_id</span>
+        <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;ProjectionDataId&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sino_id</span>
+        <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;ProjectorId&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proj_id</span>
+
+        <span class="n">alg_id</span> <span class="o">=</span> <span class="n">astra</span><span class="o">.</span><span class="n">algorithm</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">alg_id</span><span class="p">,</span> <span class="n">rec_id</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">alg_id</span><span class="p">:</span>
+            <span class="n">astra</span><span class="o">.</span><span class="n">algorithm</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">alg_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">proj_id</span><span class="p">:</span>
+            <span class="n">astra</span><span class="o">.</span><span class="n">projector</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">proj_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sino_id</span><span class="p">:</span>
+            <span class="n">astra</span><span class="o">.</span><span class="n">data2d</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">sino_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rec_id</span><span class="p">:</span>
+            <span class="n">astra</span><span class="o">.</span><span class="n">data2d</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">rec_id</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AstraRecon"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.astra_recon.html#mantidimaging.core.reconstruct.astra_recon.AstraRecon">[docs]</a><span class="k">class</span> <span class="nc">AstraRecon</span><span class="p">(</span><span class="n">BaseRecon</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_count_gpus</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">num_gpus</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">while</span> <span class="s2">&quot;Invalid device&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="n">num_gpus</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">astra</span><span class="o">.</span><span class="n">get_gpu_info</span><span class="p">(</span><span class="n">num_gpus</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">num_gpus</span>
+
+<div class="viewcode-block" id="AstraRecon.find_cor"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.astra_recon.html#mantidimaging.core.reconstruct.astra_recon.AstraRecon.find_cor">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find_cor</span><span class="p">(</span><span class="n">images</span><span class="p">:</span> <span class="n">Images</span><span class="p">,</span> <span class="n">slice_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_cor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">recon_params</span><span class="p">:</span> <span class="n">ReconstructionParameters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the best CoR for this slice by maximising the squared sum of the reconstructed slice.</span>
+
+<span class="sd">        Larger squared sum -&gt; bigger deviance from the mean, i.e. larger distance between noise and data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">proj_angles</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">projection_angles</span><span class="p">(</span><span class="n">recon_params</span><span class="o">.</span><span class="n">max_projection_angle</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">get_sumsq</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">image</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">minimizer_function</span><span class="p">(</span><span class="n">cor</span><span class="p">):</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">get_sumsq</span><span class="p">(</span><span class="n">AstraRecon</span><span class="o">.</span><span class="n">single_sino</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">sino</span><span class="p">(</span><span class="n">slice_idx</span><span class="p">),</span> <span class="n">ScalarCoR</span><span class="p">(</span><span class="n">cor</span><span class="p">),</span> <span class="n">proj_angles</span><span class="p">,</span> <span class="n">recon_params</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">minimize</span><span class="p">(</span><span class="n">minimizer_function</span><span class="p">,</span> <span class="n">start_cor</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;nelder-mead&#39;</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="AstraRecon.single_sino"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.astra_recon.html#mantidimaging.core.reconstruct.astra_recon.AstraRecon.single_sino">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">single_sino</span><span class="p">(</span><span class="n">sino</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">cor</span><span class="p">:</span> <span class="n">ScalarCoR</span><span class="p">,</span> <span class="n">proj_angles</span><span class="p">:</span> <span class="n">ProjectionAngles</span><span class="p">,</span>
+                    <span class="n">recon_params</span><span class="p">:</span> <span class="n">ReconstructionParameters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">sino</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Sinogram must be a 2D image&quot;</span>
+
+        <span class="n">sino</span> <span class="o">=</span> <span class="n">BaseRecon</span><span class="o">.</span><span class="n">sino_recon_prep</span><span class="p">(</span><span class="n">sino</span><span class="p">)</span>
+        <span class="n">image_width</span> <span class="o">=</span> <span class="n">sino</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">vectors</span> <span class="o">=</span> <span class="n">vec_geom_init2d</span><span class="p">(</span><span class="n">proj_angles</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">cor</span><span class="o">.</span><span class="n">to_vec</span><span class="p">(</span><span class="n">image_width</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">vol_geom</span> <span class="o">=</span> <span class="n">astra</span><span class="o">.</span><span class="n">create_vol_geom</span><span class="p">((</span><span class="n">image_width</span><span class="p">,</span> <span class="n">image_width</span><span class="p">))</span>
+        <span class="n">proj_geom</span> <span class="o">=</span> <span class="n">astra</span><span class="o">.</span><span class="n">create_proj_geom</span><span class="p">(</span><span class="s1">&#39;parallel_vec&#39;</span><span class="p">,</span> <span class="n">image_width</span><span class="p">,</span> <span class="n">vectors</span><span class="p">)</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">astra</span><span class="o">.</span><span class="n">astra_dict</span><span class="p">(</span><span class="n">recon_params</span><span class="o">.</span><span class="n">algorithm</span><span class="p">)</span>
+        <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;FilterType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">recon_params</span><span class="o">.</span><span class="n">filter_name</span>
+        <span class="k">with</span> <span class="n">_managed_recon</span><span class="p">(</span><span class="n">sino</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">proj_geom</span><span class="p">,</span> <span class="n">vol_geom</span><span class="p">)</span> <span class="k">as</span> <span class="p">(</span><span class="n">alg_id</span><span class="p">,</span> <span class="n">rec_id</span><span class="p">):</span>
+            <span class="n">astra</span><span class="o">.</span><span class="n">algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">alg_id</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="n">recon_params</span><span class="o">.</span><span class="n">num_iter</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">astra</span><span class="o">.</span><span class="n">data2d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rec_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AstraRecon.full"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.astra_recon.html#mantidimaging.core.reconstruct.astra_recon.AstraRecon.full">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">full</span><span class="p">(</span><span class="n">images</span><span class="p">:</span> <span class="n">Images</span><span class="p">,</span>
+             <span class="n">cors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ScalarCoR</span><span class="p">],</span>
+             <span class="n">recon_params</span><span class="p">:</span> <span class="n">ReconstructionParameters</span><span class="p">,</span>
+             <span class="n">progress</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Progress</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Images</span><span class="p">:</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">num_steps</span><span class="o">=</span><span class="n">images</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+        <span class="n">output_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">num_sinograms</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="n">output_images</span><span class="p">:</span> <span class="n">Images</span> <span class="o">=</span> <span class="n">Images</span><span class="o">.</span><span class="n">create_empty_images</span><span class="p">(</span><span class="n">output_shape</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="n">output_images</span><span class="o">.</span><span class="n">record_operation</span><span class="p">(</span><span class="s1">&#39;AstraRecon.full&#39;</span><span class="p">,</span> <span class="s1">&#39;Volume Reconstruction&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">recon_params</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+
+        <span class="n">proj_angles</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">projection_angles</span><span class="p">(</span><span class="n">recon_params</span><span class="o">.</span><span class="n">max_projection_angle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">height</span><span class="p">):</span>
+            <span class="n">output_images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">AstraRecon</span><span class="o">.</span><span class="n">single_sino</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">sino</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">cors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">proj_angles</span><span class="p">,</span> <span class="n">recon_params</span><span class="p">)</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Reconstructed slice&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output_images</span></div>
+
+<div class="viewcode-block" id="AstraRecon.allowed_filters"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.astra_recon.html#mantidimaging.core.reconstruct.astra_recon.AstraRecon.allowed_filters">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">allowed_filters</span><span class="p">():</span>
+        <span class="c1"># removed from list: &#39;kaiser&#39; as it hard crashes ASTRA</span>
+        <span class="c1">#                    &#39;projection&#39;, &#39;sinogram&#39;, &#39;rprojection&#39;, &#39;rsinogram&#39; as they error</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="s1">&#39;shepp-logan&#39;</span><span class="p">,</span> <span class="s1">&#39;cosine&#39;</span><span class="p">,</span> <span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="s1">&#39;hann&#39;</span><span class="p">,</span> <span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="s1">&#39;tukey&#39;</span><span class="p">,</span> <span class="s1">&#39;lanczos&#39;</span><span class="p">,</span> <span class="s1">&#39;triangular&#39;</span><span class="p">,</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;barlett-hann&#39;</span><span class="p">,</span> <span class="s1">&#39;blackman&#39;</span><span class="p">,</span> <span class="s1">&#39;nuttall&#39;</span><span class="p">,</span> <span class="s1">&#39;blackman-harris&#39;</span><span class="p">,</span> <span class="s1">&#39;blackman-nuttall&#39;</span><span class="p">,</span> <span class="s1">&#39;flat-top&#39;</span><span class="p">,</span> <span class="s1">&#39;parzen&#39;</span>
+        <span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="allowed_recon_kwargs"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.astra_recon.html#mantidimaging.core.reconstruct.astra_recon.allowed_recon_kwargs">[docs]</a><span class="k">def</span> <span class="nf">allowed_recon_kwargs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;FBP_CUDA&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;filter_name&#39;</span><span class="p">,</span> <span class="s1">&#39;filter_par&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;SIRT_CUDA&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;num_iter&#39;</span><span class="p">,</span> <span class="s1">&#39;min_constraint&#39;</span><span class="p">,</span> <span class="s1">&#39;max_constraint&#39;</span><span class="p">,</span> <span class="s1">&#39;DetectorSuperSampling&#39;</span><span class="p">,</span> <span class="s1">&#39;PixelSuperSampling&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;SIRT3D_CUDA&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;num_iter&#39;</span><span class="p">,</span> <span class="s1">&#39;min_constraint&#39;</span><span class="p">,</span> <span class="s1">&#39;max_constraint&#39;</span><span class="p">,</span> <span class="s1">&#39;DetectorSuperSampling&#39;</span><span class="p">,</span> <span class="s1">&#39;PixelSuperSampling&#39;</span><span class="p">]</span>
+    <span class="p">}</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="astra_recon.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../reconstruct.html" >mantidimaging.core.reconstruct</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.reconstruct.astra_recon</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

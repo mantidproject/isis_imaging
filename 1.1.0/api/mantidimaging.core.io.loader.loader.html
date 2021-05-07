@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.io.loader.loader module - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.io.loader.stack_loader module" href="mantidimaging.core.io.loader.stack_loader.html" />
+    <link rel="prev" title="mantidimaging.core.io.loader.img_loader module" href="mantidimaging.core.io.loader.img_loader.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.loader.stack_loader.html" title="mantidimaging.core.io.loader.stack_loader module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.loader.img_loader.html" title="mantidimaging.core.io.loader.img_loader module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.io.html" >mantidimaging.core.io package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.core.io.loader.html" accesskey="U">mantidimaging.core.io.loader package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.loader.loader module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.io.loader.loader">
+<span id="mantidimaging-core-io-loader-loader-module"></span><h1>mantidimaging.core.io.loader.loader module<a class="headerlink" href="#module-mantidimaging.core.io.loader.loader" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="mantidimaging.core.io.loader.loader.load">
+<code class="sig-prename descclassname">mantidimaging.core.io.loader.loader.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">input_path=None</em>, <em class="sig-param">input_path_flat=None</em>, <em class="sig-param">input_path_dark=None</em>, <em class="sig-param">in_prefix=''</em>, <em class="sig-param">in_format='tif'</em>, <em class="sig-param">dtype=&lt;class 'numpy.float32'&gt;</em>, <em class="sig-param">cores=None</em>, <em class="sig-param">chunksize=None</em>, <em class="sig-param">parallel_load=False</em>, <em class="sig-param">file_names=None</em>, <em class="sig-param">indices=None</em>, <em class="sig-param">construct_sinograms=False</em>, <em class="sig-param">progress=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/loader/loader.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.loader.loader.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a stack, including sample, white and dark images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> – Path for the input data folder</p></li>
+<li><p><strong>input_path_flat</strong> – Optional: Path for the input Flat images folder</p></li>
+<li><p><strong>input_path_dark</strong> – Optional: Path for the input Dark images folder</p></li>
+<li><p><strong>in_prefix</strong> – Optional: Prefix for loaded files</p></li>
+<li><p><strong>img_format</strong> – Default:’fits’, format for the input images</p></li>
+<li><p><strong>dtype</strong> – Default:np.float32, data type for the input images</p></li>
+<li><p><strong>cores</strong> – Default:None (max available), cores to be used if
+parallel_load is True</p></li>
+<li><p><strong>chunksize</strong> – Default:None (auto calculated), chunk of work per worker</p></li>
+<li><p><strong>parallel_load</strong> – Default: False, if set to true the loading of the
+data will be done in parallel.
+This could be faster depending on the IO system.
+For local runs (with HDD) recommended setting is
+False</p></li>
+<li><p><strong>file_names</strong> – Use provided file names for loading</p></li>
+<li><p><strong>indices</strong> – Specify which indices are loaded from the found files.
+This <strong>DOES NOT</strong> check for the number in the image
+filename, but removes all indices from the filenames list
+that are not selected</p></li>
+<li><p><strong>construct_sinograms</strong> – The loaded images will be used to construct the
+sinograms during loading</p></li>
+<li><p><strong>progress</strong> – The progress reporting instance</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a tuple with shape 3: (sample, flat, dark), if no flat and dark
+were loaded, they will be None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.loader.loader.load_from_config">
+<code class="sig-prename descclassname">mantidimaging.core.io.loader.loader.</code><code class="sig-name descname">load_from_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/loader/loader.html#load_from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.loader.loader.load_from_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load data by reading the provided configuration file for paths.
+This is intended to be used internally within the scripts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> – The full reconstruction config</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the loaded data as a tuple (sample, flat, dark)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.loader.loader.load_sinogram">
+<code class="sig-prename descclassname">mantidimaging.core.io.loader.loader.</code><code class="sig-name descname">load_sinogram</code><span class="sig-paren">(</span><em class="sig-param">input_path=None</em>, <em class="sig-param">sinogram_number=0</em>, <em class="sig-param">in_prefix=''</em>, <em class="sig-param">in_format='tif'</em>, <em class="sig-param">dtype=&lt;class 'numpy.float32'&gt;</em>, <em class="sig-param">progress=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/loader/loader.html#load_sinogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.loader.loader.load_sinogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is not be exposed to the CLI.</p>
+<p>It can only be accessed internally and through IPython interface.</p>
+<p>The reason is because this function will have a lot slower performance than
+the normal load.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.loader.loader.read_in_shape">
+<code class="sig-prename descclassname">mantidimaging.core.io.loader.loader.</code><code class="sig-name descname">read_in_shape</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">in_prefix=''</em>, <em class="sig-param">in_format='tif'</em>, <em class="sig-param">data_dtype=&lt;class 'numpy.float32'&gt;</em>, <em class="sig-param">cores=None</em>, <em class="sig-param">chunksize=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/loader/loader.html#read_in_shape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.loader.loader.read_in_shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.loader.loader.read_in_shape_from_config">
+<code class="sig-prename descclassname">mantidimaging.core.io.loader.loader.</code><code class="sig-name descname">read_in_shape_from_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/loader/loader.html#read_in_shape_from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.loader.loader.read_in_shape_from_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is intended for internal usage.</p>
+<p>Read in ONLY the first image in the specified directory, and return the
+total shape that all the images in that folder will have after loaded. This
+is determined by the number of images, and the loaded image’s width and
+height.</p>
+<p>It is assumed all images are the same. If they are not the loader will fail
+on runtime.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> – The reconstruction config from which the parameters are
+read.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The full shape of the images in the specified directory in a
+tuple of (Length, X, Y)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.loader.loader.supported_formats">
+<code class="sig-prename descclassname">mantidimaging.core.io.loader.loader.</code><code class="sig-name descname">supported_formats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/loader/loader.html#supported_formats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.loader.loader.supported_formats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.io.loader.img_loader.html"
+                        title="previous chapter">mantidimaging.core.io.loader.img_loader module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.io.loader.stack_loader.html"
+                        title="next chapter">mantidimaging.core.io.loader.stack_loader module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="mantidimaging.core.io.loader.loader.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.loader.stack_loader.html" title="mantidimaging.core.io.loader.stack_loader module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.loader.img_loader.html" title="mantidimaging.core.io.loader.img_loader module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.io.html" >mantidimaging.core.io package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.core.io.loader.html" >mantidimaging.core.io.loader package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.loader.loader module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

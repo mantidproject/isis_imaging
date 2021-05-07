@@ -1,0 +1,32 @@
+mantidimaging.core.imopr package
+================================
+
+.. automodule:: mantidimaging.core.imopr
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.imopr.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.imopr.cor
+   mantidimaging.core.imopr.corpc
+   mantidimaging.core.imopr.corvo
+   mantidimaging.core.imopr.corwrite
+   mantidimaging.core.imopr.imopr
+   mantidimaging.core.imopr.opr
+   mantidimaging.core.imopr.recon
+   mantidimaging.core.imopr.sinogram
+   mantidimaging.core.imopr.utility
+   mantidimaging.core.imopr.visualiser

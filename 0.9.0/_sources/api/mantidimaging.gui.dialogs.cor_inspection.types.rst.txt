@@ -1,0 +1,7 @@
+mantidimaging.gui.dialogs.cor\_inspection.types module
+======================================================
+
+.. automodule:: mantidimaging.gui.dialogs.cor_inspection.types
+   :members:
+   :undoc-members:
+   :show-inheritance:

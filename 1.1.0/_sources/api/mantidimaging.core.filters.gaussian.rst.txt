@@ -1,0 +1,24 @@
+mantidimaging.core.filters.gaussian package
+===========================================
+
+.. automodule:: mantidimaging.core.filters.gaussian
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.gaussian.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.gaussian.gaussian
+   mantidimaging.core.filters.gaussian.gaussian_gui

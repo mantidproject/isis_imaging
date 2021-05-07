@@ -1,0 +1,7 @@
+mantidimaging.core.cor\_tilt.angles module
+==========================================
+
+.. automodule:: mantidimaging.core.cor_tilt.angles
+   :members:
+   :undoc-members:
+   :show-inheritance:

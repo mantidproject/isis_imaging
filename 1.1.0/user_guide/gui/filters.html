@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Filters - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="COR and Tilt Finding" href="cor_tilt.html" />
+    <link rel="prev" title="Stack Visualiser" href="stack_vis.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cor_tilt.html" title="COR and Tilt Finding"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="stack_vis.html" title="Stack Visualiser"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Graphical User Interface (GUI)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Filters</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="filters">
+<h1>Filters<a class="headerlink" href="#filters" title="Permalink to this headline">¶</a></h1>
+<p>Selecting the <em>Filters</em> option in the <em>Processing</em> menu opens the filters
+dialog, this is used for applying filters to image stacks.</p>
+<p>Filters may be applied to image stacks of any type (i.e. projection, sinogram,
+reconstruction), they are essentially just image filters and do not directly
+care about the type of image.</p>
+<a class="reference internal image-reference" href="../../_images/gui_filters_dialog_initial.png"><img alt="Filters dialog" src="../../_images/gui_filters_dialog_initial.png" style="width: 60%;" /></a>
+<p>Here you can select the type of filter and the image stack you wish to apply it
+to, properties of the selected filter are automatically shown in the <em>Filter
+Properties</em> section.</p>
+<p>The right hand panel shows a preview of the image and intensity histogram before
+and after application of the filter. The toolbar above this section behaves in
+the same way as the toolbar on the Stack Visualiser.</p>
+<p>The pan and zoom of both image and histogram plots are linked for fine
+inspection of the effects of the filter.</p>
+<p>The <em>Image</em> control in the <em>Preview</em> section can be used to select the index of
+the image in the stack that is used to generate the preview.</p>
+<p>Filters are automatically updated when parameters are changed. For filters that
+take a long time to apply even on a single image it is worthwhile to disable the
+<em>Auto Update</em> option and trigger preview updates manually using the <em>Update Now</em>
+button.</p>
+<p>For filters that use a region of interest as a parameter (namely Crop
+Coordinates and ROI Normalisation) the ROI is selected using the controls on the
+stack visualiser for the selected image stack (as shown in the screenshot below).</p>
+<a class="reference internal image-reference" href="../../_images/gui_filters_dialog_crop_roi.png"><img alt="Crop coordinates filter with ROI" src="../../_images/gui_filters_dialog_crop_roi.png" style="width: 80%;" /></a>
+<p>Pressing <em>Apply</em> applies the filter to every image in the stack, replacing the
+data in the stack.</p>
+<p>It is normal for this to take a significant amount of time for a large stack of
+images.</p>
+<p>The application of a filter can not be undone.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="stack_vis.html"
+                        title="previous chapter">Stack Visualiser</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="cor_tilt.html"
+                        title="next chapter">COR and Tilt Finding</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../index.html">Latest</a></li>
+  <li><a href="../../../0.9.0/user_guide/gui/filters.html">0.9.0</a></li>
+  <li><a href="../../../1.0.0/user_guide/gui/filters.html">1.0.0</a></li>
+  <li><a href="filters.html">1.1.0</a></li>
+  <li><a href="../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cor_tilt.html" title="COR and Tilt Finding"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="stack_vis.html" title="Stack Visualiser"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Graphical User Interface (GUI)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Filters</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

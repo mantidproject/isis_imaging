@@ -1,0 +1,7 @@
+mantidimaging.core.operations.roi\_normalisation.roi\_normalisation module
+==========================================================================
+
+.. automodule:: mantidimaging.core.operations.roi_normalisation.roi_normalisation
+   :members:
+   :undoc-members:
+   :show-inheritance:

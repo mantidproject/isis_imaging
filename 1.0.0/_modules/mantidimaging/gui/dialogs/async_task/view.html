@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.dialogs.async_task.view - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.dialogs.async_task.view</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.dialogs.async_task.view</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">mantidimaging.gui.mvp_base</span> <span class="kn">import</span> <span class="n">BaseDialogView</span>
+
+<span class="kn">from</span> <span class="nn">.presenter</span> <span class="kn">import</span> <span class="n">AsyncTaskDialogPresenter</span>
+
+
+<div class="viewcode-block" id="AsyncTaskDialogView"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.dialogs.async_task.view.html#mantidimaging.gui.dialogs.async_task.view.AsyncTaskDialogView">[docs]</a><span class="k">class</span> <span class="nc">AsyncTaskDialogView</span><span class="p">(</span><span class="n">BaseDialogView</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">auto_close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AsyncTaskDialogView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+                <span class="n">parent</span><span class="p">,</span> <span class="s1">&#39;gui/ui/async_task_dialog.ui&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_view</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span> <span class="o">=</span> <span class="n">AsyncTaskDialogPresenter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">auto_close</span> <span class="o">=</span> <span class="n">auto_close</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">setMinimum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infoText</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+
+<div class="viewcode-block" id="AsyncTaskDialogView.reject"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.dialogs.async_task.view.html#mantidimaging.gui.dialogs.async_task.view.AsyncTaskDialogView.reject">[docs]</a>    <span class="k">def</span> <span class="nf">reject</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Do not close the dialog when processing is still ongoing</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">task_is_running</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">AsyncTaskDialogView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AsyncTaskDialogView.handle_completion"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.dialogs.async_task.view.html#mantidimaging.gui.dialogs.async_task.view.AsyncTaskDialogView.handle_completion">[docs]</a>    <span class="k">def</span> <span class="nf">handle_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">successful</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the UI after the task has been completed.</span>
+
+<span class="sd">        :param successful: If the task was successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Set info text to &quot;Complete&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infoText</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Complete&quot;</span><span class="p">)</span>
+
+        <span class="c1"># If auto close is enabled and the task was sucesfull then hide the UI</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_close</span> <span class="ow">and</span> <span class="n">successful</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AsyncTaskDialogView.set_progress"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.dialogs.async_task.view.html#mantidimaging.gui.dialogs.async_task.view.AsyncTaskDialogView.set_progress">[docs]</a>    <span class="k">def</span> <span class="nf">set_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="c1"># Set status message</span>
+        <span class="k">if</span> <span class="n">message</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">infoText</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+        <span class="c1"># Update progress bar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">progress</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="view.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.dialogs.async_task.view</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

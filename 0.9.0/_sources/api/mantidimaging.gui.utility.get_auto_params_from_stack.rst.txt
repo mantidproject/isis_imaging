@@ -1,0 +1,7 @@
+mantidimaging.gui.utility.get\_auto\_params\_from\_stack module
+===============================================================
+
+.. automodule:: mantidimaging.gui.utility.get_auto_params_from_stack
+   :members:
+   :undoc-members:
+   :show-inheritance:

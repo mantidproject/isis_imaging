@@ -1,0 +1,29 @@
+mantidimaging.core.filters package
+==================================
+
+.. automodule:: mantidimaging.core.filters
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.background_correction
+   mantidimaging.core.filters.circular_mask
+   mantidimaging.core.filters.clip_values
+   mantidimaging.core.filters.crop_coords
+   mantidimaging.core.filters.cut_off
+   mantidimaging.core.filters.gaussian
+   mantidimaging.core.filters.median_filter
+   mantidimaging.core.filters.minus_log
+   mantidimaging.core.filters.outliers
+   mantidimaging.core.filters.rebin
+   mantidimaging.core.filters.ring_removal
+   mantidimaging.core.filters.roi_normalisation
+   mantidimaging.core.filters.rotate_stack
+   mantidimaging.core.filters.stripe_removal
+   mantidimaging.core.filters.wip

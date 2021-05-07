@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.configurations.default_filtering - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.configurations.default_filtering</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.configurations.default_filtering</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.filters</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">background_correction</span><span class="p">,</span> <span class="n">roi_normalisation</span><span class="p">,</span> <span class="n">crop_coords</span><span class="p">,</span> <span class="n">cut_off</span><span class="p">,</span>
+        <span class="n">gaussian</span><span class="p">,</span> <span class="n">median_filter</span><span class="p">,</span> <span class="n">minus_log</span><span class="p">,</span> <span class="n">outliers</span><span class="p">,</span> <span class="n">rebin</span><span class="p">,</span> <span class="n">rotate_stack</span><span class="p">,</span>
+        <span class="n">stripe_removal</span><span class="p">,</span> <span class="n">circular_mask</span><span class="p">,</span> <span class="n">clip_values</span><span class="p">,</span> <span class="n">ring_removal</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility</span> <span class="kn">import</span> <span class="n">value_scaling</span>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../api/mantidimaging.core.configurations.default_filtering.html#mantidimaging.core.configurations.default_filtering.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">):</span>
+    <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running the default filtering.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">skip_preproc</span><span class="p">:</span>
+        <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Pre-processing steps have been skipped, &quot;</span>
+            <span class="s2">&quot;because --skip-preproc flag has been passed.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sample</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span>
+
+    <span class="n">cores</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cores</span>
+    <span class="n">chunksize</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">chunksize</span>
+    <span class="n">roi</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">region_of_interest</span>
+
+    <span class="c1"># sample = mcp_corrections.execute(sample)</span>
+    <span class="c1"># if (flat is not None and dark is not None):</span>
+    <span class="c1">#     flat = mcp_corrections.execute(flat)</span>
+    <span class="c1">#     dark = mcp_corrections.execute(dark)</span>
+
+    <span class="n">sample</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span> <span class="o">=</span> <span class="n">rotate_stack</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">rotation</span><span class="p">,</span>
+                                              <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="n">air</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">air_region</span>
+    <span class="c1"># we scale up if either a background correction is performed</span>
+    <span class="c1"># or contrast normalisation (air region)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">flat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dark</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">air</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">scale_factors</span> <span class="o">=</span> <span class="n">value_scaling</span><span class="o">.</span><span class="n">create_factors</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span>
+                                                     <span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">background_correction</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="c1"># removes the contrast difference between the stack of images</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">roi_normalisation</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">air</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="c1"># scale up the data to a nice int16 range while keeping the effects</span>
+    <span class="c1"># from the flat/dark and air normalisations</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">flat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dark</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">air</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">value_scaling</span><span class="o">.</span><span class="n">apply_factor</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">scale_factors</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span>
+                                            <span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">flat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dark</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span> <span class="o">=</span> <span class="n">crop_coords</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span> <span class="o">=</span> <span class="n">crop_coords</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">sample</span><span class="p">,</span> <span class="n">roi</span><span class="p">)</span>  <span class="c1"># flat and dark will be None</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">rebin</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">rebin</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">rebin_mode</span><span class="p">,</span>
+                           <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">stripe_removal</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">stripe_removal_wf</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">stripe_removal_ti</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">stripe_removal_sf</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">outliers</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">outliers</span><span class="p">,</span>
+                              <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">outliers_radius</span><span class="p">,</span>
+                              <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">outliers_mode</span><span class="p">,</span> <span class="n">cores</span><span class="p">)</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">median_filter</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">median_size</span><span class="p">,</span>
+                                   <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">median_mode</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">gaussian</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">gaussian_size</span><span class="p">,</span>
+                              <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">gaussian_mode</span><span class="p">,</span>
+                              <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">gaussian_order</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">cut_off</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">cut_off</span><span class="p">)</span>
+    <span class="c1"># this should be last because the other filters</span>
+    <span class="c1"># do not expect to work in -log data</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">minus_log</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">minus_log</span><span class="p">)</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">outliers</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">outliers</span><span class="p">,</span>
+                              <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">outliers_radius</span><span class="p">,</span>
+                              <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">outliers_mode</span><span class="p">,</span> <span class="n">cores</span><span class="p">)</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">ring_removal</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ring_removal</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ring_removal_x</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ring_removal_y</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ring_removal_thresh</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ring_removal_thresh_max</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ring_removal_thresh_min</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ring_removal_theta_min</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ring_removal_rwidth</span><span class="p">,</span>
+        <span class="n">cores</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">chunksize</span><span class="p">)</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">circular_mask</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">circular_mask</span><span class="p">,</span>
+                                   <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">circular_mask_val</span><span class="p">,</span> <span class="n">cores</span><span class="p">)</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">clip_values</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">clip_min</span><span class="p">,</span>
+                                 <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">clip_max</span><span class="p">,</span>
+                                 <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">clip_min_new_value</span><span class="p">,</span>
+                                 <span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">clip_max_new_value</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sample</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="default_filtering.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.configurations.default_filtering</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+mantidimaging.core.imopr.test.utility\_test module
+==================================================
+
+.. automodule:: mantidimaging.core.imopr.test.utility_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

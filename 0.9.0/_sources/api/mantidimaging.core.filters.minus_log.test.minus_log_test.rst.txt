@@ -1,0 +1,7 @@
+mantidimaging.core.filters.minus\_log.test.minus\_log\_test module
+==================================================================
+
+.. automodule:: mantidimaging.core.filters.minus_log.test.minus_log_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

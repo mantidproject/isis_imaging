@@ -1,0 +1,7 @@
+mantidimaging.core.filters.crop\_coords.test.crop\_coords\_test module
+======================================================================
+
+.. automodule:: mantidimaging.core.filters.crop_coords.test.crop_coords_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

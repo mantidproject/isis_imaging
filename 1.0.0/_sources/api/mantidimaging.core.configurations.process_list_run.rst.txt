@@ -1,0 +1,7 @@
+mantidimaging.core.configurations.process\_list\_run module
+===========================================================
+
+.. automodule:: mantidimaging.core.configurations.process_list_run
+   :members:
+   :undoc-members:
+   :show-inheritance:

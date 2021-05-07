@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Installation - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="User Guide" href="user_guide/index.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="user_guide/index.html" title="User Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">Installation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="installation">
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>Operating system</dt><dd><p>Linux. Tested on Ubuntu 18.04, 20.04 and CentOS 7</p>
+</dd>
+<dt>Python 3.8</dt><dd><p>This can be installed below using Conda if needed.</p>
+</dd>
+<dt>GPU</dt><dd><p>A CUDA capable GPU is required for some operations. CPU alternatives are provided, so it is possible to perform a tomographic reconstruction on a system without a GPU.</p>
+</dd>
+<dt>RAM</dt><dd><p>A large amount of RAM is needed to hold a dataset in memory. A 2k x 2k resolution with 1k projections held as 32 bit floats uses 16 GB of RAM. To perform safe (undoable) operations the requirement is doubled. Requirements scale with increased resolution, projection counts and bit depth.</p>
+</dd>
+</dl>
+</section>
+<section id="installing">
+<h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
+<p>The simplest way to install the toolkit is via the <a class="reference external" href="https://anaconda.org/mantid/mantidimaging/">packages</a> published to Anaconda Cloud, this
+can be done with an existing Anaconda or Miniconda distribution if you already
+have one on your machine.</p>
+<p>1. These dependencies must be present on your system before installing the Mantid Imaging environment.
+Please look for instructions specific to your OS on how to do that:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>CUDA Runtime version 10.2 - <a class="reference external" href="https://developer.nvidia.com/cuda-10.2-download-archive">https://developer.nvidia.com/cuda-10.2-download-archive</a></p></li>
+<li><p>gcc - needed for compiling some python modules</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Download and install <a class="reference external" href="https://conda.io/miniconda.html">Miniconda 3</a></p></li>
+<li><p>Make sure <code class="code docutils literal notranslate"><span class="pre">conda</span></code> is available on your PATH</p></li>
+<li><p>Create a mantidimaging conda environment. For the latest stable version:</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">create</span> <span class="pre">-f</span> <span class="pre">https://raw.githubusercontent.com/mantidproject/mantidimaging/stable/environment.yml</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>Specific versions can be installed like so:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">create</span> <span class="pre">-f</span> <span class="pre">https://raw.githubusercontent.com/mantidproject/mantidimaging/release-2.0.0/environment.yml</span></code></p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p>This creates an environment called <code class="code docutils literal notranslate"><span class="pre">mantidimaging</span></code> that you can activate via <code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">mantidimaging</span></code></p></li>
+</ol>
+</section>
+<section id="running-the-package">
+<h2>Running the package<a class="headerlink" href="#running-the-package" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Activate the environment created in the installation step: <code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">mantidimaging</span></code></p></li>
+<li><p>Run using one of the following commands:</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>GUI: <code class="code docutils literal notranslate"><span class="pre">mantidimaging</span></code></p></li>
+<li><p>IPython: <code class="code docutils literal notranslate"><span class="pre">mantidimaging-ipython</span></code></p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="running-the-source">
+<h2>Running the source<a class="headerlink" href="#running-the-source" title="Permalink to this headline">¶</a></h2>
+<p>To run from a downloaded source code, e.g. a git checkout:</p>
+<ol class="arabic simple">
+<li><p>Activate the environment created in the installation step: <code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">mantidimaging</span></code></p></li>
+<li><p>Run using one of the following commands:</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>From the root of the repository run with <code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">mantidimaging</span></code></p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="nightly-version">
+<h2>Nightly version<a class="headerlink" href="#nightly-version" title="Permalink to this headline">¶</a></h2>
+<p>The latest nightly version can be installed with</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">create</span> <span class="pre">-f</span> <span class="pre">https://raw.githubusercontent.com/mantidproject/mantidimaging/master/environment.yml</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>This will make a <cite>mantidimaging-nightly</cite> environment.</p>
+</section>
+<section id="updating">
+<h2>Updating<a class="headerlink" href="#updating" title="Permalink to this headline">¶</a></h2>
+<p>To update to the latest version of Mantid Imaging run:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">mantidimaging</span> <span class="pre">&amp;&amp;</span> <span class="pre">conda</span> <span class="pre">update</span> <span class="pre">mantidimaging</span></code></p>
+<p>If you see any issues with package compatibility, the fastest solution is reinstalling the environment - see below.</p>
+</section>
+<section id="reinstalling-the-environment">
+<h2>Reinstalling the environment<a class="headerlink" href="#reinstalling-the-environment" title="Permalink to this headline">¶</a></h2>
+<p>To completely delete the Mantid Imaging environment follow these steps:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">deactivate</span></code></p>
+<ul>
+<li><p>to exit out of the conda Mantid Imaging environment</p></li>
+</ul>
+</li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">list</span></code></p>
+<ul>
+<li><p>to see which environments you have installed</p></li>
+</ul>
+</li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">remove</span> <span class="pre">-n</span> <span class="pre">mantidimaging</span></code></p>
+<ul>
+<li><p>and press <code class="code docutils literal notranslate"><span class="pre">y</span></code> to confirm. Replace <cite>mantidimaging</cite> with any other environment you wish to remove</p></li>
+</ul>
+</li>
+<li><p>Follow steps 3 and 4 from <a class="reference internal" href="#installing">Installing</a>.</p></li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#installing">Installing</a></li>
+<li><a class="reference internal" href="#running-the-package">Running the package</a></li>
+<li><a class="reference internal" href="#running-the-source">Running the source</a></li>
+<li><a class="reference internal" href="#nightly-version">Nightly version</a></li>
+<li><a class="reference internal" href="#updating">Updating</a></li>
+<li><a class="reference internal" href="#reinstalling-the-environment">Reinstalling the environment</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="overview.html"
+                        title="previous chapter">Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="user_guide/index.html"
+                        title="next chapter">User Guide</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href=".././index.html">Latest</a></li>
+  <li><a href="../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../2.0.0/installation.html">2.0.0</a></li>
+  <li><a href="installation.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="user_guide/index.html" title="User Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">Installation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

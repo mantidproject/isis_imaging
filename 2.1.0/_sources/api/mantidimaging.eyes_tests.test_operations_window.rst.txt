@@ -1,0 +1,7 @@
+mantidimaging.eyes\_tests.test\_operations\_window module
+=========================================================
+
+.. automodule:: mantidimaging.eyes_tests.test_operations_window
+   :members:
+   :undoc-members:
+   :show-inheritance:

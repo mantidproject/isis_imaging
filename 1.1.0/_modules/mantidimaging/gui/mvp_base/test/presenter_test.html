@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.mvp_base.test.presenter_test - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.mvp_base.test.presenter_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.mvp_base.test.presenter_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">testfixtures</span> <span class="kn">import</span> <span class="n">LogCapture</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.special_imports</span> <span class="kn">import</span> <span class="n">import_mock</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.mvp_base</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">BaseDialogView</span><span class="p">,</span> <span class="n">BaseMainWindowView</span><span class="p">,</span> <span class="n">BasePresenter</span><span class="p">)</span>
+
+<span class="n">mock</span> <span class="o">=</span> <span class="n">import_mock</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="MainWindowPresenterTest"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.mvp_base.test.presenter_test.html#mantidimaging.gui.mvp_base.test.presenter_test.MainWindowPresenterTest">[docs]</a><span class="k">class</span> <span class="nc">MainWindowPresenterTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MainWindowPresenterTest.test_default_notify_method_raises_exception"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.mvp_base.test.presenter_test.html#mantidimaging.gui.mvp_base.test.presenter_test.MainWindowPresenterTest.test_default_notify_method_raises_exception">[docs]</a>    <span class="k">def</span> <span class="nf">test_default_notify_method_raises_exception</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">create_autospec</span><span class="p">(</span><span class="n">BaseMainWindowView</span><span class="p">)</span>
+        <span class="n">presenter</span> <span class="o">=</span> <span class="n">BasePresenter</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">):</span>
+            <span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainWindowPresenterTest.test_show_error_message_forwarded_to_main_window_view"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.mvp_base.test.presenter_test.html#mantidimaging.gui.mvp_base.test.presenter_test.MainWindowPresenterTest.test_show_error_message_forwarded_to_main_window_view">[docs]</a>    <span class="k">def</span> <span class="nf">test_show_error_message_forwarded_to_main_window_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">create_autospec</span><span class="p">(</span><span class="n">BaseMainWindowView</span><span class="p">)</span>
+        <span class="n">presenter</span> <span class="o">=</span> <span class="n">BasePresenter</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+
+        <span class="n">presenter</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span><span class="s2">&quot;test message&quot;</span><span class="p">)</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">show_error_dialog</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="s2">&quot;test message&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainWindowPresenterTest.test_show_error_message_forwarded_to_dialog_view"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.mvp_base.test.presenter_test.html#mantidimaging.gui.mvp_base.test.presenter_test.MainWindowPresenterTest.test_show_error_message_forwarded_to_dialog_view">[docs]</a>    <span class="k">def</span> <span class="nf">test_show_error_message_forwarded_to_dialog_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">create_autospec</span><span class="p">(</span><span class="n">BaseDialogView</span><span class="p">)</span>
+        <span class="n">presenter</span> <span class="o">=</span> <span class="n">BasePresenter</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+
+        <span class="n">presenter</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span><span class="s2">&quot;test message&quot;</span><span class="p">)</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">show_error_dialog</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="s2">&quot;test message&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainWindowPresenterTest.test_bad_view_causes_errors_to_be_logged"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.mvp_base.test.presenter_test.html#mantidimaging.gui.mvp_base.test.presenter_test.MainWindowPresenterTest.test_bad_view_causes_errors_to_be_logged">[docs]</a>    <span class="k">def</span> <span class="nf">test_bad_view_causes_errors_to_be_logged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">V</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+        <span class="n">view</span> <span class="o">=</span> <span class="n">V</span><span class="p">()</span>
+        <span class="n">presenter</span> <span class="o">=</span> <span class="n">BasePresenter</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">LogCapture</span><span class="p">()</span> <span class="k">as</span> <span class="n">lc</span><span class="p">:</span>
+            <span class="n">presenter</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span><span class="s2">&quot;test message&quot;</span><span class="p">)</span>
+
+        <span class="n">lc</span><span class="o">.</span><span class="n">check</span><span class="p">(</span>
+            <span class="p">(</span><span class="s1">&#39;mantidimaging.gui.mvp_base.presenter&#39;</span><span class="p">,</span> <span class="s1">&#39;ERROR&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Presenter error: test message&#39;</span><span class="p">)</span>
+        <span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="presenter_test.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.mvp_base.test.presenter_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

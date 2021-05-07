@@ -1,0 +1,7 @@
+mantidimaging.core.filters.circular\_mask.circular\_mask\_gui module
+====================================================================
+
+.. automodule:: mantidimaging.core.filters.circular_mask.circular_mask_gui
+   :members:
+   :undoc-members:
+   :show-inheritance:

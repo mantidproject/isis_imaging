@@ -1,0 +1,19 @@
+mantidimaging.gui.windows package
+=================================
+
+.. automodule:: mantidimaging.gui.windows
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.cor_tilt
+   mantidimaging.gui.windows.filters
+   mantidimaging.gui.windows.main
+   mantidimaging.gui.windows.stack_visualiser
+   mantidimaging.gui.windows.tomopy_recon

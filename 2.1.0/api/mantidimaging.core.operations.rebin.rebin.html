@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.operations.rebin.rebin module - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.operations.ring_removal.ring_removal module" href="mantidimaging.core.operations.ring_removal.ring_removal.html" />
+    <link rel="prev" title="mantidimaging.core.operations.outliers.outliers module" href="mantidimaging.core.operations.outliers.outliers.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.ring_removal.ring_removal.html" title="mantidimaging.core.operations.ring_removal.ring_removal module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.outliers.outliers.html" title="mantidimaging.core.operations.outliers.outliers module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../user_guide/index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../user_guide/operations/index.html" accesskey="U">Operations</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.rebin.rebin module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.operations.rebin.rebin">
+<span id="mantidimaging-core-operations-rebin-rebin-module"></span><h1>mantidimaging.core.operations.rebin.rebin module<a class="headerlink" href="#module-mantidimaging.core.operations.rebin.rebin" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.core.operations.rebin.rebin.RebinFilter">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.core.operations.rebin.rebin.</code><code class="sig-name descname">RebinFilter</code><a class="reference internal" href="../_modules/mantidimaging/core/operations/rebin/rebin.html#RebinFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.rebin.rebin.RebinFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.BaseFilter" title="mantidimaging.core.operations.base_filter.BaseFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">mantidimaging.core.operations.base_filter.BaseFilter</span></code></a></p>
+<p>Rebins the image to the given parameter.</p>
+<p>This filter temporarily increases memory usage, while the image is being rebinned.
+The memory usage will be lowered after the filter has finished executing.</p>
+<p>Intended to be used on: Any data</p>
+<p>When: If you want to reduce the data size by losing information.</p>
+<dl class="py method">
+<dt id="mantidimaging.core.operations.rebin.rebin.RebinFilter.execute_wrapper">
+<em class="property">static </em><code class="sig-name descname">execute_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rebin_to_dimensions_radio</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">shape_x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">shape_y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rebin_by_factor_radio</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">factor</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mode_field</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/rebin/rebin.html#RebinFilter.execute_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.rebin.rebin.RebinFilter.execute_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should construct a partial call to _filter_func using values taken from the widgets passed to this function
+as kwargs.
+:param kwargs: widgets which contain values required for _filter_func.
+:return: a partial call to _filter_func using parameters taken from the input widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.operations.rebin.rebin.RebinFilter.filter_func">
+<em class="property">static </em><code class="sig-name descname">filter_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">images</span><span class="p">:</span> <span class="n"><a class="reference internal" href="mantidimaging.core.data.images.html#mantidimaging.core.data.images.Images" title="mantidimaging.core.data.images.Images">mantidimaging.core.data.images.Images</a></span></em>, <em class="sig-param"><span class="n">rebin_param</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cores</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">chunksize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mantidimaging.core.data.images.html#mantidimaging.core.data.images.Images" title="mantidimaging.core.data.images.Images">mantidimaging.core.data.images.Images</a><a class="reference internal" href="../_modules/mantidimaging/core/operations/rebin/rebin.html#RebinFilter.filter_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.rebin.rebin.RebinFilter.filter_func" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images</strong> – Sample data which is to be processed. Expects radiograms</p></li>
+<li><p><strong>rebin_param</strong> – int, float or tuple
+int - Percentage of current size.
+float - Fraction of current size.
+tuple - Size of the output image (x, y).</p></li>
+<li><p><strong>mode</strong> – Interpolation to use for re-sizing
+(‘nearest’, ‘lanczos’, ‘bilinear’, ‘bicubic’ or ‘cubic’).</p></li>
+<li><p><strong>cores</strong> – The number of cores that will be used to process the data.</p></li>
+<li><p><strong>chunksize</strong> – The number of chunks that each worker will receive.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed 3D numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mantidimaging.core.operations.rebin.rebin.RebinFilter.filter_name">
+<code class="sig-name descname">filter_name</code><em class="property"> = 'Rebin'</em><a class="headerlink" href="#mantidimaging.core.operations.rebin.rebin.RebinFilter.filter_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="mantidimaging.core.operations.rebin.rebin.RebinFilter.link_histograms">
+<code class="sig-name descname">link_histograms</code><em class="property"> = True</em><a class="headerlink" href="#mantidimaging.core.operations.rebin.rebin.RebinFilter.link_histograms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.operations.rebin.rebin.RebinFilter.register_gui">
+<em class="property">static </em><code class="sig-name descname">register_gui</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">form</span></em>, <em class="sig-param"><span class="n">on_change</span></em>, <em class="sig-param"><span class="n">view</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/rebin/rebin.html#RebinFilter.register_gui"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.rebin.rebin.RebinFilter.register_gui" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds any required input widgets to the given form and returns references to them.</p>
+<p>The return values should be in a dict which can be unpacked as kwargs for a call to
+the operations <cite>execute_wrapper</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>view</strong> – </p></li>
+<li><p><strong>form</strong> – the layout to create input widgets in</p></li>
+<li><p><strong>on_change</strong> – the filter view action to be bound to all created inputs</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the widgets bound as kwargs which are needed to call execute_wrapper</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.operations.rebin.rebin.modes">
+<code class="sig-prename descclassname">mantidimaging.core.operations.rebin.rebin.</code><code class="sig-name descname">modes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/rebin/rebin.html#modes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.rebin.rebin.modes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.operations.outliers.outliers.html"
+                        title="previous chapter">mantidimaging.core.operations.outliers.outliers module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.operations.ring_removal.ring_removal.html"
+                        title="next chapter">mantidimaging.core.operations.ring_removal.ring_removal module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="mantidimaging.core.operations.rebin.rebin.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.ring_removal.ring_removal.html" title="mantidimaging.core.operations.ring_removal.ring_removal module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.outliers.outliers.html" title="mantidimaging.core.operations.outliers.outliers module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../user_guide/index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../user_guide/operations/index.html" >Operations</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.rebin.rebin module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+mantidimaging.core.filters.roi\_normalisation.test package
+==========================================================
+
+.. automodule:: mantidimaging.core.filters.roi_normalisation.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.roi_normalisation.test.roi_normalisation_test

@@ -1,0 +1,7 @@
+mantidimaging.core.operations.flat\_fielding.flat\_fielding module
+==================================================================
+
+.. automodule:: mantidimaging.core.operations.flat_fielding.flat_fielding
+   :members:
+   :undoc-members:
+   :show-inheritance:

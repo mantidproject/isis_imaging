@@ -1,0 +1,17 @@
+mantidimaging.core.configurations package
+=========================================
+
+.. automodule:: mantidimaging.core.configurations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.configurations.default_filtering
+   mantidimaging.core.configurations.default_run
+   mantidimaging.core.configurations.process_list_run

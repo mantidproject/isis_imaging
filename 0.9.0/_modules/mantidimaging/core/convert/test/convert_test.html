@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.convert.test.convert_test - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.convert.test.convert_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.convert.test.convert_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
+
+<span class="kn">import</span> <span class="nn">mantidimaging.core.testing.unit_test_helper</span> <span class="k">as</span> <span class="nn">th</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.convert</span> <span class="kn">import</span> <span class="n">convert</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.io</span> <span class="kn">import</span> <span class="n">loader</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.testing</span> <span class="kn">import</span> <span class="n">FileOutputtingTestCase</span>
+
+
+<div class="viewcode-block" id="ConvertTest"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.convert.test.convert_test.html#mantidimaging.core.convert.test.convert_test.ConvertTest">[docs]</a><span class="k">class</span> <span class="nc">ConvertTest</span><span class="p">(</span><span class="n">FileOutputtingTestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This test actually tests the saver and loader modules too, but</span>
+<span class="sd">    it isn&#39;t focussed on them</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ConvertTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># force silent outputs</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.configs.recon_config</span> <span class="kn">import</span> <span class="p">(</span>
+                <span class="n">ReconstructionConfig</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">ReconstructionConfig</span><span class="o">.</span><span class="n">empty_init</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span>
+
+<div class="viewcode-block" id="ConvertTest.create_saver"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.convert.test.convert_test.html#mantidimaging.core.convert.test.convert_test.ConvertTest.create_saver">[docs]</a>    <span class="k">def</span> <span class="nf">create_saver</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.io.saver</span> <span class="kn">import</span> <span class="n">Saver</span>
+        <span class="k">return</span> <span class="n">Saver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertTest.test_convert_fits_fits_nostack"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.convert.test.convert_test.html#mantidimaging.core.convert.test.convert_test.ConvertTest.test_convert_fits_fits_nostack">[docs]</a>    <span class="k">def</span> <span class="nf">test_convert_fits_fits_nostack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_convert</span><span class="p">(</span>
+            <span class="n">img_format</span><span class="o">=</span><span class="s1">&#39;fits&#39;</span><span class="p">,</span>
+            <span class="n">convert_format</span><span class="o">=</span><span class="s1">&#39;fits&#39;</span><span class="p">,</span>
+            <span class="n">stack</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">parallel</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertTest.test_convert_fits_tiff_nostack"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.convert.test.convert_test.html#mantidimaging.core.convert.test.convert_test.ConvertTest.test_convert_fits_tiff_nostack">[docs]</a>    <span class="k">def</span> <span class="nf">test_convert_fits_tiff_nostack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_convert</span><span class="p">(</span>
+            <span class="n">img_format</span><span class="o">=</span><span class="s1">&#39;fits&#39;</span><span class="p">,</span>
+            <span class="n">convert_format</span><span class="o">=</span><span class="s1">&#39;tiff&#39;</span><span class="p">,</span>
+            <span class="n">stack</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">parallel</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertTest.do_convert"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.convert.test.convert_test.html#mantidimaging.core.convert.test.convert_test.ConvertTest.do_convert">[docs]</a>    <span class="k">def</span> <span class="nf">do_convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_format</span><span class="p">,</span> <span class="n">convert_format</span><span class="p">,</span> <span class="n">stack</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># this just converts between the formats, but not NXS!</span>
+        <span class="c1"># create some images</span>
+        <span class="n">expected_images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()</span>
+        <span class="n">saver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_saver</span><span class="p">()</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span> <span class="o">=</span> <span class="n">img_format</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_save_preproc</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_data_as_stack</span> <span class="o">=</span> <span class="n">stack</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_overwrite_all</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># save them out</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">save_preproc_images</span><span class="p">(</span><span class="n">expected_images</span><span class="p">)</span>
+
+        <span class="n">preproc_output_path</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">+</span> <span class="s1">&#39;/pre_processed&#39;</span>
+
+        <span class="c1"># convert them</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">input_path</span> <span class="o">=</span> <span class="n">preproc_output_path</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">in_format</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span>
+        <span class="n">converted_output_path</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">+</span> <span class="s1">&#39;/converted&#39;</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">converted_output_path</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">out_format</span> <span class="o">=</span> <span class="n">convert_format</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">data_as_stack</span> <span class="o">=</span> <span class="n">stack</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">convert_prefix</span> <span class="o">=</span> <span class="s1">&#39;converted&#39;</span>
+        <span class="n">convert</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+        <span class="c1"># load them back</span>
+        <span class="c1"># compare data to original</span>
+        <span class="c1"># this odes not load any flats or darks as they were not saved out</span>
+        <span class="n">loaded_images</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">converted_output_path</span><span class="p">,</span>
+            <span class="n">in_format</span><span class="o">=</span><span class="n">convert_format</span><span class="p">,</span>
+            <span class="n">parallel_load</span><span class="o">=</span><span class="n">parallel</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">loaded_images</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="n">expected_images</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertTest.test_convert_fits_nxs_stack"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.convert.test.convert_test.html#mantidimaging.core.convert.test.convert_test.ConvertTest.test_convert_fits_nxs_stack">[docs]</a>    <span class="k">def</span> <span class="nf">test_convert_fits_nxs_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># NXS is only supported for stack</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_convert_to_nxs</span><span class="p">(</span>
+            <span class="n">img_format</span><span class="o">=</span><span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="n">convert_format</span><span class="o">=</span><span class="s1">&#39;nxs&#39;</span><span class="p">,</span> <span class="n">stack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertTest.test_convert_tiff_nxs_stack"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.convert.test.convert_test.html#mantidimaging.core.convert.test.convert_test.ConvertTest.test_convert_tiff_nxs_stack">[docs]</a>    <span class="k">def</span> <span class="nf">test_convert_tiff_nxs_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># NXS is only supported for stack</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_convert_to_nxs</span><span class="p">(</span>
+            <span class="n">img_format</span><span class="o">=</span><span class="s1">&#39;tiff&#39;</span><span class="p">,</span> <span class="n">convert_format</span><span class="o">=</span><span class="s1">&#39;nxs&#39;</span><span class="p">,</span> <span class="n">stack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertTest.do_convert_to_nxs"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.convert.test.convert_test.html#mantidimaging.core.convert.test.convert_test.ConvertTest.do_convert_to_nxs">[docs]</a>    <span class="k">def</span> <span class="nf">do_convert_to_nxs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_format</span><span class="p">,</span> <span class="n">convert_format</span><span class="p">,</span> <span class="n">stack</span><span class="p">):</span>
+        <span class="c1"># this saves out different formats to a nxs stack</span>
+        <span class="c1"># create some images</span>
+        <span class="n">parallel</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">expected_images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()</span>
+        <span class="n">saver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_saver</span><span class="p">()</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span> <span class="o">=</span> <span class="n">img_format</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_data_as_stack</span> <span class="o">=</span> <span class="n">stack</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_save_preproc</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_overwrite_all</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># save them out</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">save_preproc_images</span><span class="p">(</span><span class="n">expected_images</span><span class="p">)</span>
+        <span class="n">preproc_output_path</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">+</span> <span class="s1">&#39;/pre_processed&#39;</span>
+
+        <span class="c1"># convert them</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">input_path</span> <span class="o">=</span> <span class="n">preproc_output_path</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">in_format</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span>
+        <span class="n">converted_output_path</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">+</span> <span class="s1">&#39;/converted&#39;</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">converted_output_path</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">out_format</span> <span class="o">=</span> <span class="n">convert_format</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">data_as_stack</span> <span class="o">=</span> <span class="n">stack</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">convert_prefix</span> <span class="o">=</span> <span class="s1">&#39;converted&#39;</span>
+        <span class="n">convert</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+        <span class="c1"># load them back</span>
+        <span class="c1"># compare data to original</span>
+        <span class="c1"># this odes not load any flats or darks as they were not saved out</span>
+        <span class="n">loaded_images</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">converted_output_path</span><span class="p">,</span>
+            <span class="n">in_format</span><span class="o">=</span><span class="n">convert_format</span><span class="p">,</span>
+            <span class="n">parallel_load</span><span class="o">=</span><span class="n">parallel</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">loaded_images</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="n">expected_images</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertTest.test_convert_nxs_fits_nostack"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.convert.test.convert_test.html#mantidimaging.core.convert.test.convert_test.ConvertTest.test_convert_nxs_fits_nostack">[docs]</a>    <span class="k">def</span> <span class="nf">test_convert_nxs_fits_nostack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_convert_from_nxs</span><span class="p">(</span>
+            <span class="n">img_format</span><span class="o">=</span><span class="s1">&#39;nxs&#39;</span><span class="p">,</span> <span class="n">convert_format</span><span class="o">=</span><span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="n">stack</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertTest.test_convert_nxs_tiff_nostack"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.convert.test.convert_test.html#mantidimaging.core.convert.test.convert_test.ConvertTest.test_convert_nxs_tiff_nostack">[docs]</a>    <span class="k">def</span> <span class="nf">test_convert_nxs_tiff_nostack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_convert_from_nxs</span><span class="p">(</span>
+            <span class="n">img_format</span><span class="o">=</span><span class="s1">&#39;nxs&#39;</span><span class="p">,</span> <span class="n">convert_format</span><span class="o">=</span><span class="s1">&#39;tiff&#39;</span><span class="p">,</span> <span class="n">stack</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertTest.do_convert_from_nxs"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.convert.test.convert_test.html#mantidimaging.core.convert.test.convert_test.ConvertTest.do_convert_from_nxs">[docs]</a>    <span class="k">def</span> <span class="nf">do_convert_from_nxs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_format</span><span class="p">,</span> <span class="n">convert_format</span><span class="p">,</span> <span class="n">stack</span><span class="p">):</span>
+        <span class="c1"># this saves out a nexus stack and then loads it in different formats</span>
+        <span class="c1"># create some images</span>
+        <span class="n">parallel</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">expected_images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()</span>
+        <span class="c1"># expected none, because NXS doesn&#39;t currently save</span>
+        <span class="c1"># out flat or dark image</span>
+        <span class="n">saver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_saver</span><span class="p">()</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span> <span class="o">=</span> <span class="n">img_format</span>
+        <span class="c1"># force saving out as STACK because we&#39;re saving NXS files</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_data_as_stack</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_save_preproc</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">_overwrite_all</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># save them out</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">save_preproc_images</span><span class="p">(</span><span class="n">expected_images</span><span class="p">)</span>
+        <span class="n">preproc_output_path</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">+</span> <span class="s1">&#39;/pre_processed&#39;</span>
+
+        <span class="c1"># convert them</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">input_path</span> <span class="o">=</span> <span class="n">preproc_output_path</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">in_format</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span>
+        <span class="n">converted_output_path</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">+</span> <span class="s1">&#39;/converted&#39;</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">converted_output_path</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">out_format</span> <span class="o">=</span> <span class="n">convert_format</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">data_as_stack</span> <span class="o">=</span> <span class="n">stack</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">convert_prefix</span> <span class="o">=</span> <span class="s1">&#39;converted&#39;</span>
+        <span class="n">convert</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+        <span class="c1"># load them back and compare data to original</span>
+        <span class="c1"># this does not load any flats or darks as they were not saved out</span>
+        <span class="n">loaded_images</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">converted_output_path</span><span class="p">,</span>
+                                    <span class="n">in_format</span><span class="o">=</span><span class="n">convert_format</span><span class="p">,</span>
+                                    <span class="n">parallel_load</span><span class="o">=</span><span class="n">parallel</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">loaded_images</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="n">expected_images</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="convert_test.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.convert.test.convert_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

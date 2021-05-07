@@ -1,0 +1,7 @@
+mantidimaging.core.gpu.utility module
+=====================================
+
+.. automodule:: mantidimaging.core.gpu.utility
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.filters.ring_removal.ring_removal module - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.filters.ring_removal.ring_removal_gui module" href="mantidimaging.core.filters.ring_removal.ring_removal_gui.html" />
+    <link rel="prev" title="mantidimaging.core.filters.ring_removal.test.ring_removal_test module" href="mantidimaging.core.filters.ring_removal.test.ring_removal_test.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.filters.ring_removal.ring_removal_gui.html" title="mantidimaging.core.filters.ring_removal.ring_removal_gui module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.filters.ring_removal.test.ring_removal_test.html" title="mantidimaging.core.filters.ring_removal.test.ring_removal_test module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.filters.html" >mantidimaging.core.filters package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.core.filters.ring_removal.html" accesskey="U">mantidimaging.core.filters.ring_removal package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.ring_removal.ring_removal module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.filters.ring_removal.ring_removal">
+<span id="mantidimaging-core-filters-ring-removal-ring-removal-module"></span><h1>mantidimaging.core.filters.ring_removal.ring_removal module<a class="headerlink" href="#module-mantidimaging.core.filters.ring_removal.ring_removal" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="mantidimaging.core.filters.ring_removal.ring_removal.execute">
+<code class="sig-prename descclassname">mantidimaging.core.filters.ring_removal.ring_removal.</code><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">run_ring_removal</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">center_x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">center_y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">thresh</span><span class="o">=</span><span class="default_value">300.0</span></em>, <em class="sig-param"><span class="n">thresh_max</span><span class="o">=</span><span class="default_value">300.0</span></em>, <em class="sig-param"><span class="n">thresh_min</span><span class="o">=</span><span class="default_value">- 100.0</span></em>, <em class="sig-param"><span class="n">theta_min</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">rwidth</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">cores</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">chunksize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/filters/ring_removal/ring_removal.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.filters.ring_removal.ring_removal.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removal of ring artifacts in reconstructed volume.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Sample data which is to be processed. Expected in radiograms</p></li>
+<li><p><strong>run_ring_removal</strong> – Uses Wavelet-Fourier based ring removal</p></li>
+<li><p><strong>center_x</strong> – (float, optional) abscissa location of center of rotation</p></li>
+<li><p><strong>center_y</strong> – (float, optional) ordinate location of center of rotation</p></li>
+<li><p><strong>thresh</strong> – (float, optional)
+maximum value of an offset due to a ring artifact</p></li>
+<li><p><strong>thresh_max</strong> – (float, optional)
+max value for portion of image to filter</p></li>
+<li><p><strong>thresh_min</strong> – (float, optional)
+min value for portion of image to filer</p></li>
+<li><p><strong>theta_min</strong> – (int, optional)
+minimum angle in degrees to be considered ring artifact</p></li>
+<li><p><strong>rwidth</strong> – (int, optional)
+Maximum width of the rings to be filtered in pixels</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Filtered data</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.filters.ring_removal.test.ring_removal_test.html"
+                        title="previous chapter">mantidimaging.core.filters.ring_removal.test.ring_removal_test module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.filters.ring_removal.ring_removal_gui.html"
+                        title="next chapter">mantidimaging.core.filters.ring_removal.ring_removal_gui module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="mantidimaging.core.filters.ring_removal.ring_removal.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.filters.ring_removal.ring_removal_gui.html" title="mantidimaging.core.filters.ring_removal.ring_removal_gui module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.filters.ring_removal.test.ring_removal_test.html" title="mantidimaging.core.filters.ring_removal.test.ring_removal_test module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.filters.html" >mantidimaging.core.filters package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.core.filters.ring_removal.html" >mantidimaging.core.filters.ring_removal package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.ring_removal.ring_removal module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

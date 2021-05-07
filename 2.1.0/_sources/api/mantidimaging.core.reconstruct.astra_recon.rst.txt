@@ -1,0 +1,7 @@
+mantidimaging.core.reconstruct.astra\_recon module
+==================================================
+
+.. automodule:: mantidimaging.core.reconstruct.astra_recon
+   :members:
+   :undoc-members:
+   :show-inheritance:

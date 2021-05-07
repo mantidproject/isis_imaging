@@ -1,0 +1,7 @@
+mantidimaging.core.cor\_tilt.test.data\_model\_test module
+==========================================================
+
+.. automodule:: mantidimaging.core.cor_tilt.test.data_model_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+mantidimaging.core.process\_list.test.executor\_test module
+===========================================================
+
+.. automodule:: mantidimaging.core.process_list.test.executor_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

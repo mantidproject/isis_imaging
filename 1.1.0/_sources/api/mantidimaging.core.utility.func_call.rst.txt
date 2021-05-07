@@ -1,0 +1,7 @@
+mantidimaging.core.utility.func\_call module
+============================================
+
+.. automodule:: mantidimaging.core.utility.func_call
+   :members:
+   :undoc-members:
+   :show-inheritance:

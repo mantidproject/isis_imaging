@@ -1,0 +1,286 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.utility.qt_helpers - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.utility.qt_helpers</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.utility.qt_helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module containing helper functions relating to PyQt.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">uic</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility</span> <span class="kn">import</span> <span class="n">finder</span>
+
+
+<div class="viewcode-block" id="BlockQtSignals"><a class="viewcode-back" href="../../../../api/mantidimaging.gui.utility.qt_helpers.html#mantidimaging.gui.utility.qt_helpers.BlockQtSignals">[docs]</a><span class="k">class</span> <span class="nc">BlockQtSignals</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Used to block Qt signals from a selection of QWidgets within a context.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q_objects</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">Qt</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">q_objects</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QObject</span><span class="p">),</span> \
+                <span class="s2">&quot;This class must be used with QObjects&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_objects</span> <span class="o">=</span> <span class="n">q_objects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_values</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_values</span> <span class="o">=</span> \
+            <span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_objects</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">obj</span><span class="p">,</span> <span class="n">prev</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q_objects</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_values</span><span class="p">):</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="n">prev</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="compile_ui"><a class="viewcode-back" href="../../../../api/mantidimaging.gui.utility.qt_helpers.html#mantidimaging.gui.utility.qt_helpers.compile_ui">[docs]</a><span class="k">def</span> <span class="nf">compile_ui</span><span class="p">(</span><span class="n">ui_file</span><span class="p">,</span> <span class="n">qt_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">finder</span><span class="o">.</span><span class="n">get_external_location</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">finder</span><span class="o">.</span><span class="n">ROOT_PACKAGE</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">uic</span><span class="o">.</span><span class="n">loadUi</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="n">ui_file</span><span class="p">),</span> <span class="n">qt_obj</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="select_file"><a class="viewcode-back" href="../../../../api/mantidimaging.gui.utility.qt_helpers.html#mantidimaging.gui.utility.qt_helpers.select_file">[docs]</a><span class="k">def</span> <span class="nf">select_file</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">caption</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param field: The field in which the result will be saved</span>
+<span class="sd">    :param caption: Title of the file browser window that will be opened</span>
+<span class="sd">    :return: True: If a file has been selected, False otherwise</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">),</span> <span class="p">(</span>
+            <span class="s2">&quot;The passed object is of type </span><span class="si">{0}</span><span class="s2">. This function only works with &quot;</span>
+            <span class="s2">&quot;QLineEdit&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">field</span><span class="p">)))</span>
+
+    <span class="n">selected_file</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="n">caption</span><span class="o">=</span><span class="n">caption</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># open file dialogue and set the text if file is selected</span>
+    <span class="k">if</span> <span class="n">selected_file</span><span class="p">:</span>
+        <span class="n">field</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">selected_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># no file has been selected</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="select_directory"><a class="viewcode-back" href="../../../../api/mantidimaging.gui.utility.qt_helpers.html#mantidimaging.gui.utility.qt_helpers.select_directory">[docs]</a><span class="k">def</span> <span class="nf">select_directory</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">caption</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">),</span> <span class="p">(</span>
+            <span class="s2">&quot;The passed object is of type </span><span class="si">{0}</span><span class="s2">. This function only works with &quot;</span>
+            <span class="s2">&quot;QLineEdit&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">field</span><span class="p">)))</span>
+
+    <span class="c1"># open file dialogue and set the text if file is selected</span>
+    <span class="n">field</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getExistingDirectory</span><span class="p">(</span><span class="n">caption</span><span class="o">=</span><span class="n">caption</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="add_property_to_form"><a class="viewcode-back" href="../../../../api/mantidimaging.gui.utility.qt_helpers.html#mantidimaging.gui.utility.qt_helpers.add_property_to_form">[docs]</a><span class="k">def</span> <span class="nf">add_property_to_form</span><span class="p">(</span><span class="n">label</span><span class="p">,</span>
+                         <span class="n">dtype</span><span class="p">,</span>
+                         <span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">valid_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">tooltip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">on_change</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">form</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a property to the algorithm dialog.</span>
+
+<span class="sd">    Handles adding basic data options to the UI.</span>
+
+<span class="sd">    :param label: Label that describes the option</span>
+<span class="sd">    :param dtype: Option data type (any of: file, int, float, bool, list)</span>
+<span class="sd">    :param default_value: Optionally select the default value</span>
+<span class="sd">    :param valid_values: Optionally provide the range or selection of valid</span>
+<span class="sd">                         values</span>
+<span class="sd">    :param tooltip: Optional tooltip text to show on property</span>
+<span class="sd">    :param on_change: Function to be called when the property changes</span>
+<span class="sd">    :param form: Form layout to optionally add the new widgets to</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># By default assume the left hand side widget will be a label</span>
+    <span class="n">left_widget</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">right_widget</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">set_spin_box</span><span class="p">(</span><span class="n">box</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to set default options on a spin box.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">valid_values</span><span class="p">:</span>
+            <span class="n">box</span><span class="o">.</span><span class="n">setMinimum</span><span class="p">(</span><span class="n">valid_values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">box</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="n">valid_values</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">default_value</span><span class="p">:</span>
+            <span class="n">box</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">default_value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">assign_tooltip</span><span class="p">(</span><span class="n">widgets</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to assign tooltips to widgets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tooltip</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">widgets</span><span class="p">:</span>
+                <span class="n">w</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="n">tooltip</span><span class="p">)</span>
+
+    <span class="c1"># Set up data type dependant widgets</span>
+    <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;file&#39;</span><span class="p">:</span>
+        <span class="n">left_widget</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="n">right_widget</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">assign_tooltip</span><span class="p">([</span><span class="n">left_widget</span><span class="p">,</span> <span class="n">right_widget</span><span class="p">])</span>
+        <span class="n">right_widget</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="n">select_file</span><span class="p">(</span><span class="n">left_widget</span><span class="p">,</span> <span class="n">label</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">on_change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">left_widget</span><span class="o">.</span><span class="n">textChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">on_change</span><span class="p">())</span>
+
+    <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span><span class="p">:</span>
+        <span class="n">right_widget</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="n">assign_tooltip</span><span class="p">([</span><span class="n">right_widget</span><span class="p">])</span>
+        <span class="n">set_spin_box</span><span class="p">(</span><span class="n">right_widget</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">on_change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">right_widget</span><span class="o">.</span><span class="n">valueChanged</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">on_change</span><span class="p">())</span>
+
+    <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;float&#39;</span><span class="p">:</span>
+        <span class="n">right_widget</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QDoubleSpinBox</span><span class="p">()</span>
+        <span class="n">assign_tooltip</span><span class="p">([</span><span class="n">right_widget</span><span class="p">])</span>
+        <span class="n">set_spin_box</span><span class="p">(</span><span class="n">right_widget</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">on_change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">right_widget</span><span class="o">.</span><span class="n">valueChanged</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">on_change</span><span class="p">())</span>
+
+    <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;bool&#39;</span><span class="p">:</span>
+        <span class="n">left_widget</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">right_widget</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">assign_tooltip</span><span class="p">([</span><span class="n">right_widget</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">right_widget</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">default_value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">on_change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">right_widget</span><span class="o">.</span><span class="n">stateChanged</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">on_change</span><span class="p">())</span>
+
+    <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+        <span class="n">right_widget</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="n">assign_tooltip</span><span class="p">([</span><span class="n">right_widget</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">valid_values</span><span class="p">:</span>
+            <span class="n">right_widget</span><span class="o">.</span><span class="n">addItems</span><span class="p">(</span><span class="n">valid_values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">on_change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">right_widget</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">on_change</span><span class="p">())</span>
+
+    <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;label&#39;</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown data type&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Add to form layout</span>
+    <span class="k">if</span> <span class="n">form</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">addRow</span><span class="p">(</span><span class="n">left_widget</span><span class="p">,</span> <span class="n">right_widget</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">left_widget</span><span class="p">,</span> <span class="n">right_widget</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="delete_all_widgets_from_layout"><a class="viewcode-back" href="../../../../api/mantidimaging.gui.utility.qt_helpers.html#mantidimaging.gui.utility.qt_helpers.delete_all_widgets_from_layout">[docs]</a><span class="k">def</span> <span class="nf">delete_all_widgets_from_layout</span><span class="p">(</span><span class="n">lo</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes and deletes all child widgets form a layout.</span>
+
+<span class="sd">    :param lo: Layout to clean</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># For each item in the layout (removed as iterated)</span>
+    <span class="k">while</span> <span class="n">lo</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">lo</span><span class="o">.</span><span class="n">takeAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Recurse for child layouts</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QLayout</span><span class="p">):</span>
+            <span class="n">delete_all_widgets_from_layout</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="c1"># Orphan child widgets (seting a None parent removes them from the</span>
+        <span class="c1"># layout and marks them for deletion)</span>
+        <span class="k">elif</span> <span class="n">item</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="qt_helpers.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.utility.qt_helpers</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

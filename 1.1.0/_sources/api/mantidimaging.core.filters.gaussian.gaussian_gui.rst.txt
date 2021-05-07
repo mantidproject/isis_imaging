@@ -1,0 +1,7 @@
+mantidimaging.core.filters.gaussian.gaussian\_gui module
+========================================================
+
+.. automodule:: mantidimaging.core.filters.gaussian.gaussian_gui
+   :members:
+   :undoc-members:
+   :show-inheritance:

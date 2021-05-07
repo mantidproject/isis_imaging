@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.stack\_visualiser.image\_selector\_widget module
+==========================================================================
+
+.. automodule:: mantidimaging.gui.windows.stack_visualiser.image_selector_widget
+   :members:
+   :undoc-members:
+   :show-inheritance:

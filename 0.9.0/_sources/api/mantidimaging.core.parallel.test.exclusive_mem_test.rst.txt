@@ -1,0 +1,7 @@
+mantidimaging.core.parallel.test.exclusive\_mem\_test module
+============================================================
+
+.. automodule:: mantidimaging.core.parallel.test.exclusive_mem_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

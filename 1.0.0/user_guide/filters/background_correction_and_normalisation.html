@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Background Correction and Normalisation - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Circular Mask" href="circular_mask.html" />
+    <link rel="prev" title="Background Correction" href="background_correction.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="circular_mask.html" title="Circular Mask"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="background_correction.html" title="Background Correction"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Filters</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Background Correction and Normalisation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="background-correction-and-normalisation">
+<h1>Background Correction and Normalisation<a class="headerlink" href="#background-correction-and-normalisation" title="Permalink to this headline">¶</a></h1>
+<p>Performs normalisation of sample and flat field images using summed intensity in
+a given open air region then performs a correction for pixel specific intensity
+variances over the range of intensities.</p>
+<p>Operates on a stack of sample images, <span class="math">I_{s}</span> using flat, <span class="math">I_{f}</span>
+(full intensity) and dark, <span class="math">I_{d}</span> (zero intensity) images.</p>
+<p>The normalisation factors for sample images, <span class="math">N_{s}</span> and flat field
+images, <span class="math">N_{f}</span> are calculated by summing the pixel intensities in a given
+region of interest (which should be an area of open beam not close to the
+sample), normalising them then taking their inverse.</p>
+<div class="math">
+<p><span class="math">D &amp;= \frac{\sum{I_{d}}}{|I_{d}|} \\
+F &amp;= \frac{\sum{N_{f}I_{f}}}{|I_{f}|} \\
+S &amp;= \frac{N_{s}I_{s} - D}{F - D}</span></p>
+</div><section id="python-api">
+<h2>Python API<a class="headerlink" href="#python-api" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="mantidimaging.core.filters.background_correction_and_normalisation.execute">
+<code class="sig-prename descclassname">mantidimaging.core.filters.background_correction_and_normalisation.</code><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">flat</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dark</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">air_region</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cores</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">chunksize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mantidimaging/core/filters/background_correction_and_normalisation/background_correction_and_normalisation.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.filters.background_correction_and_normalisation.execute" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Sample data which is to be processed. Expected in radiograms</p></li>
+<li><p><strong>flat</strong> – Flat (open beam) image to use in normalization</p></li>
+<li><p><strong>dark</strong> – Dark image to use in normalization</p></li>
+<li><p><strong>air_region</strong> – Open beam region used for calcualtion of normalisation
+factors.</p></li>
+<li><p><strong>cores</strong> – The number of cores that will be used to process the data.</p></li>
+<li><p><strong>chunksize</strong> – The number of chunks that each worker will receive.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Filtered data (stack of images)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Background Correction and Normalisation</a><ul>
+<li><a class="reference internal" href="#python-api">Python API</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="background_correction.html"
+                        title="previous chapter">Background Correction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="circular_mask.html"
+                        title="next chapter">Circular Mask</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../index.html">Latest</a></li>
+  <li><a href="../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="background_correction_and_normalisation.html">1.0.0</a></li>
+  <li><a href="../../../1.1.0/user_guide/filters/background_correction_and_normalisation.html">1.1.0</a></li>
+  <li><a href="../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="circular_mask.html" title="Circular Mask"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="background_correction.html" title="Background Correction"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Filters</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Background Correction and Normalisation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

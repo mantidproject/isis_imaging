@@ -1,0 +1,7 @@
+mantidimaging.core.cor\_tilt.test.angles\_test module
+=====================================================
+
+.. automodule:: mantidimaging.core.cor_tilt.test.angles_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

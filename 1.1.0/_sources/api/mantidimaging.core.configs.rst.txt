@@ -1,0 +1,25 @@
+mantidimaging.core.configs package
+==================================
+
+.. automodule:: mantidimaging.core.configs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.configs.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.configs.filter_registration
+   mantidimaging.core.configs.functional_config
+   mantidimaging.core.configs.recon_config

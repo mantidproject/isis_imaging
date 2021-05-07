@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.cor\_tilt.point\_table\_model module
+==============================================================
+
+.. automodule:: mantidimaging.gui.windows.cor_tilt.point_table_model
+   :members:
+   :undoc-members:
+   :show-inheritance:

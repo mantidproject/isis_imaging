@@ -1,0 +1,24 @@
+mantidimaging.core.process\_list package
+========================================
+
+.. automodule:: mantidimaging.core.process_list
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.process_list.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.process_list.executor
+   mantidimaging.core.process_list.process_list

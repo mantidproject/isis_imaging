@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Image view - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Reconstruction Help page" href="../reconstructions/index.html" />
+    <link rel="prev" title="Loading and Saving" href="loading_saving.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../reconstructions/index.html" title="Reconstruction Help page"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="loading_saving.html" title="Loading and Saving"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Graphical User Interface (GUI)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Image view</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="image-view">
+<h1>Image view<a class="headerlink" href="#image-view" title="Permalink to this headline">¶</a></h1>
+<p>The image view widget is used in many places in Mantid Imaging to display individual images and image stacks. It is based on ImageView from PyQtGraph and allows fast interaction with large datasets.</p>
+<a class="reference internal image-reference" href="../../_images/image_view.png"><img alt="Image view in main window" class="align-center" src="../../_images/image_view.png" style="width: 70%;" /></a>
+<p>To the right of image the histogram viewer allows controlling how the current image is displayed. Below the image is the stack control which to select which image in the stack is displayed.</p>
+<section id="navigation">
+<h2>Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline">¶</a></h2>
+<p>For the best experience a mouse with a scroll wheel is recommend.</p>
+<ul class="simple">
+<li><p>Panning: Click and drag with the left or middle mouse button</p></li>
+<li><p>Zooming: Either use the scroll wheel or click and drag with the right mouse button</p></li>
+<li><p>Moving through stack: Left click in the stack control area below the image or use the arrow or page-up page-down keys.</p></li>
+<li><p>Reset view: Right click and select View All</p></li>
+</ul>
+<p>On some trackpads without a scroll feature it may be helpful to enable “1 button” mouse option, by right clicking and selecting “Mouse Mode”. This enables zooming by drawing a box with the left mouse button.</p>
+</section>
+<section id="histogram">
+<h2>Histogram<a class="headerlink" href="#histogram" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../../_images/image_view_histogram.png"><img alt="Controlling the histogram the image view" class="align-center" src="../../_images/image_view_histogram.png" style="width: 90%;" /></a>
+<p>The histogram viewer controls how the pixel values in the image are displayed on the screen. The histogram shows the number of pixels for each intensity value. In the above image most of the pixels have values distributed around 10000 and structure in the histogram can be seen between zero and 10000. A few bright spots above 10000 are visible in the image.</p>
+<p>The yellow bars (labelled ‘A’ above) set the range of interest. Moving the top bar down to around 15000 allows far more of the detail to be seen, at the expense of making the bright specs less visible. This selected range is then coloured according the selected gradient, here black to white greyscale.</p>
+<p>The control ticks (triangles labelled ‘B’ above) can be moved around to customise the gradient. Control ticks can be added by left-clicking and removed by right-clicking and selecting “Remove Tick”.</p>
+<p>Alternative colour schemes can be selected by right-clicking on the gradient as shown below. It is also possible to choose if the gradient interpolation between ticks occurs in Red-Green-Blue (RGB) or Hue-Saturation-Value (HSV) colour space.</p>
+<a class="reference internal image-reference" href="../../_images/image_view_colour.png"><img alt="Selecting colours for the image view" class="align-center" src="../../_images/image_view_colour.png" style="width: 70%;" /></a>
+</section>
+<section id="colour-palette">
+<h2>Colour Palette<a class="headerlink" href="#colour-palette" title="Permalink to this headline">¶</a></h2>
+<p>The colour palette of an image can be changed by right clicking its histogram. This allows users to choose from a number
+of pre-defined gradients.</p>
+</section>
+<section id="automatic-gradient-tweaking">
+<h2>Automatic Gradient Tweaking<a class="headerlink" href="#automatic-gradient-tweaking" title="Permalink to this headline">¶</a></h2>
+<p>Users can also use the Jenks Breaks or Otsu algorithms to automatically change the appearance of the gradient. The
+software will then attempt to categorise the image into groups and select colours that emphasise the contrast between
+the different materials in the image. In some cases, this may make the different materials in the image more easy to
+distinguish from one another. Be aware that the success of the algorithm greatly depends on how much the histogram
+cooperates.</p>
+<p>This feature can be accessed by right clicking the projection histogram in the recon window and selecting “Auto”, or
+by clicking on the “Auto Change Colour Palette” button in the bottom-left corner. This is shown below:</p>
+<a class="reference internal image-reference" href="../../_images/access_auto_colour_palette.png"><img alt="Accessing the auto colour palette" class="align-center" src="../../_images/access_auto_colour_palette.png" style="width: 90%;" /></a>
+<p>This then brings up the auto colour palette menu. From here you can choose the number of materials, the algorithm you
+wish to use, and the desired colour map. The default colour map is “spectrum” as it appears to be best-suited to taking
+the results of Otsu/Jenks and choosing colours that emphasise the separateness of the different regions. Note that
+changing the colour map only provides a cosmetic difference and does not influence the results of the algorithm. Users
+should note that the execution time of the algorithm increases greatly with the input value for the number of materials.</p>
+<a class="reference internal image-reference" href="../../_images/auto_colour_palette_menu.png"><img alt="The auto colour palette menu" class="align-center" src="../../_images/auto_colour_palette_menu.png" style="width: 50%;" /></a>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Image view</a><ul>
+<li><a class="reference internal" href="#navigation">Navigation</a></li>
+<li><a class="reference internal" href="#histogram">Histogram</a></li>
+<li><a class="reference internal" href="#colour-palette">Colour Palette</a></li>
+<li><a class="reference internal" href="#automatic-gradient-tweaking">Automatic Gradient Tweaking</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="loading_saving.html"
+                        title="previous chapter">Loading and Saving</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../reconstructions/index.html"
+                        title="next chapter">Reconstruction Help page</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../index.html">Latest</a></li>
+  <li><a href="../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="image_view.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../reconstructions/index.html" title="Reconstruction Help page"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="loading_saving.html" title="Loading and Saving"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Graphical User Interface (GUI)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Image view</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

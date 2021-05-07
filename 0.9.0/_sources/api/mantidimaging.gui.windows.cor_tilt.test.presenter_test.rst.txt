@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.cor\_tilt.test.presenter\_test module
+===============================================================
+
+.. automodule:: mantidimaging.gui.windows.cor_tilt.test.presenter_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

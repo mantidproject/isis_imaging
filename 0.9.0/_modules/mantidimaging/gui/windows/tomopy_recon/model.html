@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.windows.tomopy_recon.model - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.tomopy_recon.model</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.windows.tomopy_recon.model</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.projection_angles</span> <span class="kn">import</span> \
+        <span class="n">generate</span> <span class="k">as</span> <span class="n">generate_projection_angles</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.reconstruct</span> <span class="kn">import</span> <span class="n">tomopy_reconstruct</span>
+
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TomopyReconWindowModel"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.model.html#mantidimaging.gui.windows.tomopy_recon.model.TomopyReconWindowModel">[docs]</a><span class="k">class</span> <span class="nc">TomopyReconWindowModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projection</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_slice_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cors</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projection_angles</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> \
+                <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">images</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">images</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="TomopyReconWindowModel.initial_select_data"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.model.html#mantidimaging.gui.windows.tomopy_recon.model.TomopyReconWindowModel.initial_select_data">[docs]</a>    <span class="k">def</span> <span class="nf">initial_select_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stack</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="n">stack</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">projection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> \
+            <span class="k">if</span> <span class="n">stack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TomopyReconWindowModel.generate_cors"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.model.html#mantidimaging.gui.windows.tomopy_recon.model.TomopyReconWindowModel.generate_cors">[docs]</a>    <span class="k">def</span> <span class="nf">generate_cors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cor</span><span class="p">,</span> <span class="n">gradient</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">num_slices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cors</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_slices</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">gradient</span><span class="p">)</span> <span class="o">+</span> <span class="n">cor</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Generated CORs: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cors</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TomopyReconWindowModel.generate_projection_angles"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.model.html#mantidimaging.gui.windows.tomopy_recon.model.TomopyReconWindowModel.generate_projection_angles">[docs]</a>    <span class="k">def</span> <span class="nf">generate_projection_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_angle</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">num_radiograms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">projection_angles</span> <span class="o">=</span> \
+                <span class="n">generate_projection_angles</span><span class="p">(</span><span class="n">max_angle</span><span class="p">,</span> <span class="n">num_radiograms</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TomopyReconWindowModel.reconstruct_slice"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.model.html#mantidimaging.gui.windows.tomopy_recon.model.TomopyReconWindowModel.reconstruct_slice">[docs]</a>    <span class="k">def</span> <span class="nf">reconstruct_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">preview_slice_idx</span><span class="p">]])</span>
+
+        <span class="k">return</span> <span class="n">tomopy_reconstruct</span><span class="p">(</span>
+                <span class="n">sample</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="n">cor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cors</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">preview_slice_idx</span><span class="p">],</span>
+                <span class="n">proj_angles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">projection_angles</span><span class="p">,</span>
+                <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TomopyReconWindowModel.reconstruct_volume"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.model.html#mantidimaging.gui.windows.tomopy_recon.model.TomopyReconWindowModel.reconstruct_volume">[docs]</a>    <span class="k">def</span> <span class="nf">reconstruct_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tomopy_reconstruct</span><span class="p">(</span>
+                <span class="n">sample</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span>
+                <span class="n">cor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cors</span><span class="p">,</span>
+                <span class="n">proj_angles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">projection_angles</span><span class="p">,</span>
+                <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="model.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.tomopy_recon.model</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

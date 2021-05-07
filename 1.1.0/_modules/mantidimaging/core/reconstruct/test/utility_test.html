@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.reconstruct.test.utility_test - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.reconstruct.test.utility_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.reconstruct.test.utility_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span><span class="p">,</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.reconstruct</span> <span class="kn">import</span> <span class="n">utility</span>
+
+
+<span class="n">TEST_PARAMS_1</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;operation_history&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;region_of_interest&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="mi">61</span><span class="p">,</span>
+                    <span class="mi">31</span><span class="p">,</span>
+                    <span class="mi">2025</span><span class="p">,</span>
+                    <span class="mi">1730</span>
+                <span class="p">]</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span>
+            <span class="s2">&quot;mantidimaging.core.filters.crop_coords.crop_coords.execute_single&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="mf">0.75</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mantidimaging.core.filters.cut_off.cut_off.execute&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;region_of_interest&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="mi">760</span><span class="p">,</span>
+                    <span class="mi">316</span><span class="p">,</span>
+                    <span class="mi">1939</span><span class="p">,</span>
+                    <span class="mi">1687</span>
+                <span class="p">]</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span>
+            <span class="s2">&quot;mantidimaging.core.filters.crop_coords.crop_coords.execute_single&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+
+<span class="n">TEST_PARAMS_2</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;operation_history&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;region_of_interest&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="mi">61</span><span class="p">,</span>
+                    <span class="mi">31</span><span class="p">,</span>
+                    <span class="mi">2025</span><span class="p">,</span>
+                    <span class="mi">1730</span>
+                <span class="p">]</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span>
+            <span class="s2">&quot;mantidimaging.core.filters.crop_coords.crop_coords.execute_single&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+
+<span class="n">TEST_PARAMS_3</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;operation_history&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;threshold&#39;</span><span class="p">:</span> <span class="mf">0.22</span><span class="p">},</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;mantidimaging.core.filters.cut_off.cut_off.execute&#39;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;region_of_interest&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="mi">72</span><span class="p">,</span>
+                    <span class="mi">697</span><span class="p">,</span>
+                    <span class="mi">2038</span><span class="p">,</span>
+                    <span class="mi">1578</span>
+                <span class="p">]</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;mantidimaging.core.filters.crop_coords.crop_coords.execute_single&#39;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;region_of_interest&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="mi">705</span><span class="p">,</span>
+                    <span class="mi">22</span><span class="p">,</span>
+                    <span class="mi">1944</span><span class="p">,</span>
+                    <span class="mi">845</span>
+                <span class="p">]</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;mantidimaging.core.filters.crop_coords.crop_coords.execute_single&#39;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;fitted_gradient&#39;</span><span class="p">:</span> <span class="mf">0.009657997234305727</span><span class="p">,</span>
+                <span class="s1">&#39;rotation_centre&#39;</span><span class="p">:</span> <span class="mf">617.2297924368454</span><span class="p">,</span>
+                <span class="s1">&#39;rotation_centres&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="mf">619.0</span><span class="p">,</span>
+                    <span class="mf">620.171875</span><span class="p">,</span>
+                    <span class="mf">624.078125</span>
+                <span class="p">],</span>
+                <span class="s1">&#39;slice_indices&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="mi">143</span><span class="p">,</span>
+                    <span class="mi">376</span><span class="p">,</span>
+                    <span class="mi">678</span>
+                <span class="p">],</span>
+                <span class="s1">&#39;tilt_angle_rad&#39;</span><span class="p">:</span> <span class="mf">0.009657696961729184</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;cor_tilt_finding&#39;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;region_of_interest&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="mi">14</span><span class="p">,</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="mi">1191</span><span class="p">,</span>
+                    <span class="mi">249</span>
+                <span class="p">]</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;mantidimaging.core.filters.crop_coords.crop_coords.execute_single&#39;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+
+<span class="n">TEST_PARAMS_4</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;operation_history&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;fitted_gradient&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s1">&#39;rotation_centre&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+                <span class="s1">&#39;tilt_angle_rad&#39;</span><span class="p">:</span> <span class="mi">0</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;cor_tilt_finding&#39;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;region_of_interest&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="mi">20</span><span class="p">,</span>
+                    <span class="mi">100</span><span class="p">,</span>
+                    <span class="mi">100</span>
+                <span class="p">]</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;mantidimaging.core.filters.crop_coords.crop_coords.execute_single&#39;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">TEST_PARAMS_5</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;operation_history&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;region_of_interest&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="mi">20</span><span class="p">,</span>
+                    <span class="mi">100</span><span class="p">,</span>
+                    <span class="mi">100</span>
+                <span class="p">]</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;mantidimaging.core.filters.crop_coords.crop_coords.execute_single&#39;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="UtilityTest"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest">[docs]</a><span class="k">class</span> <span class="nc">UtilityTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UtilityTest.test_get_crop_multiple"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_crop_multiple">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_crop_multiple</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">imgs</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">TEST_PARAMS_1</span>
+        <span class="n">roi_offset</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_crop</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">roi_offset</span><span class="p">,</span> <span class="mi">821</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_crop_multiple_select_1"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_crop_multiple_select_1">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_crop_multiple_select_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">imgs</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">TEST_PARAMS_1</span>
+        <span class="n">roi_offset</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_crop</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">roi_offset</span><span class="p">,</span> <span class="mi">61</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_crop_multiple_select_2"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_crop_multiple_select_2">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_crop_multiple_select_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">imgs</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">TEST_PARAMS_1</span>
+        <span class="n">roi_offset</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_crop</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">roi_offset</span><span class="p">,</span> <span class="mi">760</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_crop_multiple_select_2_top"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_crop_multiple_select_2_top">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_crop_multiple_select_2_top</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">imgs</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">TEST_PARAMS_1</span>
+        <span class="n">roi_offset</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_crop</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">roi_offset</span><span class="p">,</span> <span class="mi">316</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_crop_single"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_crop_single">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_crop_single</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">imgs</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">TEST_PARAMS_2</span>
+        <span class="n">roi_offset</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_crop</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">roi_offset</span><span class="p">,</span> <span class="mi">61</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_crop_no_hist"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_crop_no_hist">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_crop_no_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">imgs</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;operation_history&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="n">roi_offset</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_crop</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">roi_offset</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_crop_empty"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_crop_empty">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_crop_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">roi_offset</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_crop</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">roi_offset</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_last_cor_tilt_find"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_last_cor_tilt_find">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_last_cor_tilt_find</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">imgs</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">TEST_PARAMS_3</span>
+        <span class="n">finding</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_last_cor_tilt_find</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNotNone</span><span class="p">(</span><span class="n">finding</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span>
+            <span class="n">finding</span><span class="p">,</span>
+            <span class="n">imgs</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">OPERATION_HISTORY</span><span class="p">][</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_last_cor_tilt_find_empty"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_last_cor_tilt_find_empty">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_last_cor_tilt_find_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">last_find</span><span class="p">,</span> <span class="n">last_find_idx</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_last_cor_tilt_find</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">last_find</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">last_find_idx</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_cor_tilt_from_images"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_cor_tilt_from_images">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_cor_tilt_from_images</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">imgs</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">TEST_PARAMS_3</span>
+        <span class="n">cor</span><span class="p">,</span> <span class="n">tilt</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_cor_tilt_from_images</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">cor</span><span class="p">,</span> <span class="mf">603.2297924368454</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">tilt</span><span class="p">,</span> <span class="mf">0.009657696961729184</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mf">0.009657997234305727</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_cor_tilt_from_images_subsequent_top_crop"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_cor_tilt_from_images_subsequent_top_crop">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_cor_tilt_from_images_subsequent_top_crop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">imgs</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">TEST_PARAMS_4</span>
+        <span class="n">cor</span><span class="p">,</span> <span class="n">tilt</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_cor_tilt_from_images</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">cor</span><span class="p">,</span> <span class="mi">70</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">tilt</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_cor_tilt_from_images_empty"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_cor_tilt_from_images_empty">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_cor_tilt_from_images_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">cor</span><span class="p">,</span> <span class="n">tilt</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_cor_tilt_from_images</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">cor</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">tilt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_cor_tilt_from_images_none"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_cor_tilt_from_images_none">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_cor_tilt_from_images_none</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cor</span><span class="p">,</span> <span class="n">tilt</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_cor_tilt_from_images</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">cor</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">tilt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UtilityTest.test_get_cor_tilt_from_images_no_cor_tilt_in_history"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.reconstruct.test.utility_test.html#mantidimaging.core.reconstruct.test.utility_test.UtilityTest.test_get_cor_tilt_from_images_no_cor_tilt_in_history">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_cor_tilt_from_images_no_cor_tilt_in_history</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+        <span class="n">imgs</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">TEST_PARAMS_5</span>
+        <span class="n">cor</span><span class="p">,</span> <span class="n">tilt</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">utility</span><span class="o">.</span><span class="n">get_cor_tilt_from_images</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">cor</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">tilt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="utility_test.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.reconstruct.test.utility_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

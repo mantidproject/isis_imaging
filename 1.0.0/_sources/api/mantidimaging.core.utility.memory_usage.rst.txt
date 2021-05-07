@@ -1,0 +1,7 @@
+mantidimaging.core.utility.memory\_usage module
+===============================================
+
+.. automodule:: mantidimaging.core.utility.memory_usage
+   :members:
+   :undoc-members:
+   :show-inheritance:

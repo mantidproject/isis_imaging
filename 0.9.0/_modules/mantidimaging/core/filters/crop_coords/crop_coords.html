@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.filters.crop_coords.crop_coords - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.crop_coords.crop_coords</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.filters.crop_coords.crop_coords</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">mantidimaging</span> <span class="kn">import</span> <span class="n">helper</span> <span class="k">as</span> <span class="n">h</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+
+<span class="k">def</span> <span class="nf">_cli_register</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--region-of-interest&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Crop original images using these coordinates. The selection is a&quot;</span>
+        <span class="s2">&quot; rectangle and expected order is - Left Top Right Bottom.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;If not given, the whole images are used.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Example: --region-of-interest 150 234 23 22.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../../user_guide/filters/crop_coords.html#mantidimaging.core.filters.crop_coords.crop_coords.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">region_of_interest</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dark</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Execute the Crop Coordinates by Region of Interest filter.</span>
+<span class="sd">    This does NOT do any checks if the Region of interest is out of bounds!</span>
+
+<span class="sd">    If the region of interest is out of bounds, the crop will **FAIL** at</span>
+<span class="sd">    runtime.</span>
+
+<span class="sd">    If the region of interest is in bounds, but has overlapping coordinates</span>
+<span class="sd">    the crop give back a 0 shape of the coordinates that were wrong.</span>
+
+<span class="sd">    :param data: Input data as a 3D numpy.ndarray</span>
+
+<span class="sd">    :param region_of_interest: Crop original images using these coordinates.</span>
+<span class="sd">                               The selection is a rectangle and expected order</span>
+<span class="sd">                               is - Left Top Right Bottom.</span>
+
+<span class="sd">    :param flat: The average flat image to be cropped</span>
+
+<span class="sd">    :param dark: The average dark image to be cropped</span>
+
+<span class="sd">    :return: The processed 3D numpy.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># execute only for sample, if no flat and dark images are provided</span>
+    <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">flat</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">dark</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">execute_single</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">region_of_interest</span><span class="p">,</span> <span class="n">progress</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># crop all and return as tuple</span>
+        <span class="k">return</span> <span class="n">execute_single</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">region_of_interest</span><span class="p">,</span> <span class="n">progress</span><span class="p">),</span> \
+            <span class="n">execute_single</span><span class="p">(</span><span class="n">flat</span><span class="p">,</span> <span class="n">region_of_interest</span><span class="p">,</span> <span class="n">progress</span><span class="p">),</span> \
+            <span class="n">execute_single</span><span class="p">(</span><span class="n">dark</span><span class="p">,</span> <span class="n">region_of_interest</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="execute_single"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.filters.crop_coords.crop_coords.html#mantidimaging.core.filters.crop_coords.crop_coords.execute_single">[docs]</a><span class="k">def</span> <span class="nf">execute_single</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">region_of_interest</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Crop Coords&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">region_of_interest</span><span class="p">:</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">add_estimated_steps</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span>
+                       <span class="n">region</span> <span class="ow">in</span> <span class="n">region_of_interest</span><span class="p">),</span> \
+                <span class="s2">&quot;The region of interest coordinates are not integers!&quot;</span>
+
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Cropping with coordinates: </span><span class="si">{0}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">region_of_interest</span><span class="p">))</span>
+
+            <span class="n">left</span> <span class="o">=</span> <span class="n">region_of_interest</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">top</span> <span class="o">=</span> <span class="n">region_of_interest</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">region_of_interest</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">bottom</span> <span class="o">=</span> <span class="n">region_of_interest</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="crop_coords.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.crop_coords.crop_coords</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

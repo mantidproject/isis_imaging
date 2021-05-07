@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.stack\_visualiser.histogram module
+============================================================
+
+.. automodule:: mantidimaging.gui.windows.stack_visualiser.histogram
+   :members:
+   :undoc-members:
+   :show-inheritance:

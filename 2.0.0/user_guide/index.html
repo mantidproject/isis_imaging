@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>User Guide - MantidImaging 2.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Operations" href="operations/index.html" />
+    <link rel="prev" title="Installation" href="../installation.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="operations/index.html" title="Operations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../installation.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.0.0 Documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<p><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="operations/index.html">Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui/index.html">Graphical User Interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reconstructions/index.html">Reconstruction Help page</a></li>
+</ul>
+</div>
+<section id="mantid-imaging-user-guide-example-reconstruction">
+<h2>Mantid Imaging User Guide: Example Reconstruction<a class="headerlink" href="#mantid-imaging-user-guide-example-reconstruction" title="Permalink to this headline">¶</a></h2>
+<p>Written: November 2020</p>
+<p>Author: Arianna Wintle (STFC)</p>
+<p>Please email any suggestions to <a class="reference external" href="mailto:mantidimagingsupport&#37;&#52;&#48;stfc365&#46;onmicrosoft&#46;com">mantidimagingsupport<span>&#64;</span>stfc365<span>&#46;</span>onmicrosoft<span>&#46;</span>com</a></p>
+<section id="loading-sample-stack">
+<h3>Loading Sample Stack<a class="headerlink" href="#loading-sample-stack" title="Permalink to this headline">¶</a></h3>
+<p>Firstly, let’s load our projections. Go to “File” then “Load” or alternatively use the shortcut “Ctrl”+”o”. This brings up the following loading screen:</p>
+<a class="reference internal image-reference" href="../_images/loading_screen.png"><img alt="Loading screen" class="align-center" src="../_images/loading_screen.png" style="width: 70%;" /></a>
+<ol class="arabic simple">
+<li><p>Click select on the sample row and go to the directory you want to load. We’ll be working with the “Tilt 4 pre reco” data set.</p></li>
+<li><p>Open one of the images with the prefix “Tomo”.</p></li>
+<li><p>All images with the prefix “Tomo” in the same directory will be loaded</p></li>
+</ol>
+<p>Mantid Imaging will search the directory for all the files with prefixes like “Flat” and “Dark” and put them in the correct category.
+Another location that is checked is the parent directory - it will search for folders names “Flat” and “Dark” there, and use those images for each one, respectively.
+If they are missed or stored in a different location, the above steps can be repeated to find and load these.</p>
+<p>At this stage there is also the option to:</p>
+<ol class="arabic simple">
+<li><p>Open only a portion of the sample images. This can be done by manually selecting the file indices or using the “Preview” Button which will set the file indices to a suitable selection.</p></li>
+<li><p>Select the pixel size of the detector used in microns. This can also be changed at a later stage.</p></li>
+<li><p>Untick a category of files to not load. For example, if both “Dark Before” and “Dark After” images have been found this can be adjusted to only one.</p></li>
+</ol>
+</section>
+<section id="project-window">
+<h3>Project Window<a class="headerlink" href="#project-window" title="Permalink to this headline">¶</a></h3>
+<img alt="View of the application window" class="align-center" src="../_images/project_view_guide.png" />
+</section>
+<section id="operations">
+<h3>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h3>
+<p>Next let’s take the sample we loaded and let’s tidy it up with operations. To open the operations go to “Workflow” then “Operations”.</p>
+<ol class="arabic simple">
+<li><p><strong>Remove Outliers</strong> will be the first operation we will apply. This has to be completed in 2 modes “Bright” and “Dark”. We’ll complete this for both modes with difference set to 500 and median kernel set to size 3. Apply this to all stacks.
+- The difference value is used to find outliers, and will have to be adjusted depending on the values in your data, and how aggressive you want the filter to be.
+- Safe Apply is enabled by default and it will show a window containing the original data and the processed data. This allows us to see the result of the operation before applying it. Choose the new data to proceed.</p></li>
+<li><p><strong>Flat Fielding</strong> As we only have one set of flat and dark images we will set the flat fielding method to “Only Before”. With safe apply checked running this operation opens the following window:
+- Safe Apply window showing before flat fielding on the left and after flat fielding on the right. Next select “Choose New Data” to apply operation.</p></li>
+</ol>
+<img alt="Flat fielding with Safe Apply option turned on" class="align-center" src="../_images/flat_fielding.png" />
+<ol class="arabic simple" start="3">
+<li><p><strong>ROI Normalisation</strong> After going to this operation we’re able to click “Select ROI” and set our ROI to a space free of any sample. This operation will result in a much greater consistency between projections visible in the ROI viewer.</p></li>
+<li><p><strong>Crop Coordinates</strong> Next we will crop the stack to contain the sample only by selecting a ROI as in the following.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/Crop.png"><img alt="ROI that needs to be selected for the crop" class="align-center" src="../_images/Crop.png" style="width: 70%;" /></a>
+<p>At this point we have a sample ready to reconstruct. Note: operations such as a Median Filter could be used here, but in an effort to conserve grey value as accurately as possible it was avoided. To see the list of available operations go to the <a class="reference internal" href="operations/index.html#operations"><span class="std std-ref">Operations</span></a> help page.</p>
+</section>
+<section id="reconstruction">
+<h3>Reconstruction<a class="headerlink" href="#reconstruction" title="Permalink to this headline">¶</a></h3>
+<p>To open the reconstruction window, go to “Workflow” then “Reconstruct”. This should open onto the “COR and Tilt” tab. The reconstruction window provides 2 automatic methods COR/Tilt finding, read more about them here: <a class="reference internal" href="reconstructions/center_of_rotation.html#center-of-rotation"><span class="std std-ref">Center of Rotation and Tilt</span></a>.</p>
+<p>For this reconstruction we will be manually finding the COR and tilt values. The best way to do this is to use the <strong>COR Table</strong>.</p>
+<ol class="arabic simple">
+<li><p>First select a slice index close to the top of the sample by clicking on the projection image (the top left image from the 3 visible in the window), or dragging the yellow line.</p>
+<ul class="simple">
+<li><p>Alternatively you can use the Preview box at the bottom of the reconstruction window.</p></li>
+</ul>
+</li>
+<li><p>Then press the “Add” button at the bottom of the screen. This should add your slice to the table.</p></li>
+<li><p>Press the “Refine” button whilst selecting this slice. This brings up the following window:</p></li>
+</ol>
+<img alt="Loading screen" class="align-center" src="../_images/refine_window.png" />
+<ol class="arabic simple" start="4">
+<li><p>Continue by selecting which image shows the most accurate depiction of the sample. Mantid Imaging will highlight the image it feels is best in green. This can be inaccurate for very noisy samples, but should be accurate for this dataset.</p></li>
+<li><p>Select another slice at the bottom of the sample, “Add” it to the table.  As soon as you add the 2nd slice it will perform a fit for the COR and tilt. This will not be accurate - select the newly added row and repeat the refine.</p></li>
+<li><p>Once you find a good COR and confirmed with “Finish”, the fit should be automatically performed to the new COR you found.</p></li>
+</ol>
+<p>Now move to the “Reconstruct” tab. At this stage there should several different settings to use. For this sample use the following settings.</p>
+<ul class="simple">
+<li><p>Maximum Projection Angle: 360.00</p></li>
+<li><p>Algorithm: FBP-CUDA</p></li>
+<li><p>Reconstruction filter: hann</p></li>
+<li><p>Pixel size (microns): 103</p></li>
+</ul>
+<p>There are many filter options. Experiment with the filters by looking at the slice preview and the corresponding histogram next to it. Filters like “hann” will strongly filter out higher frequency components. In contrast “ram-lak” preserves these higher frequency components resulting in a visibly less smooth histogram.</p>
+<p>Then click “Reconstruct Volume” to complete the reconstruction. This should take about 5 minutes.</p>
+</section>
+<section id="post-reconstruction">
+<h3>Post-reconstruction<a class="headerlink" href="#post-reconstruction" title="Permalink to this headline">¶</a></h3>
+<p>Once the reconstruction is finished, the data will be automatically divided by the pixel size, so the resulting images will contain the attenuation values. At this point you can apply some post-processing operations (such as circular mask), or just save out the stack with File &gt; Save (or CTRL+S), in order to visualise it as a 3D volume in another software.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">User Guide</a><ul>
+<li><a class="reference internal" href="#mantid-imaging-user-guide-example-reconstruction">Mantid Imaging User Guide: Example Reconstruction</a><ul>
+<li><a class="reference internal" href="#loading-sample-stack">Loading Sample Stack</a></li>
+<li><a class="reference internal" href="#project-window">Project Window</a></li>
+<li><a class="reference internal" href="#operations">Operations</a></li>
+<li><a class="reference internal" href="#reconstruction">Reconstruction</a></li>
+<li><a class="reference internal" href="#post-reconstruction">Post-reconstruction</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../installation.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="operations/index.html"
+                        title="next chapter">Operations</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/user_guide/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/user_guide/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/user_guide/index.html">1.1.0</a></li>
+  <li><a href="index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/user_guide/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="operations/index.html" title="Operations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../installation.html" title="Installation"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.0.0 Documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

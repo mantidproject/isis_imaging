@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.utility.test.registrator_test - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.test.registrator_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.utility.test.registrator_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.registrator</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">get_package_children</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RegistratorTest"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.test.registrator_test.html#mantidimaging.core.utility.test.registrator_test.RegistratorTest">[docs]</a><span class="k">class</span> <span class="nc">RegistratorTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This test suite tests the registrator functionality by operating on the</span>
+<span class="sd">    mantidimaging.core.filters package.</span>
+
+<span class="sd">    If any filters are added or removed, or if the structure of that package is</span>
+<span class="sd">    changed then this test will need to be adjusted accordingly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RegistratorTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RegistratorTest.test_get_package_children"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.test.registrator_test.html#mantidimaging.core.utility.test.registrator_test.RegistratorTest.test_get_package_children">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_package_children</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="n">get_package_children</span><span class="p">(</span><span class="s1">&#39;mantidimaging.core.filters&#39;</span><span class="p">,</span>
+                                       <span class="n">packages</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">modules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span> <span class="p">[</span>
+            <span class="s1">&#39;mantidimaging.core.filters.background_correction&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.background_correction.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.circular_mask&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.circular_mask.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.clip_values&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.clip_values.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.crop_coords&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.crop_coords.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.cut_off&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.cut_off.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.gaussian&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.gaussian.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.median_filter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.median_filter.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.minus_log&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.minus_log.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.outliers&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.outliers.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.rebin&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.rebin.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.ring_removal&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.ring_removal.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.roi_normalisation&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.roi_normalisation.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.rotate_stack&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.rotate_stack.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.stripe_removal&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.stripe_removal.test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.wip&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.wip.mcp_corrections&#39;</span>
+        <span class="p">])</span></div>
+
+<div class="viewcode-block" id="RegistratorTest.test_get_package_children_with_ignores"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.test.registrator_test.html#mantidimaging.core.utility.test.registrator_test.RegistratorTest.test_get_package_children_with_ignores">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_package_children_with_ignores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="n">get_package_children</span><span class="p">(</span><span class="s1">&#39;mantidimaging.core.filters&#39;</span><span class="p">,</span>
+                                       <span class="n">packages</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                       <span class="n">ignore</span><span class="o">=</span><span class="p">[</span>
+                                           <span class="s1">&#39;mantidimaging.core.filters.wip&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;test&#39;</span><span class="p">])</span>
+
+        <span class="n">modules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span> <span class="p">[</span>
+            <span class="s1">&#39;mantidimaging.core.filters.background_correction&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.circular_mask&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.clip_values&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.crop_coords&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.cut_off&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.gaussian&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.median_filter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.minus_log&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.outliers&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.rebin&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.ring_removal&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.roi_normalisation&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.rotate_stack&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.stripe_removal&#39;</span>
+        <span class="p">])</span></div>
+
+<div class="viewcode-block" id="RegistratorTest.test_get_package_children_modules_only"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.test.registrator_test.html#mantidimaging.core.utility.test.registrator_test.RegistratorTest.test_get_package_children_modules_only">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_package_children_modules_only</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="n">get_package_children</span><span class="p">(</span><span class="s1">&#39;mantidimaging.core.filters.wip&#39;</span><span class="p">,</span>
+                                       <span class="n">packages</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                       <span class="n">modules</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">modules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span> <span class="p">[</span>
+            <span class="s1">&#39;mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections&#39;</span>
+        <span class="p">])</span></div>
+
+<div class="viewcode-block" id="RegistratorTest.test_get_package_children_packages_and_modules"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.test.registrator_test.html#mantidimaging.core.utility.test.registrator_test.RegistratorTest.test_get_package_children_packages_and_modules">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_package_children_packages_and_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="n">get_package_children</span><span class="p">(</span><span class="s1">&#39;mantidimaging.core.filters.wip&#39;</span><span class="p">,</span>
+                                       <span class="n">packages</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                       <span class="n">modules</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">modules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span> <span class="p">[</span>
+            <span class="s1">&#39;mantidimaging.core.filters.wip.mcp_corrections&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections&#39;</span>
+        <span class="p">])</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="registrator_test.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.test.registrator_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

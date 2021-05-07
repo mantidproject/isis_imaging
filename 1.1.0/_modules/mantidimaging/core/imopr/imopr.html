@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.imopr.imopr - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.imopr.imopr</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.imopr.imopr</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging</span> <span class="kn">import</span> <span class="n">helper</span> <span class="k">as</span> <span class="n">h</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.io</span> <span class="kn">import</span> <span class="n">loader</span>
+
+
+<div class="viewcode-block" id="get_available_operators"><a class="viewcode-back" href="../../../../api/mantidimaging.core.imopr.imopr.html#mantidimaging.core.imopr.imopr.get_available_operators">[docs]</a><span class="k">def</span> <span class="nf">get_available_operators</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="s1">&#39;recon&#39;</span><span class="p">,</span> <span class="s1">&#39;sino&#39;</span><span class="p">,</span> <span class="s1">&#39;show&#39;</span><span class="p">,</span> <span class="s1">&#39;vis&#39;</span><span class="p">,</span> <span class="s1">&#39;cor&#39;</span><span class="p">,</span> <span class="s1">&#39;corvo&#39;</span><span class="p">,</span> <span class="s1">&#39;corpc&#39;</span><span class="p">,</span> <span class="s1">&#39;corwrite&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;sum&#39;</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;subtract&#39;</span><span class="p">,</span> <span class="s1">&#39;sub&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;divide&#39;</span><span class="p">,</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;multiply&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;mul&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;avg&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../api/mantidimaging.core.imopr.imopr.html#mantidimaging.core.imopr.imopr.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Execute the image operator.</span>
+
+<span class="sd">    This allows performing operations on single images, or specified images</span>
+<span class="sd">    slices.</span>
+
+<span class="sd">    This mode respects --indices &lt;start&gt; &lt;stop&gt; &lt;step&gt;.</span>
+
+<span class="sd">    This means the operations will be performed only on the indices you have</span>
+<span class="sd">    specified.</span>
+
+<span class="sd">    Currently available modes, more information in each module&#39;s file:</span>
+<span class="sd">        - cor - get the COR for a slice or multiple slices using tomopy</span>
+<span class="sd">                find_center.</span>
+<span class="sd">        - corwrite - output a reconstructed image for different CORs for</span>
+<span class="sd">                     slices.</span>
+
+<span class="sd">        TODO outdated:</span>
+<span class="sd">        - recon - do a reconstruction on a single or multiple slices, --imopr 1</span>
+<span class="sd">                  recon, --imopr 10 34 recon</span>
+<span class="sd">        - sino - visualise the sinogram for single or multiple slices, --imopr</span>
+<span class="sd">                 1 sino, --imopr 10 34 sino</span>
+<span class="sd">        - vis - just visualise the single or multiple images, --imopr 1 vis,</span>
+<span class="sd">                --imopr 10 34 vis</span>
+<span class="sd">        - corvo - get the COR for a slice or multiple slices using</span>
+<span class="sd">                  tomopy find_center_vo, --imopr 1 corvo, --imopr 10 34 corvo</span>
+<span class="sd">        - corpc - get the COR for a slice or multiple slices using</span>
+<span class="sd">                  tomopy find_center_pc, --imopr 1 corpc, --imopr 10 34 corpc</span>
+<span class="sd">        - opr - do operations on 2 images, that can be:</span>
+<span class="sd">                sum(also +), --imopr 1 3 sum, --imopr 10 34 +</span>
+<span class="sd">                subtract(also sub, -), --imopr 1 3 sub, --imopr 10 34 -</span>
+<span class="sd">                divide(also div, /), --imopr 1 3 div, --imopr 10 34 /</span>
+<span class="sd">                multiply(also mul, *), --imopr 1 3 mul, --imopr 10 34 *</span>
+<span class="sd">                mean(also avg, x), --imopr 1 3 avg, --imopr 10 34 x</span>
+
+<span class="sd">    COR functions reference:</span>
+<span class="sd">    http://tomopy.readthedocs.io/en/latest/api/tomopy.recon.rotation.html</span>
+
+<span class="sd">    :param config:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># use [:] to get a copy of the list</span>
+    <span class="n">commands</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">imopr</span><span class="p">[:]</span>
+    <span class="c1"># strip the last command, it must be the name of the module</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">get_function</span><span class="p">(</span><span class="n">commands</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+    <span class="c1"># the rest is a list of indices</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">]</span>
+
+    <span class="n">h</span><span class="o">.</span><span class="n">check_config_integrity</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">module</span><span class="o">.</span><span class="n">sanity_checks</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">images</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Data shape </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">module</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">flat</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">dark</span><span class="p">,</span>
+            <span class="n">config</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_function"><a class="viewcode-back" href="../../../../api/mantidimaging.core.imopr.imopr.html#mantidimaging.core.imopr.imopr.get_function">[docs]</a><span class="k">def</span> <span class="nf">get_function</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">module_name</span> <span class="o">==</span> <span class="s2">&quot;recon&quot;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.imopr</span> <span class="kn">import</span> <span class="n">recon</span>
+        <span class="k">return</span> <span class="n">recon</span>
+    <span class="k">elif</span> <span class="n">module_name</span> <span class="o">==</span> <span class="s2">&quot;sino&quot;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.imopr</span> <span class="kn">import</span> <span class="n">sinogram</span>
+        <span class="k">return</span> <span class="n">sinogram</span>
+    <span class="k">elif</span> <span class="n">module_name</span> <span class="o">==</span> <span class="s2">&quot;show&quot;</span> <span class="ow">or</span> <span class="n">module_name</span> <span class="o">==</span> <span class="s2">&quot;vis&quot;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.imopr</span> <span class="kn">import</span> <span class="n">visualiser</span>
+        <span class="k">return</span> <span class="n">visualiser</span>
+    <span class="k">elif</span> <span class="n">module_name</span> <span class="o">==</span> <span class="s2">&quot;cor&quot;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.imopr</span> <span class="kn">import</span> <span class="n">cor</span>
+        <span class="k">return</span> <span class="n">cor</span>
+    <span class="k">elif</span> <span class="n">module_name</span> <span class="o">==</span> <span class="s2">&quot;corvo&quot;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.imopr</span> <span class="kn">import</span> <span class="n">corvo</span>
+        <span class="k">return</span> <span class="n">corvo</span>
+    <span class="k">elif</span> <span class="n">module_name</span> <span class="o">==</span> <span class="s2">&quot;corpc&quot;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.imopr</span> <span class="kn">import</span> <span class="n">corpc</span>
+        <span class="k">return</span> <span class="n">corpc</span>
+    <span class="k">elif</span> <span class="n">module_name</span> <span class="o">==</span> <span class="s2">&quot;corwrite&quot;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.imopr</span> <span class="kn">import</span> <span class="n">corwrite</span>
+        <span class="k">return</span> <span class="n">corwrite</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.imopr</span> <span class="kn">import</span> <span class="n">opr</span>
+        <span class="k">if</span> <span class="n">module_name</span> <span class="ow">in</span> <span class="n">opr</span><span class="o">.</span><span class="n">get_available_operators</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">opr</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="imopr.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.imopr.imopr</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

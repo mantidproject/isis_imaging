@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.dialogs.async_task.test.task_test - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.dialogs.async_task.test.task_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.dialogs.async_task.test.task_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.dialogs.async_task.task</span> <span class="kn">import</span> <span class="n">TaskWorkerThread</span>
+
+
+<div class="viewcode-block" id="TaskWorkerThreadTest"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.dialogs.async_task.test.task_test.html#mantidimaging.gui.dialogs.async_task.test.task_test.TaskWorkerThreadTest">[docs]</a><span class="k">class</span> <span class="nc">TaskWorkerThreadTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TaskWorkerThreadTest.test_basic_happy_case"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.dialogs.async_task.test.task_test.html#mantidimaging.gui.dialogs.async_task.test.task_test.TaskWorkerThreadTest.test_basic_happy_case">[docs]</a>    <span class="k">def</span> <span class="nf">test_basic_happy_case</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+        <span class="n">t</span> <span class="o">=</span> <span class="n">TaskWorkerThread</span><span class="p">()</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">task_function</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+
+        <span class="n">t</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+        <span class="n">t</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">was_successful</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TaskWorkerThreadTest.test_failure"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.dialogs.async_task.test.task_test.html#mantidimaging.gui.dialogs.async_task.test.task_test.TaskWorkerThreadTest.test_failure">[docs]</a>    <span class="k">def</span> <span class="nf">test_failure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;nope&#39;</span><span class="p">)</span>
+
+        <span class="n">t</span> <span class="o">=</span> <span class="n">TaskWorkerThread</span><span class="p">()</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">task_function</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+
+        <span class="n">t</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+        <span class="n">t</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">was_successful</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNotNone</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="ne">RuntimeError</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;nope&#39;</span><span class="p">,</span> <span class="p">))</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="task_test.html">1.1.0</a></li>
+  <li><a href="../../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.dialogs.async_task.test.task_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

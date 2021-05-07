@@ -1,0 +1,7 @@
+mantidimaging.core.operations.outliers.outliers module
+======================================================
+
+.. automodule:: mantidimaging.core.operations.outliers.outliers
+   :members:
+   :undoc-members:
+   :show-inheritance:

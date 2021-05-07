@@ -1,0 +1,7 @@
+mantidimaging.core.cor\_tilt.workflow module
+============================================
+
+.. automodule:: mantidimaging.core.cor_tilt.workflow
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.tomopy\_recon.model module
+====================================================
+
+.. automodule:: mantidimaging.gui.windows.tomopy_recon.model
+   :members:
+   :undoc-members:
+   :show-inheritance:

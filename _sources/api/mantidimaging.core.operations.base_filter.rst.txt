@@ -1,0 +1,7 @@
+mantidimaging.core.operations.base\_filter module
+=================================================
+
+.. automodule:: mantidimaging.core.operations.base_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:

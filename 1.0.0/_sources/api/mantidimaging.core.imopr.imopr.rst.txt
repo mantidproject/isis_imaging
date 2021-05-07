@@ -1,0 +1,7 @@
+mantidimaging.core.imopr.imopr module
+=====================================
+
+.. automodule:: mantidimaging.core.imopr.imopr
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,27 @@
+mantidimaging.gui.windows.main package
+======================================
+
+.. automodule:: mantidimaging.gui.windows.main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.main.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.main.load_dialog
+   mantidimaging.gui.windows.main.model
+   mantidimaging.gui.windows.main.presenter
+   mantidimaging.gui.windows.main.save_dialog
+   mantidimaging.gui.windows.main.view

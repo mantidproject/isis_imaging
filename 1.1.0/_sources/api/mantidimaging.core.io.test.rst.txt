@@ -1,0 +1,16 @@
+mantidimaging.core.io.test package
+==================================
+
+.. automodule:: mantidimaging.core.io.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.io.test.io_test
+   mantidimaging.core.io.test.utility_test

@@ -1,0 +1,7 @@
+mantidimaging.core.rotation.data\_model module
+==============================================
+
+.. automodule:: mantidimaging.core.rotation.data_model
+   :members:
+   :undoc-members:
+   :show-inheritance:

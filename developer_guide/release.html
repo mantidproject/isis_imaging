@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Creating a Release &#8212; MantidImaging 2.1.0 documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Testing" href="testing.html" />
+    <link rel="prev" title="Conda Packaging and Docker images" href="conda_packaging_and_docker_image.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="testing.html" title="Testing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="conda_packaging_and_docker_image.html" title="Conda Packaging and Docker images"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Creating a Release</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="creating-a-release">
+<h1>Creating a Release<a class="headerlink" href="#creating-a-release" title="Permalink to this headline">¶</a></h1>
+<p>This is a checklist for creating a new release.</p>
+<p>Releases are created from the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch.</p>
+<p>The version number is expected to be in SemVer format and will be referred to as
+<code class="docutils literal notranslate"><span class="pre">M.m.p</span></code>, adjust this as appropriate.</p>
+<ul class="simple">
+<li><p>Create a new release branch</p></li>
+<li><dl class="simple">
+<dt>Update version numbers in:</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mantidimaging/__init__.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docs/conf.py</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Go to <a class="reference external" href="https://github.com/mantidproject/mantidimaging/releases">https://github.com/mantidproject/mantidimaging/releases</a></p></li>
+<li><p>Draft a new release, with the appropriate version number, targetting the new release branch</p></li>
+<li><p>Perform the necessary testing or merge necessary bug fixes in the release branch</p></li>
+<li><p>(optional) Add release notes in the docs GitHub</p></li>
+<li><p>Go to the release draft and publish it</p></li>
+<li><p>Once published the tag will be available for Conda to use, but a package with a <code class="code docutils literal notranslate"><span class="pre">main</span></code> label is not created automatically
+- To manually publish a package please follow <a class="reference internal" href="conda_packaging_and_docker_image.html#conda-packaging-and-docker-images"><span class="std std-ref">Conda Packaging and Docker images</span></a></p></li>
+</ul>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="conda_packaging_and_docker_image.html"
+                        title="previous chapter">Conda Packaging and Docker images</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="testing.html"
+                        title="next chapter">Testing</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../index.html">Latest</a></li>
+  <li><a href="../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="testing.html" title="Testing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="conda_packaging_and_docker_image.html" title="Conda Packaging and Docker images"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Creating a Release</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

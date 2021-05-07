@@ -1,0 +1,7 @@
+mantidimaging.core.data.utility module
+======================================
+
+.. automodule:: mantidimaging.core.data.utility
+   :members:
+   :undoc-members:
+   :show-inheritance:

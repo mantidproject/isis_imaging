@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.tools.astra_tool - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.tools.astra_tool</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.tools.astra_tool</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.tools.abstract_tool</span> <span class="kn">import</span> <span class="n">AbstractTool</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility</span> <span class="kn">import</span> <span class="n">projection_angles</span>
+
+
+<div class="viewcode-block" id="run_reconstruct"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.astra_tool.html#mantidimaging.core.tools.astra_tool.run_reconstruct">[docs]</a><span class="k">def</span> <span class="nf">run_reconstruct</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">proj_angles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module function for running a reconstruction.</span>
+
+<span class="sd">    It will create the Astra tool object at runtime.</span>
+
+<span class="sd">    :param sample: The sample image data as a 3D numpy.ndarray</span>
+
+<span class="sd">    :param config: A ReconstructionConfig with all the necessary parameters</span>
+<span class="sd">                   to run a reconstruction. The Centers of Rotation</span>
+<span class="sd">                    must be interpolated independently!</span>
+
+<span class="sd">    :param proj_angles: The projection angle for each slice.</span>
+<span class="sd">                        If not provided equidistant angles will be generated</span>
+
+<span class="sd">    :param kwargs: Any keyword arguments will be forwarded to the TomoPy</span>
+<span class="sd">                   reconstruction function</span>
+
+<span class="sd">    :return: The reconstructed volume</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tool</span> <span class="o">=</span> <span class="n">AstraTool</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">tool</span><span class="o">.</span><span class="n">run_reconstruct</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">proj_angles</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AstraTool"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.astra_tool.html#mantidimaging.core.tools.astra_tool.AstraTool">[docs]</a><span class="k">class</span> <span class="nc">AstraTool</span><span class="p">(</span><span class="n">AbstractTool</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uses TomoPy&#39;s integration of Astra</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AstraTool.tool_supported_methods"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.astra_tool.html#mantidimaging.core.tools.astra_tool.AstraTool.tool_supported_methods">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">tool_supported_methods</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s1">&#39;FP&#39;</span><span class="p">,</span> <span class="s1">&#39;FP_CUDA&#39;</span><span class="p">,</span> <span class="s1">&#39;BP&#39;</span><span class="p">,</span> <span class="s1">&#39;BP_CUDA&#39;</span><span class="p">,</span> <span class="s1">&#39;FBP&#39;</span><span class="p">,</span> <span class="s1">&#39;FBP_CUDA&#39;</span><span class="p">,</span> <span class="s1">&#39;SIRT&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;SIRT_CUDA&#39;</span><span class="p">,</span> <span class="s1">&#39;SART&#39;</span><span class="p">,</span> <span class="s1">&#39;SART_CUDA&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS_CUDA&#39;</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="AstraTool.check_algorithm_compatibility"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.astra_tool.html#mantidimaging.core.tools.astra_tool.AstraTool.check_algorithm_compatibility">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check_algorithm_compatibility</span><span class="p">(</span><span class="n">algorithm</span><span class="p">):</span>
+        <span class="c1"># get full caps, because all the names in ASTRA are in FULL CAPS</span>
+        <span class="n">ALGORITHM</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">ALGORITHM</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AstraTool</span><span class="o">.</span><span class="n">tool_supported_methods</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The selected algorithm </span><span class="si">{0}</span><span class="s2"> is not supported by Astra.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">ALGORITHM</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">AbstractTool</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># we import tomopy so that we can use Astra through TomoPy&#39;s</span>
+        <span class="c1"># implementation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_self</span><span class="p">()</span>
+
+<div class="viewcode-block" id="AstraTool.import_self"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.astra_tool.html#mantidimaging.core.tools.astra_tool.AstraTool.import_self">[docs]</a>    <span class="k">def</span> <span class="nf">import_self</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">astra</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot find and import the astra toolbox package: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">exc</span><span class="p">))</span>
+
+        <span class="n">min_astra_version</span> <span class="o">=</span> <span class="mf">1.8</span>
+        <span class="n">astra_version</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">astra</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">astra_version</span><span class="p">,</span>
+                      <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">astra_version</span> <span class="o">&gt;=</span> <span class="n">min_astra_version</span><span class="p">:</span>
+            <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Imported astra successfully. Version: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">astra_version</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not find the required version of astra. &quot;</span>
+                <span class="s2">&quot;Found version: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">astra_version</span><span class="p">))</span>
+
+        <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Astra using CUDA: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">astra</span><span class="o">.</span><span class="n">astra</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">astra</span></div>
+
+<div class="viewcode-block" id="AstraTool.run_reconstruct"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.astra_tool.html#mantidimaging.core.tools.astra_tool.AstraTool.run_reconstruct">[docs]</a>    <span class="k">def</span> <span class="nf">run_reconstruct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">proj_angles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run a reconstruction with TomoPy&#39;s ASTRA integration, using the CPU and</span>
+<span class="sd">        GPU algorithms they provide.</span>
+
+<span class="sd">        TODO This reconstruction function does NOT fully support the full range</span>
+<span class="sd">        of options that are available for each algorithm in Astra.</span>
+
+<span class="sd">        Information about how to use Astra through TomoPy is available at:</span>
+<span class="sd">        http://tomopy.readthedocs.io/en/latest/ipynb/astra.html</span>
+
+<span class="sd">        More information about the ASTRA Reconstruction parameters is available</span>
+<span class="sd">        at:</span>
+<span class="sd">         - http://www.astra-toolbox.com/docs/proj2d.html</span>
+<span class="sd">         - http://www.astra-toolbox.com/docs/algs/index.html</span>
+
+<span class="sd">        :param data: Input data as a 3D numpy.ndarray</span>
+<span class="sd">        :param config: A ReconstructionConfig with all the necessary parameters</span>
+<span class="sd">                       to run a reconstruction.</span>
+<span class="sd">        :param proj_angles: The projection angle for each slice</span>
+<span class="sd">        :param kwargs: Any keyword arguments will be forwarded to the TomoPy</span>
+<span class="sd">                       reconstruction function</span>
+<span class="sd">        :return: 3D numpy.ndarray containing the reconstructed data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">proj_angles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">proj_angles</span> <span class="o">=</span> <span class="n">projection_angles</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">max_angle</span><span class="p">,</span>
+                                                     <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">proj_angles</span><span class="p">))</span>
+
+        <span class="n">detector_spacing_x</span> <span class="o">=</span> <span class="mf">0.55</span>
+        <span class="n">detector_spacing_y</span> <span class="o">=</span> <span class="mf">0.55</span>
+
+        <span class="k">assert</span> <span class="p">(</span><span class="n">detector_spacing_x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">detector_spacing_y</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">),</span> <span class="s2">&quot;Det spacing must be positive or Astra will crash&quot;</span>
+
+        <span class="n">projections_geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">create_proj_geom</span><span class="p">(</span>
+            <span class="s1">&#39;parallel3d&#39;</span><span class="p">,</span> <span class="n">detector_spacing_x</span><span class="p">,</span> <span class="n">detector_spacing_y</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">proj_angles</span><span class="p">)</span>
+
+        <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">projections_geometry</span><span class="p">)</span>
+
+        <span class="n">sinogram_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">data3d</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s1">&#39;-sino&#39;</span><span class="p">,</span> <span class="n">projections_geometry</span><span class="p">,</span>
+                                                <span class="n">data</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">data3d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sinogram_id</span><span class="p">)</span>
+        <span class="n">recon_volume_geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">create_vol_geom</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">recon_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">data3d</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s1">&#39;-vol&#39;</span><span class="p">,</span> <span class="n">recon_volume_geometry</span><span class="p">)</span>
+
+        <span class="c1"># algorithm = config.func.algorithm</span>
+        <span class="n">algorithm</span> <span class="o">=</span> <span class="s1">&#39;FBP_CUDA&#39;</span>
+        <span class="n">alg_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">astra_dict</span><span class="p">(</span><span class="n">algorithm</span><span class="p">)</span>
+        <span class="n">alg_cfg</span><span class="p">[</span><span class="s1">&#39;ReconstructionDataId&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">recon_id</span>
+        <span class="n">alg_cfg</span><span class="p">[</span><span class="s1">&#39;ProjectionDataId&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sinogram_id</span>
+
+        <span class="n">alg_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">algorithm</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">alg_cfg</span><span class="p">)</span>
+
+        <span class="n">number_of_iters</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">alg_id</span><span class="p">,</span> <span class="n">number_of_iters</span><span class="p">)</span>
+        <span class="n">recon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">data3d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">recon_id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">algorithm</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">alg_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">data3d</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">recon_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_astra</span><span class="o">.</span><span class="n">data3d</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">sinogram_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">recon</span></div>
+
+<div class="viewcode-block" id="AstraTool.algorithm_name_handling"><a class="viewcode-back" href="../../../../api/mantidimaging.core.tools.astra_tool.html#mantidimaging.core.tools.astra_tool.AstraTool.algorithm_name_handling">[docs]</a>    <span class="k">def</span> <span class="nf">algorithm_name_handling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alg</span><span class="p">):</span>
+        <span class="c1"># remove xxx_CUDA from the string with the [0:find..]</span>
+        <span class="n">iterative_algorithm</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">alg</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">alg</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="s1">&#39;_&#39;</span><span class="p">)]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;FBP&#39;</span><span class="p">,</span> <span class="s1">&#39;FB&#39;</span><span class="p">,</span> <span class="s1">&#39;BP&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">True</span>
+
+        <span class="c1"># are we using a CUDA algorithm</span>
+        <span class="n">proj_type</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">alg</span><span class="p">[</span><span class="n">alg</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;CUDA&#39;</span> <span class="k">else</span> <span class="s1">&#39;linear&#39;</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="astra_tool.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.tools.astra_tool</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

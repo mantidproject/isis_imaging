@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Mantid Imaging 2.1 &#8212; MantidImaging 2.1.0 documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Mantid Imaging 2.0" href="2.0.html" />
+    <link rel="prev" title="Release Notes" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="2.0.html" title="Mantid Imaging 2.0"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Release Notes"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Release Notes</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Mantid Imaging 2.1</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="mantid-imaging-2-1">
+<h1>Mantid Imaging 2.1<a class="headerlink" href="#mantid-imaging-2-1" title="Permalink to this headline">¶</a></h1>
+<p>This release brings some new features and bug fixes.</p>
+<p>Mantid Imaging now requires python 3.8</p>
+<section id="new-features">
+<h2>New features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>#778: Load images with drag and drop</p></li>
+<li><p>#823: Automatically transpose colour palette</p></li>
+<li><p>#567: Add new user wizard</p></li>
+<li><p>#886 : Don’t reset zoom when changing operation parameters</p></li>
+<li><p>#873 : Link histogram scales in operations window</p></li>
+<li><p>#914 : Modes for ROI normalisation</p></li>
+<li><p>#872 : Histogram improvement</p></li>
+<li><p>#920 : Don’t forget parameters when closing and reopening recon window</p></li>
+</ul>
+</section>
+<section id="fixes">
+<h2>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>#816 : Error finding screen size in some dual screen set ups</p></li>
+<li><p>#820 : Help links go to wrong page</p></li>
+<li><p>#836 : Median filter returning data from wrong images</p></li>
+<li><p>#846 : Fixing AstropyDeprecationWarning</p></li>
+<li><p>#843 : Error loading stack</p></li>
+<li><p>#856 : Move shared array allocation to <cite>multiprocessing.Array</cite> when on Python 3.8</p></li>
+<li><p>#854 : Ops window, image selector in preview section skips by 2</p></li>
+<li><p>#856 : Operations auto update not triggered on spinbox changes</p></li>
+<li><p>#874 : Widgets in Operations window need minimum sizes</p></li>
+<li><p>#866 : Warning if running Flat-fielding again</p></li>
+<li><p>#878 : Update update instructions in version check</p></li>
+<li><p>#885 : RuntimeError after closing wizard</p></li>
+<li><p>#805, #875, #891 : Fix segmentation fault due to object lifetime</p></li>
+<li><p>#716 : Prevent simultaneous operations</p></li>
+<li><p>#901: Rebin Operation failed: ‘&lt;’ not supported between instances of ‘Progress’ and ‘int’</p></li>
+<li><p>#912: Fix ROI normalise due to rescale changes</p></li>
+<li><p>#921: Ops window Image spin box looses focus after key press</p></li>
+<li><p>#914: Outliers acts as median in dark mode</p></li>
+<li><p>#919: Median min kernel size</p></li>
+<li><p>#905: Ring Removal has no effect</p></li>
+<li><p>#906: Clip values</p></li>
+<li><p>#931: Crop Coordinates error if image is smaller than 200x200</p></li>
+</ul>
+</section>
+<section id="developer-changes">
+<h2>Developer Changes<a class="headerlink" href="#developer-changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>#770 : Use multiprocessing.Array</p></li>
+<li><p>#709 : Applitools GUI tests</p></li>
+<li><p>#908 : Fix GUI test failure</p></li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Mantid Imaging 2.1</a><ul>
+<li><a class="reference internal" href="#new-features">New features</a></li>
+<li><a class="reference internal" href="#fixes">Fixes</a></li>
+<li><a class="reference internal" href="#developer-changes">Developer Changes</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Release Notes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="2.0.html"
+                        title="next chapter">Mantid Imaging 2.0</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../index.html">Latest</a></li>
+  <li><a href="../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="2.0.html" title="Mantid Imaging 2.0"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Release Notes"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" >Release Notes</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Mantid Imaging 2.1</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,333 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.configs.recon_config - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.configs.recon_config</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.configs.recon_config</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">RawTextHelpFormatter</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.configs.functional_config</span> <span class="kn">import</span> <span class="n">FunctionalConfig</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.configs.filter_registration</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">register_filters_on_cli</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="grab_full_config"><a class="viewcode-back" href="../../../../api/mantidimaging.core.configs.recon_config.html#mantidimaging.core.configs.recon_config.grab_full_config">[docs]</a><span class="k">def</span> <span class="nf">grab_full_config</span><span class="p">(</span><span class="n">default_args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build the command line at runtime, by parsing all of the filters&#39;</span>
+<span class="sd">    parameter.</span>
+
+<span class="sd">    Afterwards parses the arguments passed in from command line, updates the</span>
+<span class="sd">    vales and creates the ReconstructionConfig.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># intentionally not importing with the whole module sometimes we don&#39;t want</span>
+    <span class="c1"># to process the sys.argv arguments</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Run image processing and tomographic reconstruction via &quot;</span>
+                    <span class="s2">&quot;third party tools&quot;</span><span class="p">,</span>
+        <span class="n">formatter_class</span><span class="o">=</span><span class="n">RawTextHelpFormatter</span><span class="p">)</span>
+
+    <span class="c1"># this sets up the arguments in the parser, with defaults from the Config</span>
+    <span class="c1"># file</span>
+    <span class="n">functional_args</span> <span class="o">=</span> <span class="n">FunctionalConfig</span><span class="p">()</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">functional_args</span><span class="o">.</span><span class="n">_setup_parser</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+
+    <span class="c1"># setup args for the filters</span>
+    <span class="n">register_filters_on_cli</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+
+    <span class="c1"># generate a list of both default arguments and real arguments</span>
+    <span class="n">arg_list</span> <span class="o">=</span> <span class="n">default_args</span> <span class="k">if</span> <span class="n">default_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="n">arg_list</span> <span class="o">+=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="c1"># so parsing</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">arg_list</span><span class="p">)</span>
+
+    <span class="c1"># update the configs</span>
+    <span class="n">functional_args</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="c1"># combine all of them together</span>
+    <span class="k">return</span> <span class="n">ReconstructionConfig</span><span class="p">(</span><span class="n">functional_args</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReconstructionConfig"><a class="viewcode-back" href="../../../../api/mantidimaging.core.configs.recon_config.html#mantidimaging.core.configs.recon_config.ReconstructionConfig">[docs]</a><span class="k">class</span> <span class="nc">ReconstructionConfig</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Full configuration (pre-proc + tool/algorithm + post-proc.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functional_config</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">special_args</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param functional_config: The functional config,</span>
+<span class="sd">                                  must be the class FunctionalConfig</span>
+<span class="sd">        :param args: All of the arguments parsed by argparser</span>
+<span class="sd">        :param funsafe: If funsafe the special arguments check will be skipped</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># just some sanity checks</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">functional_config</span><span class="p">,</span> <span class="n">FunctionalConfig</span>
+        <span class="p">),</span> <span class="s2">&quot;Functional config is invalid type. The script might be corrupted.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">functional_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+
+        <span class="c1"># THIS MUST BE THE LAST THING THIS FUNCTION DOES</span>
+        <span class="k">if</span> <span class="n">special_args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">handle_special_arguments</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ReconstructionConfig.handle_special_arguments"><a class="viewcode-back" href="../../../../api/mantidimaging.core.configs.recon_config.html#mantidimaging.core.configs.recon_config.ReconstructionConfig.handle_special_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">handle_special_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">region_of_interest</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">region_of_interest</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Not enough arguments provided for the Region of Interest!&quot;</span>
+                    <span class="s2">&quot; Expecting 4, but found </span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">region_of_interest</span><span class="p">),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">region_of_interest</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">region_of_interest</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">region_of_interest</span>
+            <span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">air_region</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">air_region</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Not enough arguments provided for the Air Region &quot;</span>
+                    <span class="s2">&quot;Normalisation! Expecting 4, but found </span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">air_region</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">air_region</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">air_region</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">air_region</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">save_preproc</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">convert</span> <span class="ow">or</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">aggregate</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;An option was specified that requires an output directory, &quot;</span>
+                <span class="s2">&quot;but no output directory was given!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;The options that require output directory are:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;-s/--save-preproc, --convert, --aggregate&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">reconstruction</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;If running a reconstruction a Center of &quot;</span>
+                             <span class="s2">&quot;Rotation MUST be provided&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="c1"># If the provided cors is a filename then load COR from file</span>
+            <span class="kn">from</span> <span class="nn">mantidimaging.core.imopr.helper</span> <span class="kn">import</span> <span class="n">load_cors_from_file</span>
+            <span class="n">cors</span> <span class="o">=</span> <span class="n">load_cors_from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cor_slices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cors</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cor_slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Convert the centers of rotation (if provided) to floats</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">cor</span><span class="p">)</span> <span class="k">for</span> <span class="n">cor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span><span class="p">]</span>
+
+            <span class="c1"># Convert the slices for the center of rotation centers of rotation</span>
+            <span class="c1"># (if provided) to ints</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cor_slices</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cor_slices</span> <span class="o">=</span> \
+                        <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">slice_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">slice_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cor_slices</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cor_slices</span><span class="p">:</span>
+            <span class="n">len_cors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span><span class="p">)</span>
+            <span class="n">len_cor_slices</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cor_slices</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">len_cors</span> <span class="o">!=</span> <span class="n">len_cor_slices</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Centers of Rotation (len </span><span class="si">{0}</span><span class="s2">) doesn&#39;t match length of &quot;</span>
+                    <span class="s2">&quot;Slice Indices (len </span><span class="si">{1}</span><span class="s2">)!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">len_cors</span><span class="p">,</span>
+                                                      <span class="n">len_cor_slices</span><span class="p">))</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CORs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span><span class="p">))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;COR slices: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cor_slices</span><span class="p">))</span>
+
+        <span class="c1"># If the reconstruction is ran on already cropped images, then no ROI</span>
+        <span class="c1"># should be provided, however if we have a ROI then the Centers of</span>
+        <span class="c1"># Rotation will be inaccurate because the image has moved</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">region_of_interest</span><span class="p">:</span>
+            <span class="c1"># the COR is going to be related to the full image</span>
+            <span class="c1"># as we are going to be cropping it, we subtract the crop</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">region_of_interest</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># subtract the move to the left to account for the crop from all</span>
+            <span class="c1"># the CORs</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">cor</span><span class="p">)</span> <span class="o">-</span> <span class="n">left</span> <span class="k">for</span> <span class="n">cor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">]</span>
+
+            <span class="c1"># if a single value is passed, assume we want from 0 up to the</span>
+            <span class="c1"># passed value</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="c1"># start index 0, with step 1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="c1"># only add the step</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span>
+                <span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Invalid amount of indices provided! Please use one of &quot;</span>
+                    <span class="s2">&quot;the formats --indices &lt;end_idx&gt;, --indices &lt;start_idx&gt; &quot;</span>
+                    <span class="s2">&quot;&lt;end_idx&gt;, --indices &lt;start_idx&gt; &lt;end_idx&gt; &lt;step&gt;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">split</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">max_memory</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The --split flag was passed, but no &quot;</span>
+                             <span class="s2">&quot;--max-memory was specified!&quot;</span><span class="p">)</span>
+
+        <span class="c1"># float16, uint16 data types produce exceptions</span>
+        <span class="c1"># &gt; float 16 - scipy median filter does not support it</span>
+        <span class="c1"># &gt; uint16 -  division is wrong, so all values become 0 and 1</span>
+        <span class="c1"># could convert to float16, but then we&#39;d have to go up to</span>
+        <span class="c1"># float32 for the median filter anyway</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">data_dtype</span> <span class="o">==</span> <span class="s1">&#39;float32&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">data_dtype</span> <span class="o">==</span> <span class="s1">&#39;float64&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">process_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1"># remove the list, we want a single string</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">process_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">process_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ReconstructionConfig.empty_init"><a class="viewcode-back" href="../../../../api/mantidimaging.core.configs.recon_config.html#mantidimaging.core.configs.recon_config.ReconstructionConfig.empty_init">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">empty_init</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create and return a ReconstructionConfig with all the default values.</span>
+
+<span class="sd">        This function is provided here to create a config with the defaults,</span>
+<span class="sd">        but not go through the hassle of importing every single config and</span>
+<span class="sd">        then constructing it manually.</span>
+<span class="sd">        This method does that for you!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># workaround to all the checks we&#39;ve done</span>
+
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+
+        <span class="n">functional_args</span> <span class="o">=</span> <span class="n">FunctionalConfig</span><span class="p">()</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">functional_args</span><span class="o">.</span><span class="n">_setup_parser</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+
+        <span class="c1"># setup args for the filters</span>
+        <span class="n">register_filters_on_cli</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+
+        <span class="c1"># get the OS&#39;s temp directory</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">temp_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="c1"># pass in the mandatory arguments</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="n">temp_dir</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">]</span>
+
+        <span class="c1"># parse the fake arguments</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+
+        <span class="c1"># update the configs</span>
+        <span class="n">functional_args</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ReconstructionConfig</span><span class="p">(</span>
+                <span class="n">functional_args</span><span class="p">,</span> <span class="n">fake_args</span><span class="p">,</span> <span class="n">special_args</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="recon_config.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.configs.recon_config</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

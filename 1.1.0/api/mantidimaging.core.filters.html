@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.filters package - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.filters.background_correction package" href="mantidimaging.core.filters.background_correction.html" />
+    <link rel="prev" title="mantidimaging.core.data.images module" href="mantidimaging.core.data.images.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.filters.background_correction.html" title="mantidimaging.core.filters.background_correction package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.data.images.html" title="mantidimaging.core.data.images module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" accesskey="U">mantidimaging.core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.filters">
+<span id="mantidimaging-core-filters-package"></span><h1>mantidimaging.core.filters package<a class="headerlink" href="#module-mantidimaging.core.filters" title="Permalink to this headline">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.background_correction.html">mantidimaging.core.filters.background_correction package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.background_correction.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.background_correction.test.html">mantidimaging.core.filters.background_correction.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.background_correction.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.background_correction.test.background_correction_test.html">mantidimaging.core.filters.background_correction.test.background_correction_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.background_correction.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.background_correction.background_correction.html">mantidimaging.core.filters.background_correction.background_correction module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.background_correction.background_correction_gui.html">mantidimaging.core.filters.background_correction.background_correction_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.background_correction_and_normalisation.html">mantidimaging.core.filters.background_correction_and_normalisation package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.background_correction_and_normalisation.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.background_correction_and_normalisation.test.html">mantidimaging.core.filters.background_correction_and_normalisation.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.background_correction_and_normalisation.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.background_correction_and_normalisation.background_correction_and_normalisation.html">mantidimaging.core.filters.background_correction_and_normalisation.background_correction_and_normalisation module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.background_correction_and_normalisation.background_correction_and_normalisation_gui.html">mantidimaging.core.filters.background_correction_and_normalisation.background_correction_and_normalisation_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.circular_mask.html">mantidimaging.core.filters.circular_mask package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.circular_mask.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.circular_mask.test.html">mantidimaging.core.filters.circular_mask.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.circular_mask.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.circular_mask.test.circular_mask_test.html">mantidimaging.core.filters.circular_mask.test.circular_mask_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.circular_mask.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.circular_mask.circular_mask.html">mantidimaging.core.filters.circular_mask.circular_mask module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.circular_mask.circular_mask_gui.html">mantidimaging.core.filters.circular_mask.circular_mask_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.clip_values.html">mantidimaging.core.filters.clip_values package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.clip_values.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.clip_values.test.html">mantidimaging.core.filters.clip_values.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.clip_values.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.clip_values.test.clip_values_test.html">mantidimaging.core.filters.clip_values.test.clip_values_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.clip_values.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.clip_values.clip_values.html">mantidimaging.core.filters.clip_values.clip_values module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.clip_values.clip_values_gui.html">mantidimaging.core.filters.clip_values.clip_values_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.crop_coords.html">mantidimaging.core.filters.crop_coords package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.crop_coords.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.crop_coords.test.html">mantidimaging.core.filters.crop_coords.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.crop_coords.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.crop_coords.test.crop_coords_test.html">mantidimaging.core.filters.crop_coords.test.crop_coords_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.crop_coords.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.crop_coords.crop_coords.html">mantidimaging.core.filters.crop_coords.crop_coords module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.crop_coords.crop_coords_gui.html">mantidimaging.core.filters.crop_coords.crop_coords_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.cut_off.html">mantidimaging.core.filters.cut_off package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.cut_off.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.cut_off.test.html">mantidimaging.core.filters.cut_off.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.cut_off.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.cut_off.test.cut_off_test.html">mantidimaging.core.filters.cut_off.test.cut_off_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.cut_off.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.cut_off.cut_off.html">mantidimaging.core.filters.cut_off.cut_off module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.cut_off.cut_off_gui.html">mantidimaging.core.filters.cut_off.cut_off_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.gaussian.html">mantidimaging.core.filters.gaussian package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.gaussian.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.gaussian.test.html">mantidimaging.core.filters.gaussian.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.gaussian.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.gaussian.test.gaussian_test.html">mantidimaging.core.filters.gaussian.test.gaussian_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.gaussian.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.gaussian.gaussian.html">mantidimaging.core.filters.gaussian.gaussian module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.gaussian.gaussian_gui.html">mantidimaging.core.filters.gaussian.gaussian_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.median_filter.html">mantidimaging.core.filters.median_filter package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.median_filter.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.median_filter.test.html">mantidimaging.core.filters.median_filter.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.median_filter.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.median_filter.test.median_filter_test.html">mantidimaging.core.filters.median_filter.test.median_filter_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.median_filter.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.median_filter.median_filter.html">mantidimaging.core.filters.median_filter.median_filter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.median_filter.median_filter_gui.html">mantidimaging.core.filters.median_filter.median_filter_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.minus_log.html">mantidimaging.core.filters.minus_log package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.minus_log.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.minus_log.test.html">mantidimaging.core.filters.minus_log.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.minus_log.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.minus_log.test.minus_log_test.html">mantidimaging.core.filters.minus_log.test.minus_log_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.minus_log.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.minus_log.minus_log.html">mantidimaging.core.filters.minus_log.minus_log module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.minus_log.minus_log_gui.html">mantidimaging.core.filters.minus_log.minus_log_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.outliers.html">mantidimaging.core.filters.outliers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.outliers.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.outliers.test.html">mantidimaging.core.filters.outliers.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.outliers.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.outliers.test.outliers_test.html">mantidimaging.core.filters.outliers.test.outliers_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.outliers.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.outliers.outliers.html">mantidimaging.core.filters.outliers.outliers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.outliers.outliers_gui.html">mantidimaging.core.filters.outliers.outliers_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.rebin.html">mantidimaging.core.filters.rebin package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.rebin.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.rebin.test.html">mantidimaging.core.filters.rebin.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.rebin.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.rebin.test.rebin_test.html">mantidimaging.core.filters.rebin.test.rebin_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.rebin.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.rebin.rebin.html">mantidimaging.core.filters.rebin.rebin module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.rebin.rebin_gui.html">mantidimaging.core.filters.rebin.rebin_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.ring_removal.html">mantidimaging.core.filters.ring_removal package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.ring_removal.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.ring_removal.test.html">mantidimaging.core.filters.ring_removal.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.ring_removal.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.ring_removal.test.ring_removal_test.html">mantidimaging.core.filters.ring_removal.test.ring_removal_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.ring_removal.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.ring_removal.ring_removal.html">mantidimaging.core.filters.ring_removal.ring_removal module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.ring_removal.ring_removal_gui.html">mantidimaging.core.filters.ring_removal.ring_removal_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.roi_normalisation.html">mantidimaging.core.filters.roi_normalisation package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.roi_normalisation.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.roi_normalisation.test.html">mantidimaging.core.filters.roi_normalisation.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.roi_normalisation.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.roi_normalisation.test.roi_normalisation_test.html">mantidimaging.core.filters.roi_normalisation.test.roi_normalisation_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.roi_normalisation.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.roi_normalisation.roi_normalisation.html">mantidimaging.core.filters.roi_normalisation.roi_normalisation module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.roi_normalisation.roi_normalisation_gui.html">mantidimaging.core.filters.roi_normalisation.roi_normalisation_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.rotate_stack.html">mantidimaging.core.filters.rotate_stack package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.rotate_stack.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.rotate_stack.test.html">mantidimaging.core.filters.rotate_stack.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.rotate_stack.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.rotate_stack.test.rotate_stack_test.html">mantidimaging.core.filters.rotate_stack.test.rotate_stack_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.rotate_stack.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.rotate_stack.rotate_stack.html">mantidimaging.core.filters.rotate_stack.rotate_stack module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.rotate_stack.rotate_stack_gui.html">mantidimaging.core.filters.rotate_stack.rotate_stack_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.stripe_removal.html">mantidimaging.core.filters.stripe_removal package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.stripe_removal.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.stripe_removal.test.html">mantidimaging.core.filters.stripe_removal.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.stripe_removal.test.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.stripe_removal.test.stripe_removal_test.html">mantidimaging.core.filters.stripe_removal.test.stripe_removal_test module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.stripe_removal.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.stripe_removal.stripe_removal.html">mantidimaging.core.filters.stripe_removal.stripe_removal module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.stripe_removal.stripe_removal_gui.html">mantidimaging.core.filters.stripe_removal.stripe_removal_gui module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mantidimaging.core.filters.wip.html">mantidimaging.core.filters.wip package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mantidimaging.core.filters.wip.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mantidimaging.core.filters.wip.mcp_corrections.html">mantidimaging.core.filters.wip.mcp_corrections package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mantidimaging.core.filters.wip.mcp_corrections.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections.html">mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">mantidimaging.core.filters package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.data.images.html"
+                        title="previous chapter">mantidimaging.core.data.images module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.filters.background_correction.html"
+                        title="next chapter">mantidimaging.core.filters.background_correction package</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="mantidimaging.core.filters.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.filters.background_correction.html" title="mantidimaging.core.filters.background_correction package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.data.images.html" title="mantidimaging.core.data.images module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

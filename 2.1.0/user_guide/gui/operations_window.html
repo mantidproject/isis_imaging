@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Operations Window - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">Operations Window</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="operations-window">
+<h1>Operations Window<a class="headerlink" href="#operations-window" title="Permalink to this headline">¶</a></h1>
+<p>Selecting the <em>Operations</em> option in the <em>Workflow</em> menu opens the operations
+dialog, this is used for applying filters to image stacks.</p>
+<p>Operations may be applied to image stacks of any type (i.e. projection, sinogram,
+reconstruction), they are essentially just image filters and do not directly
+care about the type of image.</p>
+<a class="reference internal image-reference" href="../../_images/operations_window.png"><img alt="Operations dialog" src="../../_images/operations_window.png" style="width: 90%;" /></a>
+<p>Here you can select the type of filter and the image stack you wish to apply it
+to, properties of the selected filter are automatically shown in the <em>Filter
+Properties</em> section.</p>
+<p>The [?] button next to filter selector will open a webpage with an explanation of the filter parameters.</p>
+<p>The right hand panel shows a slice from the original image stack, a preview of the filter applied to the slice, and the pixel intensity difference. Below a histogram of pixel values before and after is shown. The image views can be navigated as described in the <a class="reference internal" href="image_view.html#image-view"><span class="std std-ref">Image view</span></a> help page.</p>
+<p>There are several tickboxes to customise the behaviour of the preview area.</p>
+<dl class="simple">
+<dt>Legend</dt><dd><p>Enables a legend in the histogram</p>
+</dd>
+<dt>Link Images</dt><dd><p>Links the pan and zoom between the before, after and difference views</p>
+</dd>
+<dt>Combine Histograms</dt><dd><p>Use a single histogram to show before and after</p>
+</dd>
+<dt>Overlay difference</dt><dd><p>Highlights pixels that have changed in the after image</p>
+</dd>
+<dt>Invert diff image</dt><dd><p>Invert the colours used in the difference view</p>
+</dd>
+<dt>Lock Scale</dt><dd><p>Lock the colour scale when adjusting filter parameters</p>
+</dd>
+<dt>Lock Zoom</dt><dd><p>Lock the pan and zoom when adjusting filter parameters</p>
+</dd>
+</dl>
+<p>The <em>Image</em> control in the <em>Preview</em> section can be used to select the index of
+the image in the stack that is used to generate the preview.</p>
+<p>Previews are automatically updated when parameters are changed. For filters that
+take a long time to apply even on a single image it is worthwhile to disable the
+<em>Auto Update</em> option and trigger preview updates manually using the <em>Update Now</em>
+button.</p>
+<p>For filters that use a region of interest as a parameter (namely Crop
+Coordinates and ROI Normalisation) the ROI is selected using the controls on the
+stack visualiser for the selected image stack (as shown in the screenshot below).</p>
+<a class="reference internal image-reference" href="../../_images/gui_filters_dialog_crop_roi.png"><img alt="Crop coordinates filter with ROI" src="../../_images/gui_filters_dialog_crop_roi.png" style="width: 60%;" /></a>
+<p>Pressing <em>Apply</em> applies the filter to every image in the stack, replacing the
+data in the stack. For some filters it is also possible to <em>Apply to all stacks</em> if required.</p>
+<p>It is normal for this to take a significant amount of time for a large stack of
+images.</p>
+<p>If <em>Safe Apply</em> is enabled then the filter will be applied to a copy of the data and a comparison window will be shown to select whether to keep the filtered version. The application of a filter can not be undone.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../index.html">Latest</a></li>
+  <li><a href="../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="operations_window.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">Operations Window</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

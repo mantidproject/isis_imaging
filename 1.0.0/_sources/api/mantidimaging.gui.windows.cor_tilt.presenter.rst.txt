@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.cor\_tilt.presenter module
+====================================================
+
+.. automodule:: mantidimaging.gui.windows.cor_tilt.presenter
+   :members:
+   :undoc-members:
+   :show-inheritance:

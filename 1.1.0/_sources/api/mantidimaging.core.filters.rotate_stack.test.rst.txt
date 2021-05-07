@@ -1,0 +1,15 @@
+mantidimaging.core.filters.rotate\_stack.test package
+=====================================================
+
+.. automodule:: mantidimaging.core.filters.rotate_stack.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.rotate_stack.test.rotate_stack_test

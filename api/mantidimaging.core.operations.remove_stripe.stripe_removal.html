@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.operations.remove_stripe.stripe_removal module &#8212; MantidImaging 2.1.0 documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Graphical User Interface (GUI)" href="../user_guide/gui/index.html" />
+    <link rel="prev" title="mantidimaging.core.operations.rotate_stack.rotate_stack module" href="mantidimaging.core.operations.rotate_stack.rotate_stack.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../user_guide/gui/index.html" title="Graphical User Interface (GUI)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.rotate_stack.rotate_stack.html" title="mantidimaging.core.operations.rotate_stack.rotate_stack module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../user_guide/index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../user_guide/operations/index.html" accesskey="U">Operations</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.remove_stripe.stripe_removal module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.operations.remove_stripe.stripe_removal">
+<span id="mantidimaging-core-operations-remove-stripe-stripe-removal-module"></span><h1>mantidimaging.core.operations.remove_stripe.stripe_removal module<a class="headerlink" href="#module-mantidimaging.core.operations.remove_stripe.stripe_removal" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.core.operations.remove_stripe.stripe_removal.</code><code class="sig-name descname">StripeRemovalFilter</code><a class="reference internal" href="../_modules/mantidimaging/core/operations/remove_stripe/stripe_removal.html#StripeRemovalFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.BaseFilter" title="mantidimaging.core.operations.base_filter.BaseFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">mantidimaging.core.operations.base_filter.BaseFilter</span></code></a></p>
+<p>Stripe removal operations wrapped from TomoPy.</p>
+<p>Source: <a class="reference external" href="https://tomopy.readthedocs.io/en/latest/api/tomopy.prep.stripe.html">https://tomopy.readthedocs.io/en/latest/api/tomopy.prep.stripe.html</a></p>
+<p>Intended to be used on: Sinograms</p>
+<p>When: If stripes artifacts are present that have not been
+removed with outliers + flat-fielding the projections</p>
+<p>Caution: Horizontal stripes are caused by changes in image intensity (pixel values),
+and should be fixed by ROI Normalisation instead!</p>
+<dl class="py method">
+<dt id="mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.execute_wrapper">
+<em class="property">static </em><code class="sig-name descname">execute_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value_filter_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value_wf_level</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value_wf_wname</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value_wf_sigma</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value_ti_nblock</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value_ti_alpha</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value_sf_size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/remove_stripe/stripe_removal.html#StripeRemovalFilter.execute_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.execute_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should construct a partial call to _filter_func using values taken from the widgets passed to this function
+as kwargs.
+:param kwargs: widgets which contain values required for _filter_func.
+:return: a partial call to _filter_func using parameters taken from the input widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.filter_func">
+<em class="property">static </em><code class="sig-name descname">filter_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">images</span></em>, <em class="sig-param"><span class="n">wf</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ti</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sf</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cores</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">chunksize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/remove_stripe/stripe_removal.html#StripeRemovalFilter.filter_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.filter_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute stripe removal operations.</p>
+<p>Multiple operations can be executed, if they are specified on the command
+line.</p>
+<p>The order for that execution will always be: wavelett-fourier, titarenko,
+smoothing-filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images</strong> – Sample data which is to be processed. Expected in radiograms</p></li>
+<li><p><strong>wf</strong> – <p>Specify parameters for the wavelett-fourier filter.
+Acceptable keywords are:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>level (default None, type int, optional parameter)</dt><dd><p>Number of discrete wavelet transform levels.</p>
+</dd>
+<dt>wname (default ‘db5’, type str, optional parameter)</dt><dd><p>Type of the wavelet filter. ‘haar’, ‘db5’, ‘sym5’.</p>
+</dd>
+<dt>sigma (default 2, type float, optional parameter)</dt><dd><p>Damping parameter in Fourier space.</p>
+</dd>
+<dt>pad (default True, type bool, optional parameter)</dt><dd><p>If True, extend the size of the sinogram by
+padding with zeros.</p>
+</dd>
+</dl>
+</div></blockquote>
+</p></li>
+<li><p><strong>ti</strong> – <p>Specify parameters for the titarenko filter.
+Acceptable keywords are:</p>
+<blockquote>
+<div><p>nblock (default:0, int, optional) Number of blocks.</p>
+<p>alpha (default: 1.5, int, optional) Damping factor.</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>sf</strong> – <p>Specify parameters for the smoothing-filter.
+Acceptable keywords are:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>size (default: 5, int, optional)</dt><dd><p>Size of the smoothing filter.</p>
+</dd>
+</dl>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Processed data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.filter_name">
+<code class="sig-name descname">filter_name</code><em class="property"> = 'Stripe Removal'</em><a class="headerlink" href="#mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.filter_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.group_name">
+<em class="property">static </em><code class="sig-name descname">group_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.FilterGroup" title="mantidimaging.core.operations.base_filter.FilterGroup">mantidimaging.core.operations.base_filter.FilterGroup</a><a class="reference internal" href="../_modules/mantidimaging/core/operations/remove_stripe/stripe_removal.html#StripeRemovalFilter.group_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.group_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.link_histograms">
+<code class="sig-name descname">link_histograms</code><em class="property"> = True</em><a class="headerlink" href="#mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.link_histograms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.register_gui">
+<em class="property">static </em><code class="sig-name descname">register_gui</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">form</span></em>, <em class="sig-param"><span class="n">on_change</span></em>, <em class="sig-param"><span class="n">view</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/remove_stripe/stripe_removal.html#StripeRemovalFilter.register_gui"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.remove_stripe.stripe_removal.StripeRemovalFilter.register_gui" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds any required input widgets to the given form and returns references to them.</p>
+<p>The return values should be in a dict which can be unpacked as kwargs for a call to
+the operations <cite>execute_wrapper</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>view</strong> – </p></li>
+<li><p><strong>form</strong> – the layout to create input widgets in</p></li>
+<li><p><strong>on_change</strong> – the filter view action to be bound to all created inputs</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the widgets bound as kwargs which are needed to call execute_wrapper</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.operations.remove_stripe.stripe_removal.methods">
+<code class="sig-prename descclassname">mantidimaging.core.operations.remove_stripe.stripe_removal.</code><code class="sig-name descname">methods</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/remove_stripe/stripe_removal.html#methods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.remove_stripe.stripe_removal.methods" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.operations.remove_stripe.stripe_removal.wavelet_names">
+<code class="sig-prename descclassname">mantidimaging.core.operations.remove_stripe.stripe_removal.</code><code class="sig-name descname">wavelet_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/remove_stripe/stripe_removal.html#wavelet_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.remove_stripe.stripe_removal.wavelet_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.operations.rotate_stack.rotate_stack.html"
+                        title="previous chapter">mantidimaging.core.operations.rotate_stack.rotate_stack module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../user_guide/gui/index.html"
+                        title="next chapter">Graphical User Interface (GUI)</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../index.html">Latest</a></li>
+  <li><a href="../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../user_guide/gui/index.html" title="Graphical User Interface (GUI)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.rotate_stack.rotate_stack.html" title="mantidimaging.core.operations.rotate_stack.rotate_stack module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../user_guide/index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../user_guide/operations/index.html" >Operations</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.remove_stripe.stripe_removal module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

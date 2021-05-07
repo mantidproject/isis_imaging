@@ -1,0 +1,18 @@
+mantidimaging.core.cor\_tilt.test package
+=========================================
+
+.. automodule:: mantidimaging.core.cor_tilt.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.cor_tilt.test.angles_test
+   mantidimaging.core.cor_tilt.test.auto_test
+   mantidimaging.core.cor_tilt.test.data_model_test
+   mantidimaging.core.cor_tilt.test.workflow_test

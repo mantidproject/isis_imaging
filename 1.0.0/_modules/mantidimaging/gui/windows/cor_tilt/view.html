@@ -1,0 +1,458 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.windows.cor_tilt.view - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.cor_tilt.view</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.windows.cor_tilt.view</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">matplotlib.backends.backend_qt5agg</span> <span class="kn">import</span> <span class="n">FigureCanvasQTAgg</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QAbstractItemView</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.cor_tilt</span> <span class="kn">import</span> <span class="n">Field</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.mvp_base</span> <span class="kn">import</span> <span class="n">BaseMainWindowView</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.widgets</span> <span class="kn">import</span> <span class="n">NavigationToolbarSimple</span>
+
+<span class="kn">from</span> <span class="nn">.presenter</span> <span class="kn">import</span> <span class="n">CORTiltWindowPresenter</span>
+<span class="kn">from</span> <span class="nn">.presenter</span> <span class="kn">import</span> <span class="n">Notification</span> <span class="k">as</span> <span class="n">PresNotification</span>
+<span class="kn">from</span> <span class="nn">.point_table_model</span> <span class="kn">import</span> <span class="n">CorTiltPointQtModel</span>
+
+
+<div class="viewcode-block" id="CORTiltWindowView"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView">[docs]</a><span class="k">class</span> <span class="nc">CORTiltWindowView</span><span class="p">(</span><span class="n">BaseMainWindowView</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_window</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Greys_r&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CORTiltWindowView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+                <span class="n">main_window</span><span class="p">,</span> <span class="s1">&#39;gui/ui/cor_tilt_window.ui&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span> <span class="o">=</span> <span class="n">CORTiltWindowPresenter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_window</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmap</span> <span class="o">=</span> <span class="n">cmap</span>
+
+        <span class="c1"># Handle calculate button click</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">autoCalculateButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">PresNotification</span><span class="o">.</span><span class="n">RUN_AUTOMATIC</span><span class="p">))</span>
+
+        <span class="c1"># Handle stack selection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackSelector</span><span class="o">.</span><span class="n">stack_selected_uuid</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">set_stack_uuid</span><span class="p">)</span>
+
+        <span class="c1"># Handle stack cropping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setRoi</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">PresNotification</span><span class="o">.</span><span class="n">CROP_TO_ROI</span><span class="p">))</span>
+
+        <span class="c1"># Handle preview image selection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previewProjectionIndex</span><span class="o">.</span><span class="n">valueChanged</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">set_preview_projection_idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previewSliceIndex</span><span class="o">.</span><span class="n">valueChanged</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">set_preview_slice_idx</span><span class="p">)</span>
+
+        <span class="c1"># Handle calculation parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projectionCountReset</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset_projection_count</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">add_mpl_figure</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">toolbar</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">figure</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+            <span class="n">canvas</span> <span class="o">=</span> <span class="n">FigureCanvasQTAgg</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
+            <span class="n">canvas</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">toolbar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">toolbar</span> <span class="o">=</span> <span class="n">toolbar</span><span class="p">(</span><span class="n">canvas</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+                <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">toolbar</span><span class="p">)</span>
+            <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">canvas</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">canvas</span><span class="p">,</span> <span class="n">toolbar</span><span class="p">)</span>
+
+        <span class="c1"># Image plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_figure</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_canvas</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> \
+            <span class="n">add_mpl_figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageLayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span>
+            <span class="s1">&#39;button_press_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_image_on_button_press</span><span class="p">)</span>
+
+        <span class="c1"># Reconstruction preview plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_figure</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recon_canvas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recon_toolbar</span> <span class="o">=</span> \
+            <span class="n">add_mpl_figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reconPreviewLayout</span><span class="p">,</span> <span class="n">NavigationToolbarSimple</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recon_figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_image</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Linear fit plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_figure</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_canvas</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">add_mpl_figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitLayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_fit_plot</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span>
+                <span class="s1">&#39;button_press_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_fit_plot_button_press</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_canvas</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span>
+                <span class="s1">&#39;Double click to open a larger plot (requires at least &#39;</span>
+                <span class="s1">&#39;2 points)&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Point table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">horizontalHeader</span><span class="p">()</span><span class="o">.</span><span class="n">setStretchLastSection</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setSelectionBehavior</span><span class="p">(</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">SelectRows</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setSelectionMode</span><span class="p">(</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">SingleSelection</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">rowsInserted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_table_row_count_change</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">rowsRemoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_table_row_count_change</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">modelReset</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_table_row_count_change</span><span class="p">)</span>
+
+        <span class="c1"># Update previews when data in table changes</span>
+        <span class="k">def</span> <span class="nf">on_data_change</span><span class="p">(</span><span class="n">tl</span><span class="p">,</span> <span class="n">br</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">PresNotification</span><span class="o">.</span><span class="n">UPDATE_PREVIEWS</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tl</span> <span class="o">==</span> <span class="n">br</span> <span class="ow">and</span> <span class="n">tl</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="o">==</span> <span class="n">Field</span><span class="o">.</span><span class="n">CENTRE_OF_ROTATION</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">mdl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+                <span class="n">slice_idx</span> <span class="o">=</span> <span class="n">mdl</span><span class="o">.</span><span class="n">data</span><span class="p">(</span>
+                        <span class="n">mdl</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">tl</span><span class="o">.</span><span class="n">row</span><span class="p">(),</span> <span class="n">Field</span><span class="o">.</span><span class="n">SLICE_INDEX</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">handle_cor_manually_changed</span><span class="p">(</span><span class="n">slice_idx</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">rowsRemoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span>
+                    <span class="n">PresNotification</span><span class="o">.</span><span class="n">UPDATE_PREVIEWS</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">on_data_change</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">manualClearAllButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">removeAllRows</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manualRemoveButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">removeSelectedRows</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manualAddButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span>
+                    <span class="n">PresNotification</span><span class="o">.</span><span class="n">ADD_NEW_COR_TABLE_ROW</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manualRefineCorButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span>
+                    <span class="n">PresNotification</span><span class="o">.</span><span class="n">REFINE_SELECTED_COR</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manualFitButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span>
+                    <span class="n">PresNotification</span><span class="o">.</span><span class="n">RUN_MANUAL</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="nf">on_row_change</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Handles setting preview slice index from the currently selected row</span>
+<span class="sd">            in the manual COR table.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+                <span class="n">slice_idx</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">row</span><span class="p">())[</span>
+                        <span class="n">Field</span><span class="o">.</span><span class="n">SLICE_INDEX</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">set_preview_slice_idx</span><span class="p">(</span><span class="n">slice_idx</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span>
+                        <span class="n">PresNotification</span><span class="o">.</span><span class="n">PREVIEW_RECONSTRUCTION_SET_COR</span><span class="p">)</span>
+
+            <span class="c1"># Only allow the refine button to be clicked when a valid row is</span>
+            <span class="c1"># selected</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manualRefineCorButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">isValid</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span><span class="o">.</span><span class="n">currentRowChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="n">on_row_change</span><span class="p">)</span>
+
+        <span class="c1"># Update initial UI state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_table_row_count_change</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_results</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackSelector</span><span class="o">.</span><span class="n">subscribe_to_main_window</span><span class="p">(</span><span class="n">main_window</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CORTiltWindowView.cleanup"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackSelector</span><span class="o">.</span><span class="n">unsubscribe_from_main_window</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">point_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mdl</span> <span class="o">=</span> <span class="n">CorTiltPointQtModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="n">mdl</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CORTiltWindowView.set_results"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.set_results">[docs]</a>    <span class="k">def</span> <span class="nf">set_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cor</span><span class="p">,</span> <span class="n">tilt</span><span class="p">,</span> <span class="n">gradient</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the numerical COR and tilt angle results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resultCor</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">cor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resultTilt</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">tilt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resultGradient</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">gradient</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.update_image_preview"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.update_image_preview">[docs]</a>    <span class="k">def</span> <span class="nf">update_image_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                             <span class="n">image_data</span><span class="p">,</span>
+                             <span class="n">preview_slice_index</span><span class="p">,</span>
+                             <span class="n">tilt_line_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">roi</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the preview projection image and associated annotations.</span>
+
+<span class="sd">        Region of interest sets the bounds of the image axes, it does not</span>
+<span class="sd">        resize the data itself. The advantage of this is that the coordinates</span>
+<span class="sd">        do not change.</span>
+
+<span class="sd">        :param image_data: Projection image data (single/2D image)</span>
+<span class="sd">        :param preview_slice_index: Y coordinate at which to draw the preview</span>
+<span class="sd">                                    slice indicator</span>
+<span class="sd">        :param tilt_line_points: Tuple of (X, Y) data points for tilt preview</span>
+<span class="sd">                                 line</span>
+<span class="sd">        :param roi: Region of interest to crop the image to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_plot</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">previewSliceIndex</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">preview_slice_index</span><span class="p">)</span>
+
+        <span class="c1"># Plot image</span>
+        <span class="k">if</span> <span class="n">image_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image_data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cmap</span><span class="p">)</span>
+
+            <span class="c1"># Plot preview slice line</span>
+            <span class="n">x_max</span> <span class="o">=</span> <span class="n">image_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span>
+                    <span class="p">[</span><span class="n">preview_slice_index</span><span class="p">,</span> <span class="n">preview_slice_index</span><span class="p">],</span>
+                    <span class="n">c</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Plot tilt line</span>
+        <span class="k">if</span> <span class="n">tilt_line_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">tilt_line_points</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Set zoom level to ROI</span>
+        <span class="k">if</span> <span class="n">roi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_plot</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_plot</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="n">roi</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.preview_image_on_button_press"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.preview_image_on_button_press">[docs]</a>    <span class="k">def</span> <span class="nf">preview_image_on_button_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles mouse button presses on the preview projection image.</span>
+
+<span class="sd">        Used to set the preview slice when a user clicks on a given part of the</span>
+<span class="sd">        image.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">ydata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">set_preview_slice_idx</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">ydata</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.update_image_recon_preview"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.update_image_recon_preview">[docs]</a>    <span class="k">def</span> <span class="nf">update_image_recon_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the reconstruction preview image with new data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Plot image</span>
+        <span class="k">if</span> <span class="n">image_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Cache image</span>
+            <span class="c1"># Saves time when drawing and maintains image extents</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recon_image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">recon_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recon_plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                        <span class="n">image_data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cmap</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">recon_image</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">recon_image</span><span class="o">.</span><span class="n">autoscale</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.reset_image_recon_preview"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.reset_image_recon_preview">[docs]</a>    <span class="k">def</span> <span class="nf">reset_image_recon_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the recon preview image, forcing a complete redraw next time it</span>
+<span class="sd">        is updated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_plot</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_image</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.update_fit_plot"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.update_fit_plot">[docs]</a>    <span class="k">def</span> <span class="nf">update_fit_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_axis</span><span class="p">,</span> <span class="n">cor_data</span><span class="p">,</span> <span class="n">fit_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the fit result preview plot with the data provided.</span>
+
+<span class="sd">        :param x_axis: Common x axis data (slice index)</span>
+<span class="sd">        :param cor_data: Centre of rotation determined per slice</span>
+<span class="sd">        :param fit_data: Result of linear fitting of per slice centre of</span>
+<span class="sd">                         rotation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_plot</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+
+        <span class="c1"># Plot COR data</span>
+        <span class="k">if</span> <span class="n">cor_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_axis</span><span class="p">,</span> <span class="n">cor_data</span><span class="p">)</span>
+
+        <span class="c1"># Plot fit</span>
+        <span class="k">if</span> <span class="n">fit_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_axis</span><span class="p">,</span> <span class="n">fit_data</span><span class="p">)</span>
+
+        <span class="c1"># Remove axes ticks to save screen space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_plot</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_plot</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+
+        <span class="c1"># Use tight layout to reduce unused canvas space</span>
+        <span class="c1"># https://matplotlib.org/users/tight_layout_guide.html</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_figure</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.handle_fit_plot_button_press"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.handle_fit_plot_button_press">[docs]</a>    <span class="k">def</span> <span class="nf">handle_fit_plot_button_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle mouse button presses on the fit plot preview.</span>
+
+<span class="sd">        Currently opens a larger version of the plot in a new window when the</span>
+<span class="sd">        plot is double (left) clicked.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Double left click</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">dblclick</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">PresNotification</span><span class="o">.</span><span class="n">SHOW_COR_VS_SLICE_PLOT</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.set_num_projections"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.set_num_projections">[docs]</a>    <span class="k">def</span> <span class="nf">set_num_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the number of projections in the input dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Preview image control</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previewProjectionIndex</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previewProjectionIndex</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># Projection downsample control</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projectionCount</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projectionCount</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">count</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.set_num_slices"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.set_num_slices">[docs]</a>    <span class="k">def</span> <span class="nf">set_num_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the number of slices (projection Y axis size) of the full input</span>
+<span class="sd">        image.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Preview image control</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previewSliceIndex</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previewSliceIndex</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.reset_projection_count"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.reset_projection_count">[docs]</a>    <span class="k">def</span> <span class="nf">reset_projection_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the number of projections to the maximum available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projectionCount</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectionCount</span><span class="o">.</span><span class="n">maximum</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.show_results"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.show_results">[docs]</a>    <span class="k">def</span> <span class="nf">show_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shows results after finding is complete.</span>
+
+<span class="sd">        Specifically switch to the &quot;Results&quot; tab.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resultsTab</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.on_table_row_count_change"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.on_table_row_count_change">[docs]</a>    <span class="k">def</span> <span class="nf">on_table_row_count_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called when rows have been added or removed from the point table.</span>
+
+<span class="sd">        Used to conditionally enable UI controls that depend on a certain</span>
+<span class="sd">        amount of entries in the table.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Disable clear buttons when there are no rows in the table</span>
+        <span class="n">empty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">empty</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manualRemoveButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="ow">not</span> <span class="n">empty</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manualClearAllButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="ow">not</span> <span class="n">empty</span><span class="p">)</span>
+
+        <span class="c1"># Update previews when no data is left</span>
+        <span class="k">if</span> <span class="n">empty</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">PresNotification</span><span class="o">.</span><span class="n">UPDATE_PREVIEWS</span><span class="p">)</span>
+
+        <span class="c1"># Disable fit button when there are less than 2 rows (points)</span>
+        <span class="n">enough_to_fit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">num_points</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manualFitButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">enough_to_fit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CORTiltWindowView.add_cor_table_row"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.view.html#mantidimaging.gui.windows.cor_tilt.view.CORTiltWindowView.add_cor_table_row">[docs]</a>    <span class="k">def</span> <span class="nf">add_cor_table_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">cor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a row to the manual COR table with a specified slice index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">appendNewRow</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">cor</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">slice_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of slices/sinograms the user has selected for automatic</span>
+<span class="sd">        COR/Tilt finding.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliceCount</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">projection_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of projections the user has selected for automatic COR/Tilt</span>
+<span class="sd">        finding.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectionCount</span><span class="o">.</span><span class="n">value</span><span class="p">()</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="view.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.cor_tilt.view</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

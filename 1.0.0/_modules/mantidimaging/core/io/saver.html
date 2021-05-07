@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.io.saver - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.saver</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.io.saver</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+
+<span class="kn">from</span> <span class="nn">.utility</span> <span class="kn">import</span> <span class="n">DEFAULT_IO_FILE_FORMAT</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">DEFAULT_ZFILL_LENGTH</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">DEFAULT_NAME_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;image&#39;</span>
+<span class="n">DEFAULT_NAME_POSTFIX</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="write_fits"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.write_fits">[docs]</a><span class="k">def</span> <span class="nf">write_fits</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">astropy.io.fits</span> <span class="k">as</span> <span class="nn">fits</span>
+    <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">hdulist</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">([</span><span class="n">hdu</span><span class="p">])</span>
+    <span class="n">hdulist</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">clobber</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write_img"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.write_img">[docs]</a><span class="k">def</span> <span class="nf">write_img</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">mantidimaging.core.utility.special_imports</span> <span class="kn">import</span> <span class="n">import_skimage_io</span>
+    <span class="n">skio</span> <span class="o">=</span> <span class="n">import_skimage_io</span><span class="p">()</span>
+    <span class="n">skio</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write_nxs"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.write_nxs">[docs]</a><span class="k">def</span> <span class="nf">write_nxs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">projection_angles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">h5py</span>
+    <span class="n">nxs</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+    <span class="c1"># appending flat and dark images is disabled for now</span>
+    <span class="c1"># new shape to account for appending flat and dark images</span>
+    <span class="c1"># correct_shape = (data.shape[0] + 2, data.shape[1], data.shape[2])</span>
+
+    <span class="n">dset</span> <span class="o">=</span> <span class="n">nxs</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;tomography/sample_data&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">dset</span><span class="p">[:</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:]</span>
+    <span class="c1"># left here if we decide to start appending the flat and dark images again</span>
+    <span class="c1"># dset[-2] = flat[:]</span>
+    <span class="c1"># dset[-1] = dark[:]</span>
+
+    <span class="k">if</span> <span class="n">projection_angles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rangle</span> <span class="o">=</span> <span class="n">nxs</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
+            <span class="s2">&quot;tomography/rotation_angle&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">projection_angles</span><span class="p">)</span>
+        <span class="n">rangle</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">projection_angles</span></div>
+
+
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.save">[docs]</a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+         <span class="n">output_dir</span><span class="p">,</span>
+         <span class="n">name_prefix</span><span class="o">=</span><span class="n">DEFAULT_NAME_PREFIX</span><span class="p">,</span>
+         <span class="n">swap_axes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+         <span class="n">out_format</span><span class="o">=</span><span class="n">DEFAULT_IO_FILE_FORMAT</span><span class="p">,</span>
+         <span class="n">overwrite_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+         <span class="n">custom_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+         <span class="n">zfill_len</span><span class="o">=</span><span class="n">DEFAULT_ZFILL_LENGTH</span><span class="p">,</span>
+         <span class="n">name_postfix</span><span class="o">=</span><span class="n">DEFAULT_NAME_POSTFIX</span><span class="p">,</span>
+         <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+         <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save image volume (3d) into a series of slices along the Z axis.</span>
+<span class="sd">    The Z axis in the script is the ndarray.shape[0].</span>
+
+<span class="sd">    :param data: Data as images/slices stores in numpy array</span>
+<span class="sd">    :param output_dir: Output directory for the files</span>
+<span class="sd">    :param name_prefix: Prefix for the names of the images,</span>
+<span class="sd">                        appended before the image number</span>
+<span class="sd">    :param swap_axes: Swap the 0 and 1 axis of the images</span>
+<span class="sd">                      (convert from radiograms to sinograms on saving)</span>
+<span class="sd">    :param out_format: File format of the saved out images</span>
+<span class="sd">    :param overwrite_all: Overwrite existing images with conflicting names</span>
+<span class="sd">    :param custom_idx: Single index to be used for the file name,</span>
+<span class="sd">                       instead of incremental numbers</span>
+<span class="sd">    :param zfill_len: This option is ignored if custom_idx is specified!</span>
+<span class="sd">                      Prepend zeros to the output file names to have a</span>
+<span class="sd">                      constant file name length. Example:</span>
+<span class="sd">                      - saving out an image with zfill_len = 6:</span>
+<span class="sd">                          saved_image000001,...saved_image000201 and so on</span>
+<span class="sd">                      - saving out an image with zfill_len = 3:</span>
+<span class="sd">                          saved_image001,...saved_image201 and so on</span>
+<span class="sd">    :param name_postfix: Postfix for the name after the index</span>
+<span class="sd">    :param indices: Only works if custom_idx is not specified.</span>
+<span class="sd">                    Specify the start and end range of the indices</span>
+<span class="sd">                    which will be used for the file names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                        <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Save&#39;</span><span class="p">)</span>
+
+    <span class="c1"># expand the path for plugins that don&#39;t do it themselves</span>
+    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">output_dir</span><span class="p">))</span>
+    <span class="n">make_dirs_if_needed</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">overwrite_all</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Images</span><span class="p">):</span>
+        <span class="c1"># Save metadata</span>
+        <span class="n">metadata_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">name_prefix</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span><span class="p">)</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Metadata filename: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">metadata_filename</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">metadata_filename</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">metadata_save</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sample</span>
+
+    <span class="k">if</span> <span class="n">swap_axes</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">out_format</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;nxs&#39;</span><span class="p">]:</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">name_prefix</span> <span class="o">+</span> <span class="n">name_postfix</span><span class="p">)</span>
+        <span class="n">write_nxs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">filename</span> <span class="o">+</span> <span class="s1">&#39;.nxs&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite_all</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">out_format</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;fit&#39;</span><span class="p">,</span> <span class="s1">&#39;fits&#39;</span><span class="p">]:</span>
+            <span class="n">write_func</span> <span class="o">=</span> <span class="n">write_fits</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># pass all other formats to skimage</span>
+            <span class="n">write_func</span> <span class="o">=</span> <span class="n">write_img</span>
+
+        <span class="n">num_images</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">add_estimated_steps</span><span class="p">(</span><span class="n">num_images</span><span class="p">)</span>
+
+        <span class="n">names</span> <span class="o">=</span> <span class="n">generate_names</span><span class="p">(</span><span class="n">name_prefix</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">num_images</span><span class="p">,</span> <span class="n">custom_idx</span><span class="p">,</span>
+                               <span class="n">zfill_len</span><span class="p">,</span> <span class="n">name_postfix</span><span class="p">,</span> <span class="n">out_format</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span><span class="p">):</span>
+                <span class="n">write_func</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">output_dir</span><span class="p">,</span> <span class="n">names</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span> <span class="n">overwrite_all</span><span class="p">)</span>
+
+                <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Image </span><span class="si">{}</span><span class="s1"> of </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">idx</span><span class="p">,</span> <span class="n">num_images</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="generate_names"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.generate_names">[docs]</a><span class="k">def</span> <span class="nf">generate_names</span><span class="p">(</span><span class="n">name_prefix</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">num_images</span><span class="p">,</span> <span class="n">custom_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">zfill_len</span><span class="o">=</span><span class="n">DEFAULT_ZFILL_LENGTH</span><span class="p">,</span>
+                   <span class="n">name_postfix</span><span class="o">=</span><span class="n">DEFAULT_NAME_POSTFIX</span><span class="p">,</span>
+                   <span class="n">out_format</span><span class="o">=</span><span class="n">DEFAULT_IO_FILE_FORMAT</span><span class="p">):</span>
+    <span class="n">start_index</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">indices</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">custom_idx</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">custom_idx</span>
+        <span class="n">increment</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start_index</span><span class="p">)</span>
+        <span class="n">increment</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">indices</span> <span class="k">else</span> <span class="mi">1</span>
+
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span><span class="p">):</span>
+        <span class="c1"># create the file name, and use the format as extension</span>
+        <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name_prefix</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">zfill_len</span><span class="p">)</span> <span class="o">+</span>
+                     <span class="n">name_postfix</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">out_format</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">+=</span> <span class="n">increment</span>
+    <span class="k">return</span> <span class="n">names</span></div>
+
+
+<div class="viewcode-block" id="make_dirs_if_needed"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.make_dirs_if_needed">[docs]</a><span class="k">def</span> <span class="nf">make_dirs_if_needed</span><span class="p">(</span><span class="n">dirname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite_all</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Makes sure that the directory needed (for example to save a file)</span>
+<span class="sd">    exists, otherwise creates it.</span>
+
+<span class="sd">    :param dirname :: (output) directory to check</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dirname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">dirname</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite_all</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;The output directory is NOT empty:</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">. This can be &quot;</span>
+            <span class="s2">&quot;overridden with -w/--overwrite-all.&quot;</span><span class="o">.</span>
+            <span class="nb">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Saver"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.Saver">[docs]</a><span class="k">class</span> <span class="nc">Saver</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class doesn&#39;t have any try: ... except: ... because when called</span>
+<span class="sd">    it&#39;s usually at an end point, where there would be no point in recovering.</span>
+
+<span class="sd">    However if the directory in which the output should be written out does</span>
+<span class="sd">    not exist, it will be created on the first call of make_dirs_if_needed.</span>
+
+<span class="sd">    This class should always fail early before any</span>
+<span class="sd">    expensive operations have been attempted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Saver.supported_formats"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.Saver.supported_formats">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">supported_formats</span><span class="p">():</span>
+        <span class="c1"># reuse supported formats, they currently share them</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.io.loader</span> <span class="kn">import</span> <span class="n">supported_formats</span>
+        <span class="k">return</span> <span class="n">supported_formats</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_out_format</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">out_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_all</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">overwrite_all</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_swap_axes</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">swap_axes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_preproc_dir</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">preproc_subdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_preproc</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">save_preproc</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_out_slices_prefix</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">out_slices_prefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_out_horiz_slices_prefix</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">out_horiz_slices_prefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_out_horiz_slices_subdir</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">out_horiz_slices_subdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_horiz_slices</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">save_horiz_slices</span>
+
+        <span class="c1"># assign package functions for ease of access</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span> <span class="o">=</span> <span class="n">save</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_dirs_if_needed</span> <span class="o">=</span> <span class="n">make_dirs_if_needed</span>
+
+<div class="viewcode-block" id="Saver.should_save_output"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.Saver.should_save_output">[docs]</a>    <span class="k">def</span> <span class="nf">should_save_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Saver.get_output_path"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.Saver.get_output_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span></div>
+
+<div class="viewcode-block" id="Saver.save_single_image"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.Saver.save_single_image">[docs]</a>    <span class="k">def</span> <span class="nf">save_single_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">data</span><span class="p">,</span>
+                          <span class="n">subdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">name</span><span class="o">=</span><span class="s1">&#39;saved_image&#39;</span><span class="p">,</span>
+                          <span class="n">swap_axes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                          <span class="n">custom_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">zfill_len</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                          <span class="n">name_postfix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                          <span class="n">use_preproc_folder</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save a single image to a single image file.</span>
+<span class="sd">        THIS SHOULD NOT BE USED WITH A 3D STACK OF IMAGES.</span>
+
+<span class="sd">        :param subdir: Specify an additional subdirectory</span>
+<span class="sd">                       inside the output directory</span>
+<span class="sd">        :param data: Data volume with pre-processed images</span>
+<span class="sd">        :param name: Image name to be appended</span>
+<span class="sd">        :param custom_index: Index that will be appended at the end of the</span>
+<span class="sd">                             image filename</span>
+<span class="sd">        :param zfill_len: Prepend zeros to the output file names to have a</span>
+<span class="sd">                          constant file name length. Example:</span>
+<span class="sd">                          - saving out an image with zfill_len = 6:</span>
+<span class="sd">                              saved_image000001,...saved_image000201 and so on</span>
+<span class="sd">                          - saving out an image with zfill_len = 3:</span>
+<span class="sd">                              saved_image001,...saved_image201 and so on</span>
+<span class="sd">        :param name_postfix: String to be appended after the zero fill.</span>
+<span class="sd">                             This is not recommended and might confuse</span>
+<span class="sd">                             imaging programs (including this script) as to</span>
+<span class="sd">                             the order of the images, and they could</span>
+<span class="sd">                             end up not loading all of the images.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> \
+            <span class="s2">&quot;This should not be used with a 3D stack of images!&quot;</span>
+
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                            <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Save Image&#39;</span><span class="p">)</span>
+
+        <span class="c1"># reshape so that it works with the internals</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Not saving a single image, &quot;</span>
+                <span class="s2">&quot;because no output path is specified.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># using the config&#39;s output dir</span>
+        <span class="k">if</span> <span class="n">use_preproc_folder</span><span class="p">:</span>
+            <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preproc_dir</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span>
+
+        <span class="k">if</span> <span class="n">subdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># using the provided subdir</span>
+            <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">subdir</span><span class="p">)</span>
+            <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Saving single image </span><span class="si">{0}</span><span class="s2"> dtype: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">output_dir</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+
+            <span class="n">save</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span>
+                <span class="n">output_dir</span><span class="p">,</span>
+                <span class="n">name</span><span class="p">,</span>
+                <span class="n">swap_axes</span><span class="p">,</span>
+                <span class="n">out_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_out_format</span><span class="p">,</span>
+                <span class="n">overwrite_all</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_all</span><span class="p">,</span>
+                <span class="n">zfill_len</span><span class="o">=</span><span class="n">zfill_len</span><span class="p">,</span>
+                <span class="n">name_postfix</span><span class="o">=</span><span class="n">name_postfix</span><span class="p">,</span>
+                <span class="n">custom_idx</span><span class="o">=</span><span class="n">custom_index</span><span class="p">,</span>
+                <span class="n">indices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Saver.save_preproc_images"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.Saver.save_preproc_images">[docs]</a>    <span class="k">def</span> <span class="nf">save_preproc_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Specialised save function to save out the pre-processed images.</span>
+
+<span class="sd">        This will save the images out in a subdir /pre-processed/.</span>
+
+<span class="sd">        :param data: The pre-processed data that will be saved</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                            <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Save Preprocessed&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_preproc</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">preproc_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preproc_dir</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Saving all pre-processed images into </span><span class="si">{0}</span><span class="s2"> &quot;</span>
+                                    <span class="s2">&quot;dtype: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                        <span class="n">preproc_dir</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+
+                <span class="n">save</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">preproc_dir</span><span class="p">,</span> <span class="s1">&#39;out_preproc_image&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_swap_axes</span><span class="p">,</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">_out_format</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_all</span><span class="p">,</span>
+                     <span class="n">indices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Saver.save_recon_output"><a class="viewcode-back" href="../../../../api/mantidimaging.core.io.saver.html#mantidimaging.core.io.saver.Saver.save_recon_output">[docs]</a>    <span class="k">def</span> <span class="nf">save_recon_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Specialised method to save out the reconstructed data</span>
+<span class="sd">        depending on the configuration options.</span>
+
+<span class="sd">        This will save out the data in a subdirectory /reconstructed/.</span>
+<span class="sd">        If --save-horiz-slices is specified, the axis will be flipped and</span>
+<span class="sd">        the result will be saved out in /reconstructed/horiz.</span>
+<span class="sd">        ^ This means that the data usage will double as</span>
+<span class="sd">        numpy.swapaxes WILL COPY AND DOUBLE the data!</span>
+
+<span class="sd">        :param data: Reconstructed data volume that will be saved out.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                            <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Save Reconstruction&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Not saving reconstruction output, &quot;</span>
+                <span class="s2">&quot;because no output path is specified.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">out_recon_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">,</span> <span class="s1">&#39;reconstructed&#39;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Starting saving slices of the reconstructed &quot;</span>
+                                <span class="s2">&quot;volume in: </span><span class="si">{0}</span><span class="s2">...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_recon_dir</span><span class="p">))</span>
+
+            <span class="n">save</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">out_recon_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_slices_prefix</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">_swap_axes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_format</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_all</span><span class="p">,</span>
+                 <span class="n">indices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">)</span>
+
+            <span class="c1"># Sideways slices:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_horiz_slices</span><span class="p">:</span>
+                <span class="n">out_horiz_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_recon_dir</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">_out_horiz_slices_subdir</span><span class="p">)</span>
+
+                <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Saving horizontal slices in: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_horiz_dir</span><span class="p">))</span>
+
+                <span class="c1"># save out the horizontal slices by flipping the axes</span>
+                <span class="n">save</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">out_horiz_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_horiz_slices_prefix</span><span class="p">,</span>
+                     <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_swap_axes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_format</span><span class="p">,</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_all</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="saver.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.saver</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

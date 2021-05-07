@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.filters.view module
+=============================================
+
+.. automodule:: mantidimaging.gui.windows.filters.view
+   :members:
+   :undoc-members:
+   :show-inheritance:

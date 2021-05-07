@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Overview - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="MantidImaging" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="MantidImaging"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">Overview</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p>Mantid Imaging contains tools for loading data from neutron imaging experiments, preprocessing to enhance images and tomographic reconstruction into 3 dimensional data that can be output for further analysis.</p>
+<p>Mantid Imaging makes use of a range of algorithms, some from external tools including <a class="reference external" href="http://www.astra-toolbox.com/">Astra</a> and <a class="reference external" href="https://tomopy.readthedocs.io/en/latest/">Tomopy</a>. Many of these are optimised for multithreading and GPU computing.</p>
+<p>Mantid Imaging is written in Python and requires a CUDA capable GPU for full functionality. It runs on Linux. See <a class="reference internal" href="installation.html#installation"><span class="std std-ref">Installation</span></a> for more details.</p>
+<p>See the <a class="reference internal" href="user_guide/index.html#user-guide"><span class="std std-ref">User Guide</span></a> for an example taking data from a set of images to full reconstruction.</p>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<section id="operations">
+<h3>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h3>
+<p>The Operations Window provides a selection of tools and filters to process and enhance the 2D images before running the reconstruction.</p>
+<ul class="simple">
+<li><p>Crop Coordinates</p></li>
+<li><p>Flat-fielding</p></li>
+<li><p>Remove Outliers</p></li>
+<li><p>ROI Normalisation</p></li>
+<li><p>Circular Mask</p></li>
+<li><p>Clip Values</p></li>
+<li><p>Divide</p></li>
+<li><p>Gaussian</p></li>
+<li><p>Median</p></li>
+<li><p>Monitor Normalisation</p></li>
+<li><p>Rebin</p></li>
+<li><p>Rescale</p></li>
+<li><p>Ring Removal</p></li>
+<li><p>Rotate Stack</p></li>
+<li><p>Remove all stripes</p></li>
+<li><p>Remove dead stripes</p></li>
+<li><p>Remove large stripes</p></li>
+<li><p>Stripe Removal</p></li>
+<li><p>Remove stripes with filtering</p></li>
+<li><p>Remove stripes with sorting and fitting</p></li>
+</ul>
+<p>More details on using these are available in the <a class="reference internal" href="api.html#api-reference"><span class="std std-ref">API Reference</span></a> and <a class="reference internal" href="user_guide/index.html#user-guide"><span class="std std-ref">User Guide</span></a>.</p>
+</section>
+<section id="reconstruction">
+<h3>Reconstruction<a class="headerlink" href="#reconstruction" title="Permalink to this headline">¶</a></h3>
+<p>Mantid Imaging offers several reconstruction algorithms</p>
+<ul class="simple">
+<li><p>FBP_CUDA - Filtered Backprojection</p></li>
+<li><p>SIRT_CUDA - Simultaneous Iterative Reconstruction Technique</p></li>
+<li><p>gridrec</p></li>
+</ul>
+</section>
+</section>
+<section id="glossary">
+<h2>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>COR</dt><dd><p>Centre of Rotation.</p>
+</dd>
+<dt>Dataset</dt><dd><p>Consists of images stacks plus additional files or metadata, such as flat and dark frames, and log files.</p>
+</dd>
+<dt>Image</dt><dd><p>A single 2D recorded by the experiment. Typically loaded from TIFF files.</p>
+</dd>
+<dt>Image Stack</dt><dd><p>A set of multiple related images, for example images of the same object from a range of angles.</p>
+</dd>
+<dt>Projection</dt><dd><p>The original image formed by the unscattered/unabsorbed neutrons reaching the imaging detector.</p>
+</dd>
+<dt>ROI</dt><dd><p>Region of Interest. A cropped part of an image.</p>
+</dd>
+<dt>Sinogram</dt><dd><p>A projection of all rotations of a single slice through an object. Each point in the slice becomes a sinusoidal line. Also known as a Radon transform.</p>
+</dd>
+<dt>Tomography</dt><dd><p>The process of creating a 3D model if an object from a series 2D images taken at a range angles through it.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a><ul>
+<li><a class="reference internal" href="#features">Features</a><ul>
+<li><a class="reference internal" href="#operations">Operations</a></li>
+<li><a class="reference internal" href="#reconstruction">Reconstruction</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#glossary">Glossary</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">MantidImaging</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="next chapter">Installation</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href=".././index.html">Latest</a></li>
+  <li><a href="../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="overview.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="MantidImaging"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">Overview</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

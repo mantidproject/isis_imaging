@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.operations.median_filter.median_filter &#8212; MantidImaging 2.1.0 documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.median_filter.median_filter</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.operations.median_filter.median_filter</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span> <span class="k">as</span> <span class="nn">scipy_ndimage</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging</span> <span class="kn">import</span> <span class="n">helper</span> <span class="k">as</span> <span class="n">h</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.gpu</span> <span class="kn">import</span> <span class="n">utility</span> <span class="k">as</span> <span class="n">gpu</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.operations.base_filter</span> <span class="kn">import</span> <span class="n">BaseFilter</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">shared</span> <span class="k">as</span> <span class="n">ps</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.utility</span> <span class="kn">import</span> <span class="n">add_property_to_form</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.utility.qt_helpers</span> <span class="kn">import</span> <span class="n">Type</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QFormLayout</span>  <span class="c1"># pragma: no cover</span>
+
+
+<div class="viewcode-block" id="MedianFilter"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.median_filter.median_filter.html#mantidimaging.core.operations.median_filter.median_filter.MedianFilter">[docs]</a><span class="k">class</span> <span class="nc">MedianFilter</span><span class="p">(</span><span class="n">BaseFilter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Applies Median filter to the data.</span>
+
+<span class="sd">    Intended to be used on: Projections</span>
+
+<span class="sd">    When: As a pre-processing step to reduce noise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filter_name</span> <span class="o">=</span> <span class="s2">&quot;Median&quot;</span>
+    <span class="n">link_histograms</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="MedianFilter.filter_func"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.median_filter.median_filter.html#mantidimaging.core.operations.median_filter.median_filter.MedianFilter.filter_func">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_func</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Images</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;reflect&quot;</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_cpu</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param data: Input data as an Images object.</span>
+<span class="sd">        :param size: Size of the kernel</span>
+<span class="sd">        :param mode: The mode with which to handle the edges.</span>
+<span class="sd">                     One of [reflect, constant, nearest, mirror, wrap].</span>
+<span class="sd">                     Modes are described in the `SciPy documentation</span>
+<span class="sd">                     &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.median_filter.html&gt;`_.</span>
+<span class="sd">        :param cores: The number of cores that will be used to process the data.</span>
+<span class="sd">        :param chunksize: The number of chunks that each worker will receive.</span>
+<span class="sd">        :param progress: The object for displaying the progress.</span>
+<span class="sd">        :param force_cpu: Whether or not to use the CPU.</span>
+
+<span class="sd">        :return: Returns the processed data</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">and</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">force_cpu</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">_execute_gpu</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_execute</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+
+        <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="MedianFilter.register_gui"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.median_filter.median_filter.html#mantidimaging.core.operations.median_filter.median_filter.MedianFilter.register_gui">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">register_gui</span><span class="p">(</span><span class="n">form</span><span class="p">:</span> <span class="s1">&#39;QFormLayout&#39;</span><span class="p">,</span> <span class="n">on_change</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">view</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">size_field</span> <span class="o">=</span> <span class="n">add_property_to_form</span><span class="p">(</span><span class="s1">&#39;Kernel Size&#39;</span><span class="p">,</span>
+                                             <span class="n">Type</span><span class="o">.</span><span class="n">INT</span><span class="p">,</span>
+                                             <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span>
+                                             <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span>
+                                             <span class="n">on_change</span><span class="o">=</span><span class="n">on_change</span><span class="p">,</span>
+                                             <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Size of the median filter kernel&quot;</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">mode_field</span> <span class="o">=</span> <span class="n">add_property_to_form</span><span class="p">(</span><span class="s1">&#39;Edge Mode&#39;</span><span class="p">,</span>
+                                             <span class="n">Type</span><span class="o">.</span><span class="n">CHOICE</span><span class="p">,</span>
+                                             <span class="n">valid_values</span><span class="o">=</span><span class="n">modes</span><span class="p">(),</span>
+                                             <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span>
+                                             <span class="n">on_change</span><span class="o">=</span><span class="n">on_change</span><span class="p">,</span>
+                                             <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Mode to handle the edges of the image&quot;</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">gpu_field</span> <span class="o">=</span> <span class="n">add_property_to_form</span><span class="p">(</span><span class="s1">&#39;Use GPU&#39;</span><span class="p">,</span>
+                                            <span class="n">Type</span><span class="o">.</span><span class="n">BOOL</span><span class="p">,</span>
+                                            <span class="n">default_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                            <span class="n">tooltip</span><span class="o">=</span><span class="s1">&#39;Run the median filter on the GPU&#39;</span><span class="p">,</span>
+                                            <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span>
+                                            <span class="n">on_change</span><span class="o">=</span><span class="n">on_change</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;size_field&#39;</span><span class="p">:</span> <span class="n">size_field</span><span class="p">,</span> <span class="s1">&#39;mode_field&#39;</span><span class="p">:</span> <span class="n">mode_field</span><span class="p">,</span> <span class="s1">&#39;use_gpu_field&#39;</span><span class="p">:</span> <span class="n">gpu_field</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="MedianFilter.execute_wrapper"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.median_filter.median_filter.html#mantidimaging.core.operations.median_filter.median_filter.MedianFilter.execute_wrapper">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">execute_wrapper</span><span class="p">(</span><span class="n">size_field</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode_field</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_gpu_field</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">MedianFilter</span><span class="o">.</span><span class="n">filter_func</span><span class="p">,</span>
+                       <span class="n">size</span><span class="o">=</span><span class="n">size_field</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                       <span class="n">mode</span><span class="o">=</span><span class="n">mode_field</span><span class="o">.</span><span class="n">currentText</span><span class="p">(),</span>
+                       <span class="n">force_cpu</span><span class="o">=</span><span class="ow">not</span> <span class="n">use_gpu_field</span><span class="o">.</span><span class="n">isChecked</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="modes"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.median_filter.median_filter.html#mantidimaging.core.operations.median_filter.median_filter.modes">[docs]</a><span class="k">def</span> <span class="nf">modes</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span> <span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="s1">&#39;mirror&#39;</span><span class="p">,</span> <span class="s1">&#39;wrap&#39;</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Median filter&#39;</span><span class="p">)</span>
+
+    <span class="c1"># create the partial function to forward the parameters</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span><span class="n">scipy_ndimage</span><span class="o">.</span><span class="n">median_filter</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">return_to_self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PARALLEL median filter, with pixel data type: </span><span class="si">{0}</span><span class="s2">, filter &quot;</span>
+                 <span class="s2">&quot;size/width: </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span>
+
+        <span class="n">ps</span><span class="o">.</span><span class="n">shared_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
+        <span class="n">ps</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">progress</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Median filter&quot;</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="n">cores</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span> <span class="nf">_execute_gpu</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">num_steps</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">task_name</span><span class="o">=</span><span class="s2">&quot;Median filter GPU&quot;</span><span class="p">)</span>
+    <span class="n">cuda</span> <span class="o">=</span> <span class="n">gpu</span><span class="o">.</span><span class="n">CudaExecuter</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;GPU median filter, with pixel data type: </span><span class="si">{0}</span><span class="s2">, filter &quot;</span> <span class="s2">&quot;size/width: </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">cuda</span><span class="o">.</span><span class="n">median_filter</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Images</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.median_filter.median_filter</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

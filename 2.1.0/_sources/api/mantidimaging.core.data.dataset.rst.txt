@@ -1,0 +1,7 @@
+mantidimaging.core.data.dataset module
+======================================
+
+.. automodule:: mantidimaging.core.data.dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:

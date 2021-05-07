@@ -1,0 +1,7 @@
+mantidimaging.core.data.images module
+=====================================
+
+.. automodule:: mantidimaging.core.data.images
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.filters.navigation\_toolbar module
+============================================================
+
+.. automodule:: mantidimaging.gui.windows.filters.navigation_toolbar
+   :members:
+   :undoc-members:
+   :show-inheritance:

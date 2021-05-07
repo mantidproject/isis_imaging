@@ -1,0 +1,7 @@
+mantidimaging.core.configurations.default\_filtering module
+===========================================================
+
+.. automodule:: mantidimaging.core.configurations.default_filtering
+   :members:
+   :undoc-members:
+   :show-inheritance:

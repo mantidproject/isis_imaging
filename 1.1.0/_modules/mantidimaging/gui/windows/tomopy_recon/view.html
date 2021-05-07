@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.windows.tomopy_recon.view - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.tomopy_recon.view</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.windows.tomopy_recon.view</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">matplotlib.backends.backend_qt5agg</span> <span class="kn">import</span> <span class="n">FigureCanvasQTAgg</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.mvp_base</span> <span class="kn">import</span> <span class="n">BaseMainWindowView</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.utility</span> <span class="kn">import</span> <span class="n">BlockQtSignals</span>
+
+<span class="kn">from</span> <span class="nn">.navigation_toolbar</span> <span class="kn">import</span> <span class="n">TomopyReconNavigationToolbar</span>
+<span class="kn">from</span> <span class="nn">.presenter</span> <span class="kn">import</span> <span class="n">TomopyReconWindowPresenter</span>
+<span class="kn">from</span> <span class="nn">.presenter</span> <span class="kn">import</span> <span class="n">Notification</span> <span class="k">as</span> <span class="n">PresNotification</span>
+
+
+<div class="viewcode-block" id="TomopyReconWindowView"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.view.html#mantidimaging.gui.windows.tomopy_recon.view.TomopyReconWindowView">[docs]</a><span class="k">class</span> <span class="nc">TomopyReconWindowView</span><span class="p">(</span><span class="n">BaseMainWindowView</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_window</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Greys_r&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TomopyReconWindowView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+                <span class="n">main_window</span><span class="p">,</span> <span class="s1">&#39;gui/ui/tomopy_recon_window.ui&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span> <span class="o">=</span> <span class="n">TomopyReconWindowPresenter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_window</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmap</span> <span class="o">=</span> <span class="n">cmap</span>
+
+        <span class="c1"># Handle stack selection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackSelector</span><span class="o">.</span><span class="n">stack_selected_uuid</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">set_stack_uuid</span><span class="p">)</span>
+
+        <span class="c1"># Handle reconstruct buttons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reconstructSlice</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span>
+                    <span class="n">PresNotification</span><span class="o">.</span><span class="n">RECONSTRUCT_SLICE</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reconstructVolume</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span>
+                    <span class="n">PresNotification</span><span class="o">.</span><span class="n">RECONSTRUCT_VOLUME</span><span class="p">))</span>
+
+        <span class="c1"># Handle preview slice selection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previewSlice</span><span class="o">.</span><span class="n">valueChanged</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">set_preview_slice_idx</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">add_mpl_figure</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">add_toolbar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">figure</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+            <span class="n">canvas</span> <span class="o">=</span> <span class="n">FigureCanvasQTAgg</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
+            <span class="n">canvas</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">add_toolbar</span><span class="p">:</span>
+                <span class="n">toolbar</span> <span class="o">=</span> <span class="n">TomopyReconNavigationToolbar</span><span class="p">(</span><span class="n">canvas</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+                <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">toolbar</span><span class="p">)</span>
+            <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">canvas</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">canvas</span><span class="p">)</span>
+
+        <span class="c1"># Projection image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proj_figure</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_canvas</span> <span class="o">=</span> \
+            <span class="n">add_mpl_figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectionLayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proj_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proj_canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span>
+                <span class="s1">&#39;button_press_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_on_button_press</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proj_canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span>
+                <span class="s1">&#39;scroll_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_handle_scroll_wheel</span><span class="p">)</span>
+
+        <span class="c1"># Reconstructed slice image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_figure</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recon_canvas</span> <span class="o">=</span> \
+            <span class="n">add_mpl_figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reconLayout</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recon_figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackSelector</span><span class="o">.</span><span class="n">subscribe_to_main_window</span><span class="p">(</span><span class="n">main_window</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TomopyReconWindowView.cleanup"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.view.html#mantidimaging.gui.windows.tomopy_recon.view.TomopyReconWindowView.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackSelector</span><span class="o">.</span><span class="n">unsubscribe_from_main_window</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TomopyReconWindowView.proj_on_button_press"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.view.html#mantidimaging.gui.windows.tomopy_recon.view.TomopyReconWindowView.proj_on_button_press">[docs]</a>    <span class="k">def</span> <span class="nf">proj_on_button_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">ydata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">set_preview_slice_idx</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">ydata</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TomopyReconWindowView.proj_handle_scroll_wheel"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.view.html#mantidimaging.gui.windows.tomopy_recon.view.TomopyReconWindowView.proj_handle_scroll_wheel">[docs]</a>    <span class="k">def</span> <span class="nf">proj_handle_scroll_wheel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="s1">&#39;up&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">PresNotification</span><span class="o">.</span><span class="n">PREVIEW_SLICE_NEXT</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="s1">&#39;down&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">PresNotification</span><span class="o">.</span><span class="n">PREVIEW_SLICE_PREVIOUS</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TomopyReconWindowView.update_projection_preview"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.view.html#mantidimaging.gui.windows.tomopy_recon.view.TomopyReconWindowView.update_projection_preview">[docs]</a>    <span class="k">def</span> <span class="nf">update_projection_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                  <span class="n">proj_image_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="n">indicated_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proj_plot</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">proj_image_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Plot the image data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proj_plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">proj_image_data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cmap</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">indicated_slice</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Plot the slice indicator</span>
+                <span class="n">x_max</span> <span class="o">=</span> <span class="n">proj_image_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">proj_plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span> <span class="p">[</span><span class="n">indicated_slice</span><span class="p">,</span> <span class="n">indicated_slice</span><span class="p">],</span>
+                        <span class="n">c</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">proj_canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TomopyReconWindowView.update_recon_preview"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.view.html#mantidimaging.gui.windows.tomopy_recon.view.TomopyReconWindowView.update_recon_preview">[docs]</a>    <span class="k">def</span> <span class="nf">update_recon_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recon_image_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Record the image axis range from the existing preview image</span>
+        <span class="n">image_axis_ranges</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recon_plot</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">recon_plot</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+        <span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recon_plot</span><span class="o">.</span><span class="n">images</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_plot</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">recon_image_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recon_plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">recon_image_data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cmap</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">image_axis_ranges</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recon_plot</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">image_axis_ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recon_plot</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">image_axis_ranges</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TomopyReconWindowView.set_preview_slice_idx"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.view.html#mantidimaging.gui.windows.tomopy_recon.view.TomopyReconWindowView.set_preview_slice_idx">[docs]</a>    <span class="k">def</span> <span class="nf">set_preview_slice_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">BlockQtSignals</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">previewSlice</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previewSlice</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TomopyReconWindowView.set_preview_slice_max_idx"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.tomopy_recon.view.html#mantidimaging.gui.windows.tomopy_recon.view.TomopyReconWindowView.set_preview_slice_max_idx">[docs]</a>    <span class="k">def</span> <span class="nf">set_preview_slice_max_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_idx</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previewSlice</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="n">max_idx</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rotation_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cor</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+
+    <span class="nd">@rotation_centre</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">rotation_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cor</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cor_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+
+    <span class="nd">@cor_gradient</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">cor_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_proj_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxProjAngle</span><span class="o">.</span><span class="n">value</span><span class="p">()</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="view.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.tomopy_recon.view</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

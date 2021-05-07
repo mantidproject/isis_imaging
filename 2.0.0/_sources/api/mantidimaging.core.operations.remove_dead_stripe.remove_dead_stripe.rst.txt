@@ -1,0 +1,7 @@
+mantidimaging.core.operations.remove\_dead\_stripe.remove\_dead\_stripe module
+==============================================================================
+
+.. automodule:: mantidimaging.core.operations.remove_dead_stripe.remove_dead_stripe
+   :members:
+   :undoc-members:
+   :show-inheritance:

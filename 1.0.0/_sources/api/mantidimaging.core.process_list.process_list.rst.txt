@@ -1,0 +1,7 @@
+mantidimaging.core.process\_list.process\_list module
+=====================================================
+
+.. automodule:: mantidimaging.core.process_list.process_list
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,15 @@
+mantidimaging.core.utility.progress\_reporting.test package
+===========================================================
+
+.. automodule:: mantidimaging.core.utility.progress_reporting.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.utility.progress_reporting.test.progress_test

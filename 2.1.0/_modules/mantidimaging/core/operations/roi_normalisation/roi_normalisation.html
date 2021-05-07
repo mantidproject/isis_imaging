@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.operations.roi_normalisation.roi_normalisation - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.roi_normalisation.roi_normalisation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.operations.roi_normalisation.roi_normalisation</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging</span> <span class="kn">import</span> <span class="n">helper</span> <span class="k">as</span> <span class="n">h</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.operations.base_filter</span> <span class="kn">import</span> <span class="n">BaseFilter</span><span class="p">,</span> <span class="n">FilterGroup</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">shared</span> <span class="k">as</span> <span class="n">ps</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">utility</span> <span class="k">as</span> <span class="n">pu</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.sensible_roi</span> <span class="kn">import</span> <span class="n">SensibleROI</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.utility</span> <span class="kn">import</span> <span class="n">add_property_to_form</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.utility.qt_helpers</span> <span class="kn">import</span> <span class="n">Type</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.widgets.stack_selector</span> <span class="kn">import</span> <span class="n">StackSelectorWidgetView</span>
+
+
+<div class="viewcode-block" id="modes"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.roi_normalisation.roi_normalisation.html#mantidimaging.core.operations.roi_normalisation.roi_normalisation.modes">[docs]</a><span class="k">def</span> <span class="nf">modes</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;Preserve Max&#39;</span><span class="p">,</span> <span class="s1">&#39;Stack Average&#39;</span><span class="p">,</span> <span class="s1">&#39;Flat Field&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="RoiNormalisationFilter"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.roi_normalisation.roi_normalisation.html#mantidimaging.core.operations.roi_normalisation.roi_normalisation.RoiNormalisationFilter">[docs]</a><span class="k">class</span> <span class="nc">RoiNormalisationFilter</span><span class="p">(</span><span class="n">BaseFilter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Normalises the image data by the average values in a region of interest.</span>
+
+<span class="sd">    Intended to be used on: Projections</span>
+
+<span class="sd">    When: Always, to ensure that any fluctuations in beam intensity are normalised.</span>
+
+<span class="sd">    Caution: If you see horizontal lines in the sinogram this means some projections</span>
+<span class="sd">    are brighter/darker than the rest. This can be fixed with this operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filter_name</span> <span class="o">=</span> <span class="s2">&quot;ROI Normalisation&quot;</span>
+    <span class="n">link_histograms</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="RoiNormalisationFilter.filter_func"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.roi_normalisation.roi_normalisation.html#mantidimaging.core.operations.roi_normalisation.roi_normalisation.RoiNormalisationFilter.filter_func">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_func</span><span class="p">(</span><span class="n">images</span><span class="p">:</span> <span class="n">Images</span><span class="p">,</span>
+                    <span class="n">region_of_interest</span><span class="p">:</span> <span class="n">SensibleROI</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">normalisation_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">modes</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">flat_field</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Images</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Normalise by beam intensity.</span>
+
+<span class="sd">        This does NOT do any checks if the Air Region is out of bounds!</span>
+<span class="sd">        If the Air Region is out of bounds, the crop will fail at runtime.</span>
+<span class="sd">        If the Air Region is in bounds, but has overlapping coordinates</span>
+<span class="sd">        the crop give back a 0 shape of the coordinates that were wrong.</span>
+
+<span class="sd">        :param images: Sample data which is to be processed. Expected in radiograms</span>
+
+<span class="sd">        :param region_of_interest: The order is - Left Top Right Bottom. The air region</span>
+<span class="sd">                           from which sums will be calculated and all images will</span>
+<span class="sd">                           be normalised.</span>
+
+<span class="sd">        :param normalisation_mode: Controls what the air regions are normalised to.</span>
+<span class="sd">            &#39;Preserve Max&#39; : Normalisation is scaled such that the the maximum pixel value of the stack is equal before</span>
+<span class="sd">                             and after the operation.</span>
+<span class="sd">            &#39;Stack Average&#39; : The mean value of the air region across all projections is preserved.</span>
+<span class="sd">            &#39;Flat Field&#39; : The mean value of the air regions in the projections is made equal to the mean value of the</span>
+<span class="sd">                           air region in the flat field.</span>
+
+<span class="sd">        :param flat_field: If &#39;Flat Field&#39; mode is used, pass in the flat field images.</span>
+
+<span class="sd">        :param cores: The number of cores that will be used to process the data.</span>
+
+<span class="sd">        :param chunksize: The number of chunks that each worker will receive.</span>
+<span class="sd">        :param progress: Reference to a progress bar object</span>
+
+<span class="sd">        :returns: Filtered data (stack of images)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">normalisation_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">modes</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown normalisation_mode: </span><span class="si">{</span><span class="n">normalisation_mode</span><span class="si">}</span><span class="s2">, should be one of </span><span class="si">{</span><span class="n">modes</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">normalisation_mode</span> <span class="o">==</span> <span class="s2">&quot;Flat Field&quot;</span> <span class="ow">and</span> <span class="n">flat_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;flat_field must provided if using normalisation_mode of &quot;Flat Field&quot;&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">flat_field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">flat_field_data</span> <span class="o">=</span> <span class="n">flat_field</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flat_field_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+
+        <span class="c1"># just get data reference</span>
+        <span class="k">if</span> <span class="n">region_of_interest</span><span class="p">:</span>
+            <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;ROI Normalisation&#39;</span><span class="p">)</span>
+            <span class="n">_execute</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">region_of_interest</span><span class="p">,</span> <span class="n">normalisation_mode</span><span class="p">,</span> <span class="n">flat_field_data</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">images</span></div>
+
+<div class="viewcode-block" id="RoiNormalisationFilter.register_gui"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.roi_normalisation.roi_normalisation.html#mantidimaging.core.operations.roi_normalisation.roi_normalisation.RoiNormalisationFilter.register_gui">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">register_gui</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">on_change</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="n">label</span><span class="p">,</span> <span class="n">roi_field</span> <span class="o">=</span> <span class="n">add_property_to_form</span><span class="p">(</span><span class="s2">&quot;Air Region&quot;</span><span class="p">,</span>
+                                                <span class="n">Type</span><span class="o">.</span><span class="n">STR</span><span class="p">,</span>
+                                                <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span>
+                                                <span class="n">on_change</span><span class="o">=</span><span class="n">on_change</span><span class="p">,</span>
+                                                <span class="n">default_value</span><span class="o">=</span><span class="s2">&quot;0, 0, 200, 200&quot;</span><span class="p">)</span>
+        <span class="n">add_property_to_form</span><span class="p">(</span><span class="s2">&quot;Select Air Region&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;button&quot;</span><span class="p">,</span>
+                             <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span>
+                             <span class="n">on_change</span><span class="o">=</span><span class="n">on_change</span><span class="p">,</span>
+                             <span class="n">run_on_press</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">view</span><span class="o">.</span><span class="n">roi_visualiser</span><span class="p">(</span><span class="n">roi_field</span><span class="p">))</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">mode_field</span> <span class="o">=</span> <span class="n">add_property_to_form</span><span class="p">(</span><span class="s1">&#39;Normalise Mode&#39;</span><span class="p">,</span>
+                                             <span class="n">Type</span><span class="o">.</span><span class="n">CHOICE</span><span class="p">,</span>
+                                             <span class="n">valid_values</span><span class="o">=</span><span class="n">modes</span><span class="p">(),</span>
+                                             <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span>
+                                             <span class="n">on_change</span><span class="o">=</span><span class="n">on_change</span><span class="p">,</span>
+                                             <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Method to normalise output values&quot;</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">flat_field_widget</span> <span class="o">=</span> <span class="n">add_property_to_form</span><span class="p">(</span><span class="s2">&quot;Flat file&quot;</span><span class="p">,</span>
+                                                    <span class="n">Type</span><span class="o">.</span><span class="n">STACK</span><span class="p">,</span>
+                                                    <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span>
+                                                    <span class="n">filters_view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span>
+                                                    <span class="n">on_change</span><span class="o">=</span><span class="n">on_change</span><span class="p">,</span>
+                                                    <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Flat images to be used for normalising.&quot;</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flat_field_widget</span><span class="p">,</span> <span class="n">StackSelectorWidgetView</span><span class="p">)</span>
+        <span class="n">flat_field_widget</span><span class="o">.</span><span class="n">setMaximumWidth</span><span class="p">(</span><span class="mi">375</span><span class="p">)</span>
+        <span class="n">flat_field_widget</span><span class="o">.</span><span class="n">subscribe_to_main_window</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">main_window</span><span class="p">)</span>
+        <span class="n">flat_field_widget</span><span class="o">.</span><span class="n">try_to_select_relevant_stack</span><span class="p">(</span><span class="s2">&quot;Flat&quot;</span><span class="p">)</span>
+        <span class="n">flat_field_widget</span><span class="o">.</span><span class="n">try_to_select_relevant_stack</span><span class="p">(</span><span class="s2">&quot;Flat Before&quot;</span><span class="p">)</span>
+
+        <span class="n">flat_field_widget</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">mode_field</span><span class="o">.</span><span class="n">currentTextChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">text</span><span class="p">:</span> <span class="n">enable_correct_fields_only</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">flat_field_widget</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;roi_field&#39;</span><span class="p">:</span> <span class="n">roi_field</span><span class="p">,</span> <span class="s1">&#39;norm_mode&#39;</span><span class="p">:</span> <span class="n">mode_field</span><span class="p">,</span> <span class="s1">&#39;flat_field&#39;</span><span class="p">:</span> <span class="n">flat_field_widget</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="RoiNormalisationFilter.execute_wrapper"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.roi_normalisation.roi_normalisation.html#mantidimaging.core.operations.roi_normalisation.roi_normalisation.RoiNormalisationFilter.execute_wrapper">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">execute_wrapper</span><span class="p">(</span><span class="n">roi_field</span><span class="p">,</span> <span class="n">norm_mode</span><span class="p">,</span> <span class="n">flat_field</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">SensibleROI</span><span class="o">.</span><span class="n">from_list</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="k">for</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">roi_field</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)])</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="n">norm_mode</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
+            <span class="n">flat</span> <span class="o">=</span> <span class="n">flat_field</span><span class="o">.</span><span class="n">main_window</span><span class="o">.</span><span class="n">get_stack_visualiser</span><span class="p">(</span><span class="n">flat_field</span><span class="o">.</span><span class="n">current</span><span class="p">())</span>
+            <span class="n">flat_images</span> <span class="o">=</span> <span class="n">flat</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">images</span>
+            <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">RoiNormalisationFilter</span><span class="o">.</span><span class="n">filter_func</span><span class="p">,</span>
+                           <span class="n">region_of_interest</span><span class="o">=</span><span class="n">roi</span><span class="p">,</span>
+                           <span class="n">normalisation_mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+                           <span class="n">flat_field</span><span class="o">=</span><span class="n">flat_images</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The provided ROI string is invalid! Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RoiNormalisationFilter.group_name"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.roi_normalisation.roi_normalisation.html#mantidimaging.core.operations.roi_normalisation.roi_normalisation.RoiNormalisationFilter.group_name">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">group_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FilterGroup</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FilterGroup</span><span class="o">.</span><span class="n">Basic</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_calc_mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">air_left</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">air_top</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">air_right</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">air_bottom</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">air_top</span><span class="p">:</span><span class="n">air_bottom</span><span class="p">,</span> <span class="n">air_left</span><span class="p">:</span><span class="n">air_right</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_calc_max</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_divide_by_air</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">air_sums</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">air_sums</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+             <span class="n">air_region</span><span class="p">:</span> <span class="n">SensibleROI</span><span class="p">,</span>
+             <span class="n">normalisation_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">flat_field</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+             <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Normalization by air region&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">air_region</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">air_region</span> <span class="o">=</span> <span class="n">SensibleROI</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="n">air_region</span><span class="p">)</span>
+
+        <span class="c1"># initialise same number of air sums</span>
+        <span class="n">img_num</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">air_means</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_array</span><span class="p">((</span><span class="n">img_num</span><span class="p">,</span> <span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">do_calculate_air_means</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span><span class="n">_calc_mean</span><span class="p">,</span>
+                                                   <span class="n">ps</span><span class="o">.</span><span class="n">return_to_second_at_i</span><span class="p">,</span>
+                                                   <span class="n">air_left</span><span class="o">=</span><span class="n">air_region</span><span class="o">.</span><span class="n">left</span><span class="p">,</span>
+                                                   <span class="n">air_top</span><span class="o">=</span><span class="n">air_region</span><span class="o">.</span><span class="n">top</span><span class="p">,</span>
+                                                   <span class="n">air_right</span><span class="o">=</span><span class="n">air_region</span><span class="o">.</span><span class="n">right</span><span class="p">,</span>
+                                                   <span class="n">air_bottom</span><span class="o">=</span><span class="n">air_region</span><span class="o">.</span><span class="n">bottom</span><span class="p">)</span>
+
+        <span class="n">ps</span><span class="o">.</span><span class="n">shared_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">,</span> <span class="n">air_means</span><span class="p">]</span>
+        <span class="n">ps</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">do_calculate_air_means</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">progress</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="n">cores</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">normalisation_mode</span> <span class="o">==</span> <span class="s1">&#39;Preserve Max&#39;</span><span class="p">:</span>
+            <span class="n">air_maxs</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_array</span><span class="p">((</span><span class="n">img_num</span><span class="p">,</span> <span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">do_calculate_air_max</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span><span class="n">_calc_max</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">return_to_second_at_i</span><span class="p">)</span>
+
+            <span class="n">ps</span><span class="o">.</span><span class="n">shared_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">,</span> <span class="n">air_maxs</span><span class="p">]</span>
+            <span class="n">ps</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">do_calculate_air_max</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">progress</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="n">cores</span><span class="p">)</span>
+
+            <span class="c1"># calculate the before and after maximum</span>
+            <span class="n">init_max</span> <span class="o">=</span> <span class="n">air_maxs</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">post_max</span> <span class="o">=</span> <span class="p">(</span><span class="n">air_maxs</span> <span class="o">/</span> <span class="n">air_means</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">air_means</span> <span class="o">*=</span> <span class="n">post_max</span> <span class="o">/</span> <span class="n">init_max</span>
+
+        <span class="k">elif</span> <span class="n">normalisation_mode</span> <span class="o">==</span> <span class="s1">&#39;Stack Average&#39;</span><span class="p">:</span>
+            <span class="n">air_means</span> <span class="o">/=</span> <span class="n">air_means</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="n">normalisation_mode</span> <span class="o">==</span> <span class="s1">&#39;Flat Field&#39;</span> <span class="ow">and</span> <span class="n">flat_field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">flat_mean</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_array</span><span class="p">((</span><span class="n">flat_field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">),</span> <span class="n">flat_field</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">ps</span><span class="o">.</span><span class="n">shared_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">flat_field</span><span class="p">,</span> <span class="n">flat_mean</span><span class="p">]</span>
+            <span class="n">ps</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">do_calculate_air_means</span><span class="p">,</span> <span class="n">flat_field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">progress</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="n">cores</span><span class="p">)</span>
+            <span class="n">air_means</span> <span class="o">/=</span> <span class="n">flat_mean</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="n">do_divide</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span><span class="n">_divide_by_air</span><span class="p">,</span> <span class="n">fwd_function</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">inplace2</span><span class="p">)</span>
+        <span class="n">ps</span><span class="o">.</span><span class="n">shared_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">,</span> <span class="n">air_means</span><span class="p">]</span>
+        <span class="n">ps</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">do_divide</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">progress</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="n">cores</span><span class="p">)</span>
+
+        <span class="n">avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">air_means</span><span class="p">)</span>
+        <span class="n">max_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">air_means</span><span class="p">)</span> <span class="o">/</span> <span class="n">avg</span>
+        <span class="n">min_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">air_means</span><span class="p">)</span> <span class="o">/</span> <span class="n">avg</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Normalization by air region. &quot;</span> <span class="sa">f</span><span class="s2">&quot;Average: </span><span class="si">{</span><span class="n">avg</span><span class="si">}</span><span class="s2">, max ratio: </span><span class="si">{</span><span class="n">max_avg</span><span class="si">}</span><span class="s2">, min ratio: </span><span class="si">{</span><span class="n">min_avg</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="enable_correct_fields_only"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.roi_normalisation.roi_normalisation.html#mantidimaging.core.operations.roi_normalisation.roi_normalisation.enable_correct_fields_only">[docs]</a><span class="k">def</span> <span class="nf">enable_correct_fields_only</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">flat_file_widget</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;Flat Field&quot;</span><span class="p">:</span>
+        <span class="n">flat_file_widget</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">flat_file_widget</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="roi_normalisation.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.roi_normalisation.roi_normalisation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

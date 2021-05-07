@@ -1,0 +1,17 @@
+mantidimaging.gui.dialogs.async\_task.test package
+==================================================
+
+.. automodule:: mantidimaging.gui.dialogs.async_task.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.dialogs.async_task.test.model_test
+   mantidimaging.gui.dialogs.async_task.test.presenter_test
+   mantidimaging.gui.dialogs.async_task.test.task_test

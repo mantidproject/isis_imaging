@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.stack\_visualiser.presenter module
+============================================================
+
+.. automodule:: mantidimaging.gui.windows.stack_visualiser.presenter
+   :members:
+   :undoc-members:
+   :show-inheritance:

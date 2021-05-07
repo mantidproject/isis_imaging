@@ -1,0 +1,7 @@
+mantidimaging.core.cor\_tilt.data\_model module
+===============================================
+
+.. automodule:: mantidimaging.core.cor_tilt.data_model
+   :members:
+   :undoc-members:
+   :show-inheritance:

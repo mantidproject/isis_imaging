@@ -1,0 +1,7 @@
+mantidimaging.core.io.loader.stack\_loader module
+=================================================
+
+.. automodule:: mantidimaging.core.io.loader.stack_loader
+   :members:
+   :undoc-members:
+   :show-inheritance:

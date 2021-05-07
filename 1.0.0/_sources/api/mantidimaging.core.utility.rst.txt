@@ -1,0 +1,37 @@
+mantidimaging.core.utility package
+==================================
+
+.. automodule:: mantidimaging.core.utility
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.utility.progress_reporting
+   mantidimaging.core.utility.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.utility.cor_interpolate
+   mantidimaging.core.utility.execution_splitter
+   mantidimaging.core.utility.execution_timer
+   mantidimaging.core.utility.finder
+   mantidimaging.core.utility.func_call
+   mantidimaging.core.utility.histogram
+   mantidimaging.core.utility.memory_usage
+   mantidimaging.core.utility.optional_imports
+   mantidimaging.core.utility.projection_angles
+   mantidimaging.core.utility.registrator
+   mantidimaging.core.utility.shape_splitter
+   mantidimaging.core.utility.size_calculator
+   mantidimaging.core.utility.special_imports
+   mantidimaging.core.utility.value_scaling

@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.utility.registrator - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.registrator</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.utility.registrator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pkgutil</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+
+<div class="viewcode-block" id="find_package_path"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.registrator.html#mantidimaging.core.utility.registrator.find_package_path">[docs]</a><span class="k">def</span> <span class="nf">find_package_path</span><span class="p">(</span><span class="n">package_str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Attempts to find the path to a given package provided the root package is</span>
+<span class="sd">    already on the path.</span>
+
+<span class="sd">    :param package_str: Package to search for as a Python path (i.e.</span>
+<span class="sd">                        &quot;mantidimaging.core.filters&quot;)</span>
+
+<span class="sd">    :return: Path to package</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">package_as_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">package_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+        <span class="n">candidate_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">package_as_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">candidate_path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">candidate_path</span>
+
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot find path for package </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_str</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_package_children"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.registrator.html#mantidimaging.core.utility.registrator.get_package_children">[docs]</a><span class="k">def</span> <span class="nf">get_package_children</span><span class="p">(</span><span class="n">package_name</span><span class="p">,</span> <span class="n">packages</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">modules</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">ignore</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets a list of names of child packages or modules found under a given</span>
+<span class="sd">    package.</span>
+
+<span class="sd">    :param package: The package to search within</span>
+
+<span class="sd">    :param packages: Set to True to return packages</span>
+
+<span class="sd">    :param modules: Set to True to return modules</span>
+
+<span class="sd">    :param ignore: List of explicitly matching modules to ignore</span>
+
+<span class="sd">    :return: Iterator over matching modules</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Walk the children (packages and modules) of the provided root package</span>
+    <span class="n">pkgs</span> <span class="o">=</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">walk_packages</span><span class="p">([</span><span class="n">find_package_path</span><span class="p">(</span><span class="n">package_name</span><span class="p">)],</span>
+                                 <span class="n">prefix</span><span class="o">=</span><span class="n">package_name</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Ignore those that do not match the package/module selection criteria</span>
+    <span class="n">pkgs</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">packages</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">modules</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">)</span>
+
+    <span class="c1"># Ignore moduels that we want to ignore</span>
+    <span class="k">if</span> <span class="n">ignore</span><span class="p">:</span>
+        <span class="n">pkgs</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">m</span> <span class="ow">in</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">ignore</span><span class="p">]),</span>
+                      <span class="n">pkgs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pkgs</span></div>
+
+
+<div class="viewcode-block" id="import_items"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.registrator.html#mantidimaging.core.utility.registrator.import_items">[docs]</a><span class="k">def</span> <span class="nf">import_items</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">required_attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Imports a list of packages/modules and filters out those that do not have a</span>
+<span class="sd">    specified required list of attributes.</span>
+
+<span class="sd">    :param names: List of package/module names to import</span>
+
+<span class="sd">    :param required_attributes: Optional list of attributes that must be</span>
+<span class="sd">                                present on each individual module</span>
+
+<span class="sd">    :return: List of imported packages/modules</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">imported</span> <span class="o">=</span> <span class="p">[</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+
+    <span class="c1"># Filter out those that do not contain all the required attributes</span>
+    <span class="k">if</span> <span class="n">required_attributes</span><span class="p">:</span>
+        <span class="n">imported</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="nb">all</span><span class="p">([</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">required_attributes</span><span class="p">]),</span>
+                <span class="n">imported</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">imported</span></div>
+
+
+<div class="viewcode-block" id="register_into"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.registrator.html#mantidimaging.core.utility.registrator.register_into">[docs]</a><span class="k">def</span> <span class="nf">register_into</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Registers a list of packages and/or modules into a containing instance.</span>
+
+<span class="sd">    :param items: List of packages/modules to register</span>
+
+<span class="sd">    :param container: Container (instance) to register them into</span>
+
+<span class="sd">    :param func: Function by which packages/modules are registered into the</span>
+<span class="sd">                 container</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="n">func</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="registrator.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.registrator</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

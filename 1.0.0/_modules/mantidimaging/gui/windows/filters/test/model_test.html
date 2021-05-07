@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.windows.filters.test.model_test - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.filters.test.model_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.windows.filters.test.model_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">mantidimaging.core.testing.unit_test_helper</span> <span class="k">as</span> <span class="nn">th</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.special_imports</span> <span class="kn">import</span> <span class="n">import_mock</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.windows.stack_visualiser</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">StackVisualiserView</span><span class="p">,</span> <span class="n">StackVisualiserPresenter</span><span class="p">,</span> <span class="n">Parameters</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.windows.filters</span> <span class="kn">import</span> <span class="n">FiltersWindowModel</span>
+
+<span class="n">mock</span> <span class="o">=</span> <span class="n">import_mock</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="FiltersWindowModelTest"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.windows.filters.test.model_test.html#mantidimaging.gui.windows.filters.test.model_test.FiltersWindowModelTest">[docs]</a><span class="k">class</span> <span class="nc">FiltersWindowModelTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+    <span class="n">APPLY_BEFORE_AFTER_MAGIC_NUMBER</span> <span class="o">=</span> <span class="mi">42</span>
+    <span class="n">ROI_PARAMETER</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FiltersWindowModelTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FiltersWindowModelTest.setUpClass"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.windows.filters.test.model_test.html#mantidimaging.gui.windows.filters.test.model_test.FiltersWindowModelTest.setUpClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">test_data</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">generate_images_class_random_shared_array</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FiltersWindowModelTest.setUp"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.windows.filters.test.model_test.html#mantidimaging.gui.windows.filters.test.model_test.FiltersWindowModelTest.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sv_view</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">create_autospec</span><span class="p">(</span><span class="n">StackVisualiserView</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sv_view</span><span class="o">.</span><span class="n">current_roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROI_PARAMETER</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sv_presenter</span> <span class="o">=</span> <span class="n">StackVisualiserPresenter</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sv_view</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_data</span><span class="p">,</span> <span class="n">data_traversal_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sv_view</span><span class="o">.</span><span class="n">presenter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sv_presenter</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">FiltersWindowModel</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FiltersWindowModelTest.execute_mock"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.windows.filters.test.model_test.html#mantidimaging.gui.windows.filters.test.model_test.FiltersWindowModelTest.execute_mock">[docs]</a>    <span class="k">def</span> <span class="nf">execute_mock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span>
+        <span class="n">data</span> <span class="o">*=</span> <span class="mi">4</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="FiltersWindowModelTest.execute_mock_with_roi"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.windows.filters.test.model_test.html#mantidimaging.gui.windows.filters.test.model_test.FiltersWindowModelTest.execute_mock_with_roi">[docs]</a>    <span class="k">def</span> <span class="nf">execute_mock_with_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">roi</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span>
+        <span class="n">data</span> <span class="o">*=</span> <span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROI_PARAMETER</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="FiltersWindowModelTest.apply_before_mock"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.windows.filters.test.model_test.html#mantidimaging.gui.windows.filters.test.model_test.FiltersWindowModelTest.apply_before_mock">[docs]</a>    <span class="k">def</span> <span class="nf">apply_before_mock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_before_mock_variable</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">APPLY_BEFORE_AFTER_MAGIC_NUMBER</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_before_mock_variable</span></div>
+
+<div class="viewcode-block" id="FiltersWindowModelTest.apply_after_mock"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.windows.filters.test.model_test.html#mantidimaging.gui.windows.filters.test.model_test.FiltersWindowModelTest.apply_after_mock">[docs]</a>    <span class="k">def</span> <span class="nf">apply_after_mock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">result_from_before</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">result_from_before</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">APPLY_BEFORE_AFTER_MAGIC_NUMBER</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FiltersWindowModelTest.test_filters_populated"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.windows.filters.test.model_test.html#mantidimaging.gui.windows.filters.test.model_test.FiltersWindowModelTest.test_filters_populated">[docs]</a>    <span class="k">def</span> <span class="nf">test_filters_populated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">filter_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FiltersWindowModelTest.test_do_apply_filter"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.windows.filters.test.model_test.html#mantidimaging.gui.windows.filters.test.model_test.FiltersWindowModelTest.test_do_apply_filter">[docs]</a>    <span class="k">def</span> <span class="nf">test_do_apply_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sv_presenter</span><span class="o">.</span><span class="n">view</span>
+
+        <span class="n">execute</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">MagicMock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execute_mock</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setup_filter</span><span class="p">((</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">execute</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">do_apply_filter</span><span class="p">()</span>
+
+        <span class="n">execute</span><span class="o">.</span><span class="n">assert_called_once</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FiltersWindowModelTest.test_do_apply_filter_with_roi"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.windows.filters.test.model_test.html#mantidimaging.gui.windows.filters.test.model_test.FiltersWindowModelTest.test_do_apply_filter_with_roi">[docs]</a>    <span class="k">def</span> <span class="nf">test_do_apply_filter_with_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sv_presenter</span><span class="o">.</span><span class="n">view</span>
+
+        <span class="n">execute</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">MagicMock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execute_mock_with_roi</span><span class="p">)</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;roi&#39;</span><span class="p">:</span> <span class="n">Parameters</span><span class="o">.</span><span class="n">ROI</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setup_filter</span><span class="p">((</span><span class="n">params</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">execute</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">do_apply_filter</span><span class="p">()</span>
+
+        <span class="n">execute</span><span class="o">.</span><span class="n">assert_called_once</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FiltersWindowModelTest.test_do_apply_filter_pre_post_processing"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.windows.filters.test.model_test.html#mantidimaging.gui.windows.filters.test.model_test.FiltersWindowModelTest.test_do_apply_filter_pre_post_processing">[docs]</a>    <span class="k">def</span> <span class="nf">test_do_apply_filter_pre_post_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sv_presenter</span><span class="o">.</span><span class="n">view</span>
+
+        <span class="n">execute</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">MagicMock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execute_mock</span><span class="p">)</span>
+
+        <span class="n">do_before</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">MagicMock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apply_before_mock</span><span class="p">)</span>
+        <span class="n">do_after</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">MagicMock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apply_after_mock</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setup_filter</span><span class="p">((</span><span class="kc">None</span><span class="p">,</span> <span class="n">do_before</span><span class="p">,</span> <span class="n">execute</span><span class="p">,</span> <span class="n">do_after</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">do_apply_filter</span><span class="p">()</span>
+
+        <span class="n">execute</span><span class="o">.</span><span class="n">assert_called_once</span><span class="p">()</span>
+
+        <span class="n">do_before</span><span class="o">.</span><span class="n">assert_called_once</span><span class="p">()</span>
+        <span class="n">do_after</span><span class="o">.</span><span class="n">assert_called_once</span><span class="p">()</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="model_test.html">1.0.0</a></li>
+  <li><a href="../../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.filters.test.model_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+mantidimaging.core.operations.rotate\_stack package
+===================================================
+
+.. automodule:: mantidimaging.core.operations.rotate_stack
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.operations.rotate_stack.rotate_stack

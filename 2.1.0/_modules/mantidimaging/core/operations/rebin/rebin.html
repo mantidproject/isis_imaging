@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.operations.rebin.rebin - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.rebin.rebin</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.operations.rebin.rebin</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">skimage.transform</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging</span> <span class="kn">import</span> <span class="n">helper</span> <span class="k">as</span> <span class="n">h</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.operations.base_filter</span> <span class="kn">import</span> <span class="n">BaseFilter</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">shared</span> <span class="k">as</span> <span class="n">ps</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">utility</span> <span class="k">as</span> <span class="n">pu</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.utility</span> <span class="kn">import</span> <span class="n">add_property_to_form</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.utility.qt_helpers</span> <span class="kn">import</span> <span class="n">Type</span>
+
+
+<div class="viewcode-block" id="RebinFilter"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rebin.rebin.html#mantidimaging.core.operations.rebin.rebin.RebinFilter">[docs]</a><span class="k">class</span> <span class="nc">RebinFilter</span><span class="p">(</span><span class="n">BaseFilter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rebins the image to the given parameter.</span>
+
+<span class="sd">    This filter temporarily increases memory usage, while the image is being rebinned.</span>
+<span class="sd">    The memory usage will be lowered after the filter has finished executing.</span>
+
+<span class="sd">    Intended to be used on: Any data</span>
+
+<span class="sd">    When: If you want to reduce the data size by losing information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filter_name</span> <span class="o">=</span> <span class="s2">&quot;Rebin&quot;</span>
+    <span class="n">link_histograms</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="RebinFilter.filter_func"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rebin.rebin.html#mantidimaging.core.operations.rebin.rebin.RebinFilter.filter_func">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_func</span><span class="p">(</span><span class="n">images</span><span class="p">:</span> <span class="n">Images</span><span class="p">,</span> <span class="n">rebin_param</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Images</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param images: Sample data which is to be processed. Expects radiograms</span>
+<span class="sd">        :param rebin_param: int, float or tuple</span>
+<span class="sd">                            int - Percentage of current size.</span>
+<span class="sd">                            float - Fraction of current size.</span>
+<span class="sd">                            tuple - Size of the output image (x, y).</span>
+<span class="sd">        :param mode: Interpolation to use for re-sizing</span>
+<span class="sd">                     (&#39;nearest&#39;, &#39;lanczos&#39;, &#39;bilinear&#39;, &#39;bicubic&#39; or &#39;cubic&#39;).</span>
+<span class="sd">        :param cores: The number of cores that will be used to process the data.</span>
+<span class="sd">        :param chunksize: The number of chunks that each worker will receive.</span>
+
+<span class="sd">        :return: The processed 3D numpy.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rebin_param</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">param_valid</span> <span class="o">=</span> <span class="n">rebin_param</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">rebin_param</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">param_valid</span> <span class="o">=</span> <span class="n">rebin_param</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">param_valid</span><span class="p">:</span>
+            <span class="n">sample</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">data</span>
+            <span class="n">empty_resized_data</span> <span class="o">=</span> <span class="n">_create_reshaped_array</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">rebin_param</span><span class="p">)</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span><span class="n">skimage</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">resize</span><span class="p">,</span>
+                                  <span class="n">ps</span><span class="o">.</span><span class="n">return_to_second_at_i</span><span class="p">,</span>
+                                  <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+                                  <span class="n">output_shape</span><span class="o">=</span><span class="n">empty_resized_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">ps</span><span class="o">.</span><span class="n">shared_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample</span><span class="p">,</span> <span class="n">empty_resized_data</span><span class="p">]</span>
+            <span class="n">ps</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">partial_func</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
+                       <span class="n">num_operations</span><span class="o">=</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                       <span class="n">cores</span><span class="o">=</span><span class="n">cores</span><span class="p">,</span>
+                       <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Applying Rebin&quot;</span><span class="p">,</span>
+                       <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
+            <span class="n">images</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">empty_resized_data</span>
+
+        <span class="k">return</span> <span class="n">images</span></div>
+
+<div class="viewcode-block" id="RebinFilter.register_gui"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rebin.rebin.html#mantidimaging.core.operations.rebin.rebin.RebinFilter.register_gui">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">register_gui</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">on_change</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="c1"># Rebin by uniform factor options</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">factor</span> <span class="o">=</span> <span class="n">add_property_to_form</span><span class="p">(</span><span class="s1">&#39;Factor&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+                                         <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                                         <span class="n">on_change</span><span class="o">=</span><span class="n">on_change</span><span class="p">,</span>
+                                         <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Factor by which the data will be rebinned, &quot;</span>
+                                         <span class="s2">&quot;e.g. 0.5 is 50</span><span class="si">% r</span><span class="s2">educed size&quot;</span><span class="p">)</span>
+        <span class="n">factor</span><span class="o">.</span><span class="n">setSingleStep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+
+        <span class="c1"># Rebin to target shape options</span>
+        <span class="n">shape_range</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9999</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">shape_x</span> <span class="o">=</span> <span class="n">add_property_to_form</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="n">Type</span><span class="o">.</span><span class="n">INT</span><span class="p">,</span> <span class="n">valid_values</span><span class="o">=</span><span class="n">shape_range</span><span class="p">,</span> <span class="n">on_change</span><span class="o">=</span><span class="n">on_change</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">shape_y</span> <span class="o">=</span> <span class="n">add_property_to_form</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="n">Type</span><span class="o">.</span><span class="n">INT</span><span class="p">,</span> <span class="n">valid_values</span><span class="o">=</span><span class="n">shape_range</span><span class="p">,</span> <span class="n">on_change</span><span class="o">=</span><span class="n">on_change</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">Qt</span>
+        <span class="n">shape_fields</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">shape_fields</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">shape_x</span><span class="p">)</span>
+        <span class="n">shape_fields</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">shape_y</span><span class="p">)</span>
+
+        <span class="c1"># Rebin dimension selection options</span>
+        <span class="n">rebin_by_factor_radio</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QRadioButton</span><span class="p">(</span><span class="s2">&quot;Rebin by Factor&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">size_by_factor_toggled</span><span class="p">(</span><span class="n">enabled</span><span class="p">):</span>
+            <span class="n">factor</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">enabled</span><span class="p">)</span>
+            <span class="n">on_change</span><span class="p">()</span>
+
+        <span class="n">rebin_by_factor_radio</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">size_by_factor_toggled</span><span class="p">)</span>
+
+        <span class="n">rebin_to_dimensions_radio</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QRadioButton</span><span class="p">(</span><span class="s2">&quot;Rebin to Dimensions&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">size_by_dimensions_toggled</span><span class="p">(</span><span class="n">enabled</span><span class="p">):</span>
+            <span class="n">shape_x</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">enabled</span><span class="p">)</span>
+            <span class="n">shape_y</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">enabled</span><span class="p">)</span>
+            <span class="n">on_change</span><span class="p">()</span>
+
+        <span class="n">rebin_to_dimensions_radio</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">size_by_dimensions_toggled</span><span class="p">)</span>
+
+        <span class="c1"># Rebin mode options</span>
+        <span class="n">label_mode</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Mode&quot;</span><span class="p">)</span>
+        <span class="n">mode_field</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="n">mode_field</span><span class="o">.</span><span class="n">addItems</span><span class="p">(</span><span class="n">modes</span><span class="p">())</span>
+
+        <span class="n">form</span><span class="o">.</span><span class="n">addRow</span><span class="p">(</span><span class="n">rebin_to_dimensions_radio</span><span class="p">,</span> <span class="n">shape_fields</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">addRow</span><span class="p">(</span><span class="n">rebin_by_factor_radio</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">addRow</span><span class="p">(</span><span class="n">label_mode</span><span class="p">,</span> <span class="n">mode_field</span><span class="p">)</span>
+
+        <span class="c1"># Ensure good default UI state</span>
+        <span class="n">rebin_to_dimensions_radio</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">rebin_by_factor_radio</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;rebin_to_dimensions_radio&quot;</span><span class="p">:</span> <span class="n">rebin_to_dimensions_radio</span><span class="p">,</span>
+            <span class="s2">&quot;shape_x&quot;</span><span class="p">:</span> <span class="n">shape_x</span><span class="p">,</span>
+            <span class="s2">&quot;shape_y&quot;</span><span class="p">:</span> <span class="n">shape_y</span><span class="p">,</span>
+            <span class="s2">&quot;rebin_by_factor_radio&quot;</span><span class="p">:</span> <span class="n">rebin_by_factor_radio</span><span class="p">,</span>
+            <span class="s2">&quot;factor&quot;</span><span class="p">:</span> <span class="n">factor</span><span class="p">,</span>
+            <span class="s2">&quot;mode_field&quot;</span><span class="p">:</span> <span class="n">mode_field</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="RebinFilter.execute_wrapper"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rebin.rebin.html#mantidimaging.core.operations.rebin.rebin.RebinFilter.execute_wrapper">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">execute_wrapper</span><span class="p">(</span><span class="n">rebin_to_dimensions_radio</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">shape_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">shape_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">rebin_by_factor_radio</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">mode_field</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">rebin_to_dimensions_radio</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">(</span><span class="n">shape_x</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="n">shape_y</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">rebin_by_factor_radio</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">factor</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown bin dimension mode&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">RebinFilter</span><span class="o">.</span><span class="n">filter_func</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode_field</span><span class="o">.</span><span class="n">currentText</span><span class="p">(),</span> <span class="n">rebin_param</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="modes"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rebin.rebin.html#mantidimaging.core.operations.rebin.rebin.modes">[docs]</a><span class="k">def</span> <span class="nf">modes</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="s2">&quot;edge&quot;</span><span class="p">,</span> <span class="s2">&quot;wrap&quot;</span><span class="p">,</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span> <span class="s2">&quot;symmetric&quot;</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">_create_reshaped_array</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">rebin_param</span><span class="p">):</span>
+    <span class="n">old_shape</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">num_images</span> <span class="o">=</span> <span class="n">old_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># use SciPy&#39;s calculation to find the expected dimensions</span>
+    <span class="c1"># int to avoid visible deprecation warning</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rebin_param</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">expected_dimy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rebin_param</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">expected_dimx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rebin_param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">expected_dimy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rebin_param</span> <span class="o">*</span> <span class="n">old_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">expected_dimx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rebin_param</span> <span class="o">*</span> <span class="n">old_shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="c1"># allocate memory for images with new dimensions</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_images</span><span class="p">,</span> <span class="n">expected_dimy</span><span class="p">,</span> <span class="n">expected_dimx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_array</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="rebin.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.rebin.rebin</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

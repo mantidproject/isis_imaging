@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.utility.progress_reporting.test.progress_test - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.progress_reporting.test.progress_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.utility.progress_reporting.test.progress_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.special_imports</span> <span class="kn">import</span> <span class="n">import_mock</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">Progress</span><span class="p">,</span> <span class="n">ProgressHandler</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ProgressTest"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.utility.progress_reporting.test.progress_test.html#mantidimaging.core.utility.progress_reporting.test.progress_test.ProgressTest">[docs]</a><span class="k">class</span> <span class="nc">ProgressTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ProgressTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProgressTest.test_basic_single_step"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.utility.progress_reporting.test.progress_test.html#mantidimaging.core.utility.progress_reporting.test.progress_test.ProgressTest.test_basic_single_step">[docs]</a>    <span class="k">def</span> <span class="nf">test_basic_single_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Progress</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_started</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_completed</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;do a thing&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_started</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">mark_complete</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_completed</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProgressTest.test_multi_step"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.utility.progress_reporting.test.progress_test.html#mantidimaging.core.utility.progress_reporting.test.progress_test.ProgressTest.test_multi_step">[docs]</a>    <span class="k">def</span> <span class="nf">test_multi_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Default to estimating a single step</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Progress</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">end_step</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Estimate how complex I am&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">end_step</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="c1"># First step to execute may decide that more steps are required</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">set_estimated_steps</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">end_step</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.091</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Do two things&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.273</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Do two more things&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.455</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Do three things&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.727</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Do two final things&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.909</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">mark_complete</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProgressTest.test_multi_step_early_completion"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.utility.progress_reporting.test.progress_test.html#mantidimaging.core.utility.progress_reporting.test.progress_test.ProgressTest.test_multi_step_early_completion">[docs]</a>    <span class="k">def</span> <span class="nf">test_multi_step_early_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Default to estimating a single step</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Progress</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">end_step</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Estimate how complex I am&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">end_step</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="c1"># First step to execute may decide that more steps are required</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">set_estimated_steps</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">end_step</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.091</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Do two things&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.273</span><span class="p">)</span>
+
+        <span class="c1"># Finish early</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">mark_complete</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProgressTest.test_multi_step_step_increments"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.utility.progress_reporting.test.progress_test.html#mantidimaging.core.utility.progress_reporting.test.progress_test.ProgressTest.test_multi_step_step_increments">[docs]</a>    <span class="k">def</span> <span class="nf">test_multi_step_step_increments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Default to estimating a single step</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Progress</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">end_step</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Estimate how complex I am&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">end_step</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="c1"># First step to execute may decide that more steps are required</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">add_estimated_steps</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">end_step</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.091</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Do two things&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.273</span><span class="p">)</span>
+
+        <span class="c1"># Finish early</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">mark_complete</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProgressTest.test_callbacks"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.utility.progress_reporting.test.progress_test.html#mantidimaging.core.utility.progress_reporting.test.progress_test.ProgressTest.test_callbacks">[docs]</a>    <span class="k">def</span> <span class="nf">test_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mock</span> <span class="o">=</span> <span class="n">import_mock</span><span class="p">()</span>
+
+        <span class="n">cb1</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">create_autospec</span><span class="p">(</span><span class="n">ProgressHandler</span><span class="p">)</span>
+        <span class="n">cb2</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">create_autospec</span><span class="p">(</span><span class="n">ProgressHandler</span><span class="p">)</span>
+        <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">cb1</span><span class="p">,</span> <span class="n">cb2</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">assert_call</span><span class="p">(</span><span class="n">expected_completion</span><span class="p">,</span> <span class="n">expected_step</span><span class="p">,</span> <span class="n">expected_msg</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">:</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">progress_update</span><span class="o">.</span><span class="n">assert_called_once</span><span class="p">()</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">reset_mock</span><span class="p">()</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Progress</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">add_progress_handler</span><span class="p">(</span><span class="n">cb1</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">add_progress_handler</span><span class="p">(</span><span class="n">cb2</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;First&#39;</span><span class="p">)</span>
+        <span class="n">assert_call</span><span class="p">(</span><span class="mf">0.167</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;First&#39;</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Second&#39;</span><span class="p">)</span>
+        <span class="n">assert_call</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Second&#39;</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Third&#39;</span><span class="p">)</span>
+        <span class="n">assert_call</span><span class="p">(</span><span class="mf">0.667</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;Third&#39;</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Last&#39;</span><span class="p">)</span>
+        <span class="n">assert_call</span><span class="p">(</span><span class="mf">0.833</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;Last&#39;</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">mark_complete</span><span class="p">()</span>
+        <span class="n">assert_call</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProgressTest.test_add_callback_incorrect_type"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.utility.progress_reporting.test.progress_test.html#mantidimaging.core.utility.progress_reporting.test.progress_test.ProgressTest.test_add_callback_incorrect_type">[docs]</a>    <span class="k">def</span> <span class="nf">test_add_callback_incorrect_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Progress</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="n">not_a_progress_handler</span> <span class="o">=</span> <span class="s2">&quot;I&#39;m a string!&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">add_progress_handler</span><span class="p">(</span><span class="n">not_a_progress_handler</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProgressTest.test_context"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.utility.progress_reporting.test.progress_test.html#mantidimaging.core.utility.progress_reporting.test.progress_test.ProgressTest.test_context">[docs]</a>    <span class="k">def</span> <span class="nf">test_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Progress</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_started</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_completed</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;do a thing&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_started</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_completed</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProgressTest.test_context_nested"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.utility.progress_reporting.test.progress_test.html#mantidimaging.core.utility.progress_reporting.test.progress_test.ProgressTest.test_context_nested">[docs]</a>    <span class="k">def</span> <span class="nf">test_context_nested</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Progress</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_started</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_completed</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;do a thing&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">p</span><span class="p">:</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                        <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;do a thing in a loop nested in the other thing&#39;</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_completed</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">7</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_completed</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_completed</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">progress_history</span><span class="p">),</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProgressTest.test_cancellation"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.utility.progress_reporting.test.progress_test.html#mantidimaging.core.utility.progress_reporting.test.progress_test.ProgressTest.test_cancellation">[docs]</a>    <span class="k">def</span> <span class="nf">test_cancellation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Progress</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">add_estimated_steps</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">p</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                        <span class="n">p</span><span class="o">.</span><span class="n">cancel</span><span class="p">(</span><span class="s1">&#39;nope&#39;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">should_cancel</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+                        <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">is_completed</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">should_cancel</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="progress_test.html">1.1.0</a></li>
+  <li><a href="../../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.progress_reporting.test.progress_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+mantidimaging.core.filters.clip\_values package
+===============================================
+
+.. automodule:: mantidimaging.core.filters.clip_values
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.clip_values.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.clip_values.clip_values
+   mantidimaging.core.filters.clip_values.clip_values_gui

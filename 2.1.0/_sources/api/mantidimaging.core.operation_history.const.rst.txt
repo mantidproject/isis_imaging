@@ -1,0 +1,7 @@
+mantidimaging.core.operation\_history.const module
+==================================================
+
+.. automodule:: mantidimaging.core.operation_history.const
+   :members:
+   :undoc-members:
+   :show-inheritance:

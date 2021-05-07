@@ -1,0 +1,26 @@
+mantidimaging.gui.dialogs.cor\_inspection package
+=================================================
+
+.. automodule:: mantidimaging.gui.dialogs.cor_inspection
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.dialogs.cor_inspection.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.dialogs.cor_inspection.model
+   mantidimaging.gui.dialogs.cor_inspection.presenter
+   mantidimaging.gui.dialogs.cor_inspection.types
+   mantidimaging.gui.dialogs.cor_inspection.view

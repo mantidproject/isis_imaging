@@ -1,0 +1,7 @@
+mantidimaging.core.configs.functional\_config module
+====================================================
+
+.. automodule:: mantidimaging.core.configs.functional_config
+   :members:
+   :undoc-members:
+   :show-inheritance:

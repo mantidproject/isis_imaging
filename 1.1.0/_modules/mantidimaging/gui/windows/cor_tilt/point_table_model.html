@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.windows.cor_tilt.point_table_model - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.cor_tilt.point_table_model</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.windows.cor_tilt.point_table_model</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QAbstractTableModel</span><span class="p">,</span> <span class="n">QModelIndex</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.cor_tilt</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">CorTiltDataModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">FIELD_NAMES</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CorTiltPointQtModel"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel">[docs]</a><span class="k">class</span> <span class="nc">CorTiltPointQtModel</span><span class="p">(</span><span class="n">QAbstractTableModel</span><span class="p">,</span> <span class="n">CorTiltDataModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Qt data model for COR/Tilt finding.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.populate_slice_indices"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.populate_slice_indices">[docs]</a>    <span class="k">def</span> <span class="nf">populate_slice_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">cor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beginResetModel</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CorTiltPointQtModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">populate_slice_indices</span><span class="p">(</span>
+                <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">cor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endResetModel</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.sort_points"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.sort_points">[docs]</a>    <span class="k">def</span> <span class="nf">sort_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layoutAboutToBeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CorTiltPointQtModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">sort_points</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layoutChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.set_point"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.set_point">[docs]</a>    <span class="k">def</span> <span class="nf">set_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">slice_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CorTiltPointQtModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_point</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">slice_idx</span><span class="p">,</span> <span class="n">cor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.columnCount"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.columnCount">[docs]</a>    <span class="k">def</span> <span class="nf">columnCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">Field</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.rowCount"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.rowCount">[docs]</a>    <span class="k">def</span> <span class="nf">rowCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">parent</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_points</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.flags"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.flags">[docs]</a>    <span class="k">def</span> <span class="nf">flags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">flags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CorTiltPointQtModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">flags</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">flags</span> <span class="o">|=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ItemIsEditable</span>
+        <span class="k">return</span> <span class="n">flags</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.data"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.data">[docs]</a>    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">index</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">col</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()][</span><span class="n">col</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ToolTipRole</span><span class="p">:</span>
+            <span class="n">col_field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">col_field</span> <span class="o">==</span> <span class="n">Field</span><span class="o">.</span><span class="n">SLICE_INDEX</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;Slice index (y coordinate of projection)&#39;</span>
+            <span class="k">elif</span> <span class="n">col_field</span> <span class="o">==</span> <span class="n">Field</span><span class="o">.</span><span class="n">CENTRE_OF_ROTATION</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;Centre of rotation for specific slice&#39;</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.setData"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.setData">[docs]</a>    <span class="k">def</span> <span class="nf">setData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">Qt</span><span class="o">.</span><span class="n">EditRole</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">!=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">EditRole</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_results</span><span class="p">()</span>
+
+        <span class="n">col</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span>
+        <span class="n">col_field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+        <span class="n">proper_value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col_field</span> <span class="o">==</span> <span class="n">Field</span><span class="o">.</span><span class="n">SLICE_INDEX</span><span class="p">:</span>
+                <span class="n">proper_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">col_field</span> <span class="o">==</span> <span class="n">Field</span><span class="o">.</span><span class="n">CENTRE_OF_ROTATION</span><span class="p">:</span>
+                <span class="n">proper_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()][</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">proper_value</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sort_points</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.insertRows"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.insertRows">[docs]</a>    <span class="k">def</span> <span class="nf">insertRows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beginInsertRows</span><span class="p">(</span>
+                <span class="n">parent</span> <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">QModelIndex</span><span class="p">(),</span>
+                <span class="n">row</span><span class="p">,</span>
+                <span class="n">row</span> <span class="o">+</span> <span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">endInsertRows</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.removeRows"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.removeRows">[docs]</a>    <span class="k">def</span> <span class="nf">removeRows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">beginRemoveRows</span><span class="p">(</span>
+                <span class="n">parent</span> <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">QModelIndex</span><span class="p">(),</span>
+                <span class="n">row</span><span class="p">,</span>
+                <span class="n">row</span> <span class="o">+</span> <span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_point</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">endRemoveRows</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.removeAllRows"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.removeAllRows">[docs]</a>    <span class="k">def</span> <span class="nf">removeAllRows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">beginRemoveRows</span><span class="p">(</span>
+                <span class="n">parent</span> <span class="k">if</span> <span class="n">parent</span> <span class="k">else</span> <span class="n">QModelIndex</span><span class="p">(),</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_points</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">endRemoveRows</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.appendNewRow"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.appendNewRow">[docs]</a>    <span class="k">def</span> <span class="nf">appendNewRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slice_idx</span><span class="p">,</span> <span class="n">cor</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insertRows</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_points</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Field</span><span class="o">.</span><span class="n">SLICE_INDEX</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+                <span class="n">slice_idx</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_cor_at_slice</span><span class="p">(</span><span class="n">slice_idx</span><span class="p">,</span> <span class="n">cor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltPointQtModel.headerData"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.cor_tilt.point_table_model.html#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.headerData">[docs]</a>    <span class="k">def</span> <span class="nf">headerData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">orientation</span> <span class="o">!=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Horizontal</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">role</span> <span class="o">!=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">FIELD_NAMES</span><span class="p">[</span><span class="n">Field</span><span class="p">(</span><span class="n">section</span><span class="p">)]</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="point_table_model.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.cor_tilt.point_table_model</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

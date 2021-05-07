@@ -1,0 +1,7 @@
+mantidimaging.core.utility.execution\_timer module
+==================================================
+
+.. automodule:: mantidimaging.core.utility.execution_timer
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.parallel.utility - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../parallel.html" accesskey="U">mantidimaging.core.parallel</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.utility</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.parallel.utility</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="create_shared_array"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.utility.html#mantidimaging.core.parallel.utility.create_shared_array">[docs]</a><span class="k">def</span> <span class="nf">create_shared_array</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">heap</span>
+    <span class="kn">import</span> <span class="nn">ctypes</span>
+
+    <span class="n">ctype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span>  <span class="c1"># default to numpy float32 / C type float</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span> <span class="ow">or</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;uint16&#39;</span><span class="p">:</span>
+        <span class="n">ctype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int16</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span> <span class="ow">or</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;int64&#39;</span><span class="p">:</span>
+        <span class="n">ctype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int64</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="ow">or</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;float32&#39;</span><span class="p">:</span>
+        <span class="n">ctype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="ow">or</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;float64&#39;</span><span class="p">:</span>
+        <span class="n">ctype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+
+    <span class="n">length</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">axis_length</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">:</span>
+        <span class="n">length</span> <span class="o">*=</span> <span class="n">axis_length</span>
+
+    <span class="n">size</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ctype</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">length</span>
+
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="s1">&#39;Requested shared array with shape=</span><span class="si">{}</span><span class="s1">, length=</span><span class="si">{}</span><span class="s1">, size=</span><span class="si">{}</span><span class="s1">, &#39;</span>
+        <span class="s1">&#39;dtype=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">shape</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="p">))</span>
+
+    <span class="n">arena</span> <span class="o">=</span> <span class="n">heap</span><span class="o">.</span><span class="n">Arena</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span>
+
+    <span class="n">array_type</span> <span class="o">=</span> <span class="n">ctype</span> <span class="o">*</span> <span class="n">length</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">array_type</span><span class="o">.</span><span class="n">from_buffer</span><span class="p">(</span><span class="n">mem</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="multiprocessing_available"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.utility.html#mantidimaging.core.parallel.utility.multiprocessing_available">[docs]</a><span class="k">def</span> <span class="nf">multiprocessing_available</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># ignore error about unused import</span>
+        <span class="kn">import</span> <span class="nn">multiprocessing</span>  <span class="c1"># noqa: F401</span>
+        <span class="k">return</span> <span class="n">multiprocessing</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="get_cores"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.utility.html#mantidimaging.core.parallel.utility.get_cores">[docs]</a><span class="k">def</span> <span class="nf">get_cores</span><span class="p">():</span>
+    <span class="n">mp</span> <span class="o">=</span> <span class="n">multiprocessing_available</span><span class="p">()</span>
+    <span class="c1"># get max cores on the system as default</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mp</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mp</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="generate_indices"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.utility.html#mantidimaging.core.parallel.utility.generate_indices">[docs]</a><span class="k">def</span> <span class="nf">generate_indices</span><span class="p">(</span><span class="n">num_images</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate indices for each image.</span>
+
+<span class="sd">    :param num_images: The number of images.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="calculate_chunksize"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.utility.html#mantidimaging.core.parallel.utility.calculate_chunksize">[docs]</a><span class="k">def</span> <span class="nf">calculate_chunksize</span><span class="p">(</span><span class="n">cores</span><span class="p">):</span>
+    <span class="c1"># TODO possible proper calculation of chunksize, although best performance</span>
+    <span class="c1"># has been with 1</span>
+    <span class="k">return</span> <span class="mi">1</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="utility.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../parallel.html" >mantidimaging.core.parallel</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.utility</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

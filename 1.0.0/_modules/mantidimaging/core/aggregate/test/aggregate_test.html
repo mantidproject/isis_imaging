@@ -1,0 +1,279 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.aggregate.test.aggregate_test - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.aggregate.test.aggregate_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.aggregate.test.aggregate_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
+
+<span class="kn">import</span> <span class="nn">mantidimaging.core.testing.unit_test_helper</span> <span class="k">as</span> <span class="nn">th</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.aggregate</span> <span class="kn">import</span> <span class="n">aggregate</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.configs.recon_config</span> <span class="kn">import</span> <span class="n">ReconstructionConfig</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.io</span> <span class="kn">import</span> <span class="n">loader</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.io.saver</span> <span class="kn">import</span> <span class="n">Saver</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.testing</span> <span class="kn">import</span> <span class="n">FileOutputtingTestCase</span>
+
+
+<div class="viewcode-block" id="AggregateTest"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest">[docs]</a><span class="k">class</span> <span class="nc">AggregateTest</span><span class="p">(</span><span class="n">FileOutputtingTestCase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AggregateTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># force silent outputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">ReconstructionConfig</span><span class="o">.</span><span class="n">empty_init</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span>
+
+<div class="viewcode-block" id="AggregateTest.create_saver"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest.create_saver">[docs]</a>    <span class="k">def</span> <span class="nf">create_saver</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Saver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AggregateTest.test_aggregate_single_folder_sum_fits"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest.test_aggregate_single_folder_sum_fits">[docs]</a>    <span class="k">def</span> <span class="nf">test_aggregate_single_folder_sum_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_aggregate_single_folder</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="s1">&#39;sum&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AggregateTest.test_aggregate_single_folder_sum_tif"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest.test_aggregate_single_folder_sum_tif">[docs]</a>    <span class="k">def</span> <span class="nf">test_aggregate_single_folder_sum_tif</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_aggregate_single_folder</span><span class="p">(</span><span class="s1">&#39;tif&#39;</span><span class="p">,</span> <span class="s1">&#39;tif&#39;</span><span class="p">,</span> <span class="s1">&#39;sum&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AggregateTest.test_aggregate_single_folder_avg_fits"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest.test_aggregate_single_folder_avg_fits">[docs]</a>    <span class="k">def</span> <span class="nf">test_aggregate_single_folder_avg_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_aggregate_single_folder</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="s1">&#39;avg&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AggregateTest.test_aggregate_single_folder_avg_tif"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest.test_aggregate_single_folder_avg_tif">[docs]</a>    <span class="k">def</span> <span class="nf">test_aggregate_single_folder_avg_tif</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_aggregate_single_folder</span><span class="p">(</span><span class="s1">&#39;tif&#39;</span><span class="p">,</span> <span class="s1">&#39;tif&#39;</span><span class="p">,</span> <span class="s1">&#39;avg&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AggregateTest.do_aggregate_single_folder"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest.do_aggregate_single_folder">[docs]</a>    <span class="k">def</span> <span class="nf">do_aggregate_single_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                   <span class="n">img_format</span><span class="p">,</span>
+                                   <span class="n">convert_format</span><span class="p">,</span>
+                                   <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">):</span>
+        <span class="c1"># this just converts between the formats, but not NXS!</span>
+        <span class="c1"># create some images</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;sum&#39;</span> <span class="o">==</span> <span class="n">mode</span><span class="p">:</span>
+            <span class="n">expected</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">expected</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">aggregate_angles</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">parallel</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">saver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_saver</span><span class="p">()</span>
+
+        <span class="n">aggregate_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">,</span> <span class="s1">&#39;aggregate&#39;</span><span class="p">)</span>
+        <span class="c1"># save out 5 &#39;angles&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">aggregate_angles</span><span class="p">):</span>
+            <span class="n">angle_path</span> <span class="o">=</span> <span class="n">aggregate_path</span> <span class="o">+</span> <span class="s1">&#39;/angle&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">saver</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="n">angle_path</span>
+            <span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span> <span class="o">=</span> <span class="n">img_format</span>
+            <span class="n">saver</span><span class="o">.</span><span class="n">_data_as_stack</span> <span class="o">=</span> <span class="n">stack</span>
+            <span class="c1"># do the actual saving out, directories will be created here</span>
+            <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="n">images</span><span class="p">,</span>
+                <span class="n">angle_path</span><span class="p">,</span>
+                <span class="s1">&#39;out_angle&#39;</span><span class="p">,</span>
+                <span class="n">out_format</span><span class="o">=</span><span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span><span class="p">)</span>
+
+        <span class="c1"># aggregate them</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">aggregate</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;10&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="p">]</span>
+        <span class="c1"># select angles 0 - 4 (aggregate_angles is 5 so we subtract 1)</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">aggregate_angles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">aggregate_angles</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">aggregate_single_folder_output</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">input_path</span> <span class="o">=</span> <span class="n">aggregate_path</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">in_format</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">out_format</span> <span class="o">=</span> <span class="n">convert_format</span>
+        <span class="n">aggregate_output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">,</span>
+                                             <span class="s1">&#39;aggregated&#39;</span><span class="p">)</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">aggregate_output_path</span>
+        <span class="c1"># because we need to write in the same folder</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">overwrite_all</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">convert_prefix</span> <span class="o">=</span> <span class="s1">&#39;aggregated&#39;</span>
+        <span class="n">aggregate</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+        <span class="c1"># load them back</span>
+        <span class="c1"># compare data to original</span>
+        <span class="c1"># this does not load any flats or darks as they were not saved out</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">aggregate_output_path</span><span class="p">,</span>
+            <span class="n">in_format</span><span class="o">=</span><span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span><span class="p">,</span>
+            <span class="n">parallel_load</span><span class="o">=</span><span class="n">parallel</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="p">:</span>
+            <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AggregateTest.test_aggregate_not_single_folder_sum_fits"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest.test_aggregate_not_single_folder_sum_fits">[docs]</a>    <span class="k">def</span> <span class="nf">test_aggregate_not_single_folder_sum_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_aggregate_not_single_folder</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="s1">&#39;sum&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AggregateTest.test_aggregate_not_single_folder_sum_tif"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest.test_aggregate_not_single_folder_sum_tif">[docs]</a>    <span class="k">def</span> <span class="nf">test_aggregate_not_single_folder_sum_tif</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_aggregate_not_single_folder</span><span class="p">(</span><span class="s1">&#39;tif&#39;</span><span class="p">,</span> <span class="s1">&#39;tif&#39;</span><span class="p">,</span> <span class="s1">&#39;sum&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AggregateTest.test_aggregate_not_single_folder_avg_fits"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest.test_aggregate_not_single_folder_avg_fits">[docs]</a>    <span class="k">def</span> <span class="nf">test_aggregate_not_single_folder_avg_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_aggregate_not_single_folder</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="s1">&#39;avg&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AggregateTest.test_aggregate_not_single_folder_avg_tif"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest.test_aggregate_not_single_folder_avg_tif">[docs]</a>    <span class="k">def</span> <span class="nf">test_aggregate_not_single_folder_avg_tif</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_aggregate_not_single_folder</span><span class="p">(</span><span class="s1">&#39;tif&#39;</span><span class="p">,</span> <span class="s1">&#39;tif&#39;</span><span class="p">,</span> <span class="s1">&#39;avg&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AggregateTest.do_aggregate_not_single_folder"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.aggregate.test.aggregate_test.html#mantidimaging.core.aggregate.test.aggregate_test.AggregateTest.do_aggregate_not_single_folder">[docs]</a>    <span class="k">def</span> <span class="nf">do_aggregate_not_single_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                       <span class="n">img_format</span><span class="p">,</span>
+                                       <span class="n">convert_format</span><span class="p">,</span>
+                                       <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">):</span>
+        <span class="c1"># this just converts between the formats, but not NXS!</span>
+        <span class="c1"># create some images</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;sum&#39;</span> <span class="o">==</span> <span class="n">mode</span><span class="p">:</span>
+            <span class="n">expected</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">expected</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">aggregate_angles</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">parallel</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">saver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_saver</span><span class="p">()</span>
+
+        <span class="n">aggregate_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">,</span> <span class="s1">&#39;aggregate&#39;</span><span class="p">)</span>
+        <span class="c1"># keep the angle paths for the load later</span>
+        <span class="n">angle_paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># save out 5 &#39;angles&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">aggregate_angles</span><span class="p">):</span>
+            <span class="n">angle_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aggregate_path</span> <span class="o">+</span> <span class="s1">&#39;/angle&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">saver</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="n">angle_paths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span> <span class="o">=</span> <span class="n">img_format</span>
+            <span class="n">saver</span><span class="o">.</span><span class="n">_data_as_stack</span> <span class="o">=</span> <span class="n">stack</span>
+            <span class="n">saver</span><span class="o">.</span><span class="n">_overwrite_all</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># do the actual saving out, directories will be created here</span>
+            <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="n">images</span><span class="p">,</span>
+                <span class="n">angle_paths</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="s1">&#39;out_angle&#39;</span><span class="p">,</span>
+                <span class="n">swap_axes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">out_format</span><span class="o">=</span><span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span><span class="p">)</span>
+
+        <span class="c1"># aggregate them</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">aggregate</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;10&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="p">]</span>
+        <span class="c1"># select angles 0 - 4 (starts from 0 so -1)</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">aggregate_angles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">aggregate_angles</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">aggregate_single_folder_output</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">input_path</span> <span class="o">=</span> <span class="n">aggregate_path</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">in_format</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">out_format</span> <span class="o">=</span> <span class="n">convert_format</span>
+        <span class="n">aggregate_output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">,</span>
+                                             <span class="s1">&#39;aggregated&#39;</span><span class="p">)</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">aggregate_output_path</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">overwrite_all</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">convert_prefix</span> <span class="o">=</span> <span class="s1">&#39;aggregated&#39;</span>
+        <span class="n">aggregate</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+        <span class="c1"># load them back</span>
+        <span class="c1"># compare data to original</span>
+        <span class="c1"># this does not load any flats or darks as they were not saved out</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">aggregate_angles</span><span class="p">):</span>
+            <span class="n">angle_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">,</span>
+                                      <span class="s1">&#39;aggregated/angle_&#39;</span> <span class="o">+</span> <span class="n">mode</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+            <span class="n">images</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">angle_path</span><span class="p">,</span>
+                <span class="n">in_format</span><span class="o">=</span><span class="n">saver</span><span class="o">.</span><span class="n">_out_format</span><span class="p">,</span>
+                <span class="n">parallel_load</span><span class="o">=</span><span class="n">parallel</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="p">:</span>
+                <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="aggregate_test.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.aggregate.test.aggregate_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

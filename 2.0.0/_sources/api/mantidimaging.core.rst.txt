@@ -1,0 +1,23 @@
+mantidimaging.core package
+==========================
+
+.. automodule:: mantidimaging.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.data
+   mantidimaging.core.gpu
+   mantidimaging.core.io
+   mantidimaging.core.net
+   mantidimaging.core.operation_history
+   mantidimaging.core.operations
+   mantidimaging.core.parallel
+   mantidimaging.core.reconstruct
+   mantidimaging.core.rotation

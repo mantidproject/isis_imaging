@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.imopr.corwrite - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.imopr.corwrite</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.imopr.corwrite</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.tools.importer</span> <span class="kn">import</span> <span class="n">timed_import</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility</span> <span class="kn">import</span> <span class="n">projection_angles</span>
+
+
+<div class="viewcode-block" id="sanity_checks"><a class="viewcode-back" href="../../../../api/mantidimaging.core.imopr.corwrite.html#mantidimaging.core.imopr.corwrite.sanity_checks">[docs]</a><span class="k">def</span> <span class="nf">sanity_checks</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The flag -o/--output-path MUST be passed for this COR mode!&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;You need to provide input in the format:</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;--indices &lt;start&gt; &lt;stop&gt; &lt;step&gt; --imopr &lt;cors_start&gt; &lt;cors_end&gt; &quot;</span>
+            <span class="s2">&quot;&lt;cors_step&gt; corwrite: --indices 100 200 14 --imopr 5 50 7 &quot;</span>
+            <span class="s2">&quot;corwrite</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;To load and reconstruct every 14 indices from 100 to 200, with &quot;</span>
+            <span class="s2">&quot;COR from 5 to 50, incrementing by 7.&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../api/mantidimaging.core.imopr.corwrite.html#mantidimaging.core.imopr.corwrite.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param sample: the sample must be in SINOGRAMS!</span>
+<span class="sd">    :param flat: unused, only added to conform to interface.</span>
+<span class="sd">    :param dark: unused, only added to conform to interface.</span>
+<span class="sd">    :param config: the full reconstruction config</span>
+<span class="sd">    :param indices: indices that will be processed in the function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Running IMOPR with action COR using tomopy write_center. &quot;</span>
+        <span class="s2">&quot;This works ONLY with sinograms!&quot;</span><span class="p">)</span>
+
+    <span class="n">tool</span> <span class="o">=</span> <span class="n">timed_import</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating projection angles..&quot;</span><span class="p">)</span>
+    <span class="c1"># developer note: we are processing sinograms,</span>
+    <span class="c1"># but we need the number of radiograms</span>
+    <span class="n">num_radiograms</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">proj_angles</span> <span class="o">=</span> <span class="n">projection_angles</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">max_angle</span><span class="p">,</span>
+                                             <span class="n">num_radiograms</span><span class="p">)</span>
+
+    <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">actual_slice_index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="nb">range</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">range</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">step</span><span class="p">)):</span>
+
+        <span class="n">angle_output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span>
+                                         <span class="nb">str</span><span class="p">(</span><span class="n">actual_slice_index</span><span class="p">))</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting writing CORs for slice </span><span class="si">{0}</span><span class="s2"> in </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">actual_slice_index</span><span class="p">,</span> <span class="n">angle_output_path</span><span class="p">))</span>
+
+        <span class="n">tool</span><span class="o">.</span><span class="n">_tomopy</span><span class="o">.</span><span class="n">write_center</span><span class="p">(</span>
+            <span class="n">tomo</span><span class="o">=</span><span class="n">sample</span><span class="p">,</span>
+            <span class="n">theta</span><span class="o">=</span><span class="n">proj_angles</span><span class="p">,</span>
+            <span class="n">dpath</span><span class="o">=</span><span class="n">angle_output_path</span><span class="p">,</span>
+            <span class="n">ind</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+            <span class="n">sinogram_order</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">cen_range</span><span class="o">=</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">:])</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished writing CORs in&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sample</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="corwrite.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.imopr.corwrite</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

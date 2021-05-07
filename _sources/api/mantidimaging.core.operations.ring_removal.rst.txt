@@ -1,0 +1,15 @@
+mantidimaging.core.operations.ring\_removal package
+===================================================
+
+.. automodule:: mantidimaging.core.operations.ring_removal
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.operations.ring_removal.ring_removal

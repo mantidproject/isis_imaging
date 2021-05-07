@@ -1,0 +1,268 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.filters.rebin.test.rebin_test - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.rebin.test.rebin_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.filters.rebin.test.rebin_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
+
+<span class="kn">import</span> <span class="nn">mantidimaging.core.testing.unit_test_helper</span> <span class="k">as</span> <span class="nn">th</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.memory_usage</span> <span class="kn">import</span> <span class="n">get_memory_usage_linux</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.filters</span> <span class="kn">import</span> <span class="n">rebin</span>
+
+
+<div class="viewcode-block" id="RebinTest"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest">[docs]</a><span class="k">class</span> <span class="nc">RebinTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test rebin filter.</span>
+
+<span class="sd">    Tests return value only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RebinTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RebinTest.test_not_executed_rebin_none"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_not_executed_rebin_none">[docs]</a>    <span class="k">def</span> <span class="nf">test_not_executed_rebin_none</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+
+        <span class="n">val</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;nearest&#39;</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">rebin</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_not_executed_rebin_negative"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_not_executed_rebin_negative">[docs]</a>    <span class="k">def</span> <span class="nf">test_not_executed_rebin_negative</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+
+        <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;nearest&#39;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">rebin</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_not_executed_rebin_zero"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_not_executed_rebin_zero">[docs]</a>    <span class="k">def</span> <span class="nf">test_not_executed_rebin_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+
+        <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;nearest&#39;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">rebin</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_executed_uniform_par_2"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_executed_uniform_par_2">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed_uniform_par_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_execute_uniform</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_executed_uniform_par_5"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_executed_uniform_par_5">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed_uniform_par_5</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_execute_uniform</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_executed_uniform_seq_2"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_executed_uniform_seq_2">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed_uniform_seq_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_off</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_execute_uniform</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_on</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_executed_uniform_seq_5"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_executed_uniform_seq_5">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed_uniform_seq_5</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_off</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_execute_uniform</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_on</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_executed_uniform_seq_5_int"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_executed_uniform_seq_5_int">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed_uniform_seq_5_int</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_off</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_execute_uniform</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_on</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RebinTest.do_execute_uniform"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.do_execute_uniform">[docs]</a>    <span class="k">def</span> <span class="nf">do_execute_uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;nearest&#39;</span>
+
+        <span class="n">expected_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">expected_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">val</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">rebin</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">expected_x</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">expected_y</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span></div>
+
+        <span class="c1"># TODO: in-place data test</span>
+        <span class="c1"># npt.assert_equal(images.shape[1], expected_x)</span>
+        <span class="c1"># npt.assert_equal(images.shape[2], expected_y)</span>
+
+<div class="viewcode-block" id="RebinTest.test_executed_xy_par_128_256"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_executed_xy_par_128_256">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed_xy_par_128_256</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_execute_xy</span><span class="p">((</span><span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_executed_xy_par_512_256"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_executed_xy_par_512_256">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed_xy_par_512_256</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_execute_xy</span><span class="p">((</span><span class="mi">512</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_executed_xy_par_1024_1024"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_executed_xy_par_1024_1024">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed_xy_par_1024_1024</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_execute_xy</span><span class="p">((</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_executed_xy_seq_128_256"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_executed_xy_seq_128_256">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed_xy_seq_128_256</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_off</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_execute_xy</span><span class="p">((</span><span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_on</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_executed_xy_seq_512_256"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_executed_xy_seq_512_256">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed_xy_seq_512_256</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_off</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_execute_xy</span><span class="p">((</span><span class="mi">512</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_on</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RebinTest.test_executed_xy_seq_1024_1024"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_executed_xy_seq_1024_1024">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed_xy_seq_1024_1024</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_off</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_execute_xy</span><span class="p">((</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_on</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RebinTest.do_execute_xy"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.do_execute_xy">[docs]</a>    <span class="k">def</span> <span class="nf">do_execute_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">)):</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;nearest&#39;</span>
+
+        <span class="n">expected_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">expected_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">rebin</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">rebin_param</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">expected_x</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">expected_y</span><span class="p">)</span></div>
+
+        <span class="c1"># TODO: in-place data test</span>
+        <span class="c1"># npt.assert_equal(images.shape[1], expected_x)</span>
+        <span class="c1"># npt.assert_equal(images.shape[2], expected_y)</span>
+
+<div class="viewcode-block" id="RebinTest.test_memory_change_acceptable"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.rebin.test.rebin_test.html#mantidimaging.core.filters.rebin.test.rebin_test.RebinTest.test_memory_change_acceptable">[docs]</a>    <span class="k">def</span> <span class="nf">test_memory_change_acceptable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This filter will increase the memory usage as it has to allocate memory</span>
+<span class="sd">        for the new resized shape</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()</span>
+
+        <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;nearest&#39;</span>
+        <span class="c1"># This about doubles the memory. Value found from running the test</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mf">100.</span>
+
+        <span class="n">expected_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">expected_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">val</span><span class="p">)</span>
+
+        <span class="n">cached_memory</span> <span class="o">=</span> <span class="n">get_memory_usage_linux</span><span class="p">(</span><span class="n">kb</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">rebin</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertLess</span><span class="p">(</span>
+            <span class="n">get_memory_usage_linux</span><span class="p">(</span><span class="n">kb</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cached_memory</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">expected_x</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">expected_y</span><span class="p">)</span></div></div>
+
+        <span class="c1"># TODO: in-place data test</span>
+        <span class="c1"># npt.assert_equal(images.shape[1], expected_x)</span>
+        <span class="c1"># npt.assert_equal(images.shape[2], expected_y)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="rebin_test.html">1.1.0</a></li>
+  <li><a href="../../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.rebin.test.rebin_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

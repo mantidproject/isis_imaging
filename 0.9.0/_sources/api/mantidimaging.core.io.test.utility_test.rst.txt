@@ -1,0 +1,7 @@
+mantidimaging.core.io.test.utility\_test module
+===============================================
+
+.. automodule:: mantidimaging.core.io.test.utility_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

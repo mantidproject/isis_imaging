@@ -1,0 +1,7 @@
+mantidimaging.core.tools.test.importer\_test module
+===================================================
+
+.. automodule:: mantidimaging.core.tools.test.importer_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

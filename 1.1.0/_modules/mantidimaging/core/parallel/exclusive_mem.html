@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.parallel.exclusive_mem - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../parallel.html" accesskey="U">mantidimaging.core.parallel</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.exclusive_mem</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.parallel.exclusive_mem</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">utility</span> <span class="k">as</span> <span class="n">pu</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+
+<div class="viewcode-block" id="create_partial"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.exclusive_mem.html#mantidimaging.core.parallel.exclusive_mem.create_partial">[docs]</a><span class="k">def</span> <span class="nf">create_partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a partial using functools.partial, to forward the kwargs to the</span>
+<span class="sd">    parallel execution of imap.</span>
+
+<span class="sd">    This version does not have a forwarding function, because one is not</span>
+<span class="sd">    necessary.</span>
+
+<span class="sd">    The data is copied regardless of it being forwarded or not.</span>
+
+<span class="sd">    :param func: Function that will be executed</span>
+<span class="sd">    :param kwargs: kwargs to forward to the function func that will be executed</span>
+<span class="sd">    :return: a constructed partial object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+    <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.exclusive_mem.html#mantidimaging.core.parallel.exclusive_mem.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">partial_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Progress&quot;</span><span class="p">,</span>
+            <span class="n">output_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes a function in parallel, but does not share the memory between</span>
+<span class="sd">    processes.</span>
+
+<span class="sd">    Every process will copy-on-read/write the data to its own virtual memory</span>
+<span class="sd">    region, perform the calculation and return the result to the main process,</span>
+<span class="sd">    where it will be moved (not copied) to the original container.</span>
+
+<span class="sd">    - imap_unordered gives the images back in random order!</span>
+<span class="sd">    - map and map_async cannot replace the data in place and end up</span>
+<span class="sd">    doubling the memory. They do not improve speed performance either</span>
+<span class="sd">    - imap seems to be the best choice</span>
+
+<span class="sd">    This also means that this class potentially uses MUCH more memory, and</span>
+<span class="sd">    performs a lot slower.</span>
+
+<span class="sd">    If you get a similar error:</span>
+<span class="sd">        output_data[i] = res_data[:]</span>
+<span class="sd">    TypeError: &#39;NoneType&#39; object has no attribute &#39;__getitem__&#39;</span>
+
+<span class="sd">    It means that the forwarded function is not returning anything and it</span>
+<span class="sd">    should!</span>
+
+<span class="sd">    :param data: the data array that will be processed in parallel</span>
+<span class="sd">    :param partial_func: a function constructed using partial to pass the</span>
+<span class="sd">                         correct arguments</span>
+<span class="sd">    :param cores: number of cores that the processing will use</span>
+<span class="sd">    :param chunksize: chunk of work per process(worker)</span>
+<span class="sd">    :param name: name of the task used in progress reporting</span>
+<span class="sd">    :param output_data: the output array in which the results will be stored</span>
+<span class="sd">    :param progress: Progress instance to use for progress reporting (optional)</span>
+<span class="sd">    :return: The processed output data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cores</span><span class="p">:</span>
+        <span class="n">cores</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">get_cores</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">chunksize</span><span class="p">:</span>
+        <span class="n">chunksize</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">calculate_chunksize</span><span class="p">(</span><span class="n">cores</span><span class="p">)</span>
+
+    <span class="c1"># handle the case of having a different output that input i.e. rebin,</span>
+    <span class="c1"># crop, etc</span>
+    <span class="k">if</span> <span class="n">output_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># get data reference to original with [:]</span>
+        <span class="n">output_data</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">cores</span><span class="p">)</span>
+    <span class="n">img_num</span> <span class="o">=</span> <span class="n">output_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">task_name</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cores</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;c &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">chunksize</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;chs&quot;</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                        <span class="n">num_steps</span><span class="o">=</span><span class="n">img_num</span><span class="p">,</span>
+                                        <span class="n">task_name</span><span class="o">=</span><span class="n">task_name</span><span class="p">)</span>
+
+    <span class="c1"># passing the data triggers a copy-on-write in the child process, even if</span>
+    <span class="c1"># it only reads the data</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">res_data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="n">pool</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">partial_func</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="n">chunksize</span><span class="p">)):</span>
+        <span class="n">output_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">res_data</span><span class="p">[:]</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+    <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+    <span class="n">progress</span><span class="o">.</span><span class="n">mark_complete</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">output_data</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="exclusive_mem.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../parallel.html" >mantidimaging.core.parallel</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.exclusive_mem</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+mantidimaging.core.imopr.corvo module
+=====================================
+
+.. automodule:: mantidimaging.core.imopr.corvo
+   :members:
+   :undoc-members:
+   :show-inheritance:

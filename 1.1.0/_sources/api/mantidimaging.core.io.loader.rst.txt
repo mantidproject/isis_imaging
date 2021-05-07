@@ -1,0 +1,25 @@
+mantidimaging.core.io.loader package
+====================================
+
+.. automodule:: mantidimaging.core.io.loader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.io.loader.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.io.loader.img_loader
+   mantidimaging.core.io.loader.loader
+   mantidimaging.core.io.loader.stack_loader

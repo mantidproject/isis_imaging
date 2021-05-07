@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Conda Packaging and Docker images &#8212; MantidImaging 2.1.0 documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Creating a Release" href="release.html" />
+    <link rel="prev" title="Developer Conventions" href="developer_conventions.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="release.html" title="Creating a Release"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="developer_conventions.html" title="Developer Conventions"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Conda Packaging and Docker images</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="conda-packaging-and-docker-images">
+<span id="id1"></span><h1>Conda Packaging and Docker images<a class="headerlink" href="#conda-packaging-and-docker-images" title="Permalink to this headline">¶</a></h1>
+<p>The preferred method of packaging the package is as a Conda package.</p>
+<p>This is most likely to be the simplest way to distribute the package;
+Anaconda Cloud is the simplest way to obtain dependencies (for instance,
+TomoPy).</p>
+<section id="tl-dr">
+<h2>TL;DR<a class="headerlink" href="#tl-dr" title="Permalink to this headline">¶</a></h2>
+<p>Building:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">build-conda-package</span></code>. This will automatically try to install the build requirements by calling the make target <code class="code docutils literal notranslate"><span class="pre">install-build-requirements</span></code></p></li>
+</ol>
+</div></blockquote>
+<p>Installing:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">file:///tmp/mantidimaging-conda/linux-64</span> <span class="pre">-c</span> <span class="pre">conda-forge</span>&#160; <span class="pre">mantidimaging</span></code></p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="building-the-package">
+<h2>Building the package<a class="headerlink" href="#building-the-package" title="Permalink to this headline">¶</a></h2>
+<p>This can now be done in a Github Action as a more convenient way. This still works as well.</p>
+<p>Before you go any further make sure you have the build requirements installed.
+This can be done via <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">install-build-requirements</span></code>.</p>
+<p>The metadata is in <code class="code docutils literal notranslate"><span class="pre">conda/meta.yaml</span></code>. This generates a package based
+on the environment and an installation using <code class="code docutils literal notranslate"><span class="pre">setup.py</span></code>.</p>
+<p>Note that you may have issues if the Conda root directory is on an encrypted
+volume, in this case you may use the <code class="code docutils literal notranslate"><span class="pre">--croot</span></code> option to set a root
+directory that is on a “normal” volume.</p>
+<p>The command to build the package is (and the specific command can be found in the Makefile):</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">build-conda-package</span></code></p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="installing-the-package">
+<h2>Installing the package<a class="headerlink" href="#installing-the-package" title="Permalink to this headline">¶</a></h2>
+<p>Before installing the Conda package, these commands will set the channels in the correct priority order:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">config</span> <span class="pre">--prepend</span> <span class="pre">channels</span> <span class="pre">conda-forge</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">config</span> <span class="pre">--prepend</span> <span class="pre">channels</span> <span class="pre">anaconda</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">config</span> <span class="pre">--prepend</span> <span class="pre">channels</span> <span class="pre">defaults</span></code></p></li>
+</ol>
+</div></blockquote>
+<p>This makes the priority in order of <code class="code docutils literal notranslate"><span class="pre">defaults</span> <span class="pre">&gt;</span> <span class="pre">anaconda</span> <span class="pre">&gt;</span> <span class="pre">conda-forge</span></code>, and is necessary due to packages having different versions in the different repositories.
+This only has to be done once per machine.</p>
+<p>The package can be installed from a local build using: <code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span>
+<span class="pre">file:///tmp/mantidimaging-conda/linux-64</span> <span class="pre">mantidimaging</span></code> (assuming the package is
+still in the directory it was built).</p>
+<p>Here you are essentially using a directory as a channel.</p>
+<p>Caution: installing directly from the archive as it will not resolve dependencies!</p>
+</section>
+<section id="uploading-the-package">
+<h2>Uploading the package<a class="headerlink" href="#uploading-the-package" title="Permalink to this headline">¶</a></h2>
+<p>After it is built, the package can be uploaded to the upstream repository. This is done automatically if the conda automatic upload is yes, set via <code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">config</span> <span class="pre">--set</span> <span class="pre">anaconda_upload</span> <span class="pre">yes</span></code>.</p>
+<p>Two environment variables are necessary: the <code class="code docutils literal notranslate"><span class="pre">$UPLOAD_USER</span></code>, and the <code class="code docutils literal notranslate"><span class="pre">$ANACONDA_API_TOKEN</span></code>.
+You can specify your own username and API key to build the conda package in your own conda repository.
+If you want to push a package to the original repository please contact the Mantid development team for more information.</p>
+</section>
+<section id="building-the-docker-image">
+<h2>Building the Docker image<a class="headerlink" href="#building-the-docker-image" title="Permalink to this headline">¶</a></h2>
+<p>The Docker image is currently used as a setup for the test environment. The configuration is stored in the <code class="code docutils literal notranslate"><span class="pre">docker/Dockerfile</span></code>, and a <code class="code docutils literal notranslate"><span class="pre">make</span></code> helper command is provided for building it:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">cd</span> <span class="pre">docker</span> <span class="pre">&amp;&amp;</span> <span class="pre">make</span></code></p></li>
+</ol>
+</div></blockquote>
+<p>The default tags used are <code class="code docutils literal notranslate"><span class="pre">centos7</span></code>, <code class="code docutils literal notranslate"><span class="pre">ubuntu18</span></code> and <code class="code docutils literal notranslate"><span class="pre">latest</span></code>, where <code class="code docutils literal notranslate"><span class="pre">$UPLOAD_USER</span></code> is the environment variable.
+You can provide a custom one to build it to your Docker hub repository, or contact the Mantid development team if you need to push to the official one.</p>
+</section>
+<section id="pushing-the-docker-image">
+<h2>Pushing the Docker image<a class="headerlink" href="#pushing-the-docker-image" title="Permalink to this headline">¶</a></h2>
+<p>The command to push the Docker image to Docker hub does not have a <code class="code docutils literal notranslate"><span class="pre">make</span></code> shortcut provided, and is as follows:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">cd</span> <span class="pre">docker</span> <span class="pre">&amp;&amp;</span> <span class="pre">make</span> <span class="pre">push</span></code></p></li>
+</ol>
+</div></blockquote>
+<p>This assumes the Makefile command was used to create the image, and the <code class="code docutils literal notranslate"><span class="pre">$UPLOAD_USER</span></code> is still present in the environment. You can replace <code class="code docutils literal notranslate"><span class="pre">$UPLOAD_USER/mantidimaging:travis-ci-2019.10</span></code> with anything, including your own Docker hub account.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Conda Packaging and Docker images</a><ul>
+<li><a class="reference internal" href="#tl-dr">TL;DR</a></li>
+<li><a class="reference internal" href="#building-the-package">Building the package</a></li>
+<li><a class="reference internal" href="#installing-the-package">Installing the package</a></li>
+<li><a class="reference internal" href="#uploading-the-package">Uploading the package</a></li>
+<li><a class="reference internal" href="#building-the-docker-image">Building the Docker image</a></li>
+<li><a class="reference internal" href="#pushing-the-docker-image">Pushing the Docker image</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="developer_conventions.html"
+                        title="previous chapter">Developer Conventions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="release.html"
+                        title="next chapter">Creating a Release</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../index.html">Latest</a></li>
+  <li><a href="../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="release.html" title="Creating a Release"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="developer_conventions.html" title="Developer Conventions"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Conda Packaging and Docker images</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

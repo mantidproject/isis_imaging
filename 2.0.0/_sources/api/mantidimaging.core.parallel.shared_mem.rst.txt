@@ -1,0 +1,7 @@
+mantidimaging.core.parallel.shared\_mem module
+==============================================
+
+.. automodule:: mantidimaging.core.parallel.shared_mem
+   :members:
+   :undoc-members:
+   :show-inheritance:

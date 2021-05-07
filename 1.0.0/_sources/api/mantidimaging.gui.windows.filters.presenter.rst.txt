@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.filters.presenter module
+==================================================
+
+.. automodule:: mantidimaging.gui.windows.filters.presenter
+   :members:
+   :undoc-members:
+   :show-inheritance:

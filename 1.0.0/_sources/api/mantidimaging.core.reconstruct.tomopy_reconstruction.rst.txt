@@ -1,0 +1,7 @@
+mantidimaging.core.reconstruct.tomopy\_reconstruction module
+============================================================
+
+.. automodule:: mantidimaging.core.reconstruct.tomopy_reconstruction
+   :members:
+   :undoc-members:
+   :show-inheritance:

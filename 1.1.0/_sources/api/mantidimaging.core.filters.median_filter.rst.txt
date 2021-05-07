@@ -1,0 +1,24 @@
+mantidimaging.core.filters.median\_filter package
+=================================================
+
+.. automodule:: mantidimaging.core.filters.median_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.median_filter.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.median_filter.median_filter
+   mantidimaging.core.filters.median_filter.median_filter_gui

@@ -1,0 +1,7 @@
+mantidimaging.core.tools.tomopy\_tool module
+============================================
+
+.. automodule:: mantidimaging.core.tools.tomopy_tool
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,15 @@
+mantidimaging.core.filters.ring\_removal.test package
+=====================================================
+
+.. automodule:: mantidimaging.core.filters.ring_removal.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.ring_removal.test.ring_removal_test

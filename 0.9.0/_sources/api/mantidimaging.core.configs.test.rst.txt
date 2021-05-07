@@ -1,0 +1,16 @@
+mantidimaging.core.configs.test package
+=======================================
+
+.. automodule:: mantidimaging.core.configs.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.configs.test.functional_config_test
+   mantidimaging.core.configs.test.recon_config_test

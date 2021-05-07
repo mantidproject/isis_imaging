@@ -1,0 +1,7 @@
+mantidimaging.eyes\_tests.test\_compare\_images\_window module
+==============================================================
+
+.. automodule:: mantidimaging.eyes_tests.test_compare_images_window
+   :members:
+   :undoc-members:
+   :show-inheritance:

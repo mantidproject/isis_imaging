@@ -1,0 +1,7 @@
+mantidimaging.core.configs.test.functional\_config\_test module
+===============================================================
+
+.. automodule:: mantidimaging.core.configs.test.functional_config_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

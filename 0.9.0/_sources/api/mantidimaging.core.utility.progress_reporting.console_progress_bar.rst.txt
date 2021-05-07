@@ -1,0 +1,7 @@
+mantidimaging.core.utility.progress\_reporting.console\_progress\_bar module
+============================================================================
+
+.. automodule:: mantidimaging.core.utility.progress_reporting.console_progress_bar
+   :members:
+   :undoc-members:
+   :show-inheritance:

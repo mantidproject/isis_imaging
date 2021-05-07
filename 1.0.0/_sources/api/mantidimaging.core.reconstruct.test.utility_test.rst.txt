@@ -1,0 +1,7 @@
+mantidimaging.core.reconstruct.test.utility\_test module
+========================================================
+
+.. automodule:: mantidimaging.core.reconstruct.test.utility_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

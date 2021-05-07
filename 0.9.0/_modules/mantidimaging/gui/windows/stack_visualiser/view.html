@@ -1,0 +1,556 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.windows.stack_visualiser.view - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.stack_visualiser.view</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.windows.stack_visualiser.view</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_qt5agg</span> <span class="kn">import</span> <span class="n">FigureCanvasQTAgg</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span>
+<span class="kn">from</span> <span class="nn">matplotlib.widgets</span> <span class="kn">import</span> <span class="n">RectangleSelector</span><span class="p">,</span> <span class="n">Slider</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">make_axes_locatable</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.mvp_base</span> <span class="kn">import</span> <span class="n">BaseMainWindowView</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.utility</span> <span class="kn">import</span> <span class="n">BlockQtSignals</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">histogram</span>
+<span class="kn">from</span> <span class="nn">.image_selector_widget</span> <span class="kn">import</span> <span class="n">ImageSelectorWidget</span>
+<span class="kn">from</span> <span class="nn">.metadata_dialog</span> <span class="kn">import</span> <span class="n">MetadataDialog</span>
+<span class="kn">from</span> <span class="nn">.navigation_toolbar</span> <span class="kn">import</span> <span class="n">StackNavigationToolbar</span>
+<span class="kn">from</span> <span class="nn">.roi_selector_widget</span> <span class="kn">import</span> <span class="n">ROISelectorWidget</span>
+<span class="kn">from</span> <span class="nn">.presenter</span> <span class="kn">import</span> <span class="n">StackVisualiserPresenter</span>
+<span class="kn">from</span> <span class="nn">.presenter</span> <span class="kn">import</span> <span class="n">Notification</span> <span class="k">as</span> <span class="n">StackWindowNotification</span>
+
+
+<div class="viewcode-block" id="StackVisualiserView"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView">[docs]</a><span class="k">class</span> <span class="nc">StackVisualiserView</span><span class="p">(</span><span class="n">BaseMainWindowView</span><span class="p">):</span>
+
+    <span class="n">image_updated</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">roi_updated</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="s1">&#39;PyQt_PyObject&#39;</span><span class="p">)</span>
+    <span class="n">image_selected</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">dock</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">data_traversal_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Greys_r&#39;</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># enforce not showing a single image</span>
+        <span class="k">assert</span> <span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> \
+                <span class="s2">&quot;Data does NOT have 3 dimensions! Dimensions found: </span><span class="se">\</span>
+<span class="s2">                </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span>
+
+        <span class="c1"># We set the main window as the parent, the effect is the same as</span>
+        <span class="c1"># having no parent, the window will be inside the QDockWidget. If the</span>
+        <span class="c1"># dock is set as a parent the window will be an independent floating</span>
+        <span class="c1"># window</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StackVisualiserView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s1">&#39;gui/ui/stack.ui&#39;</span><span class="p">)</span>
+
+        <span class="c1"># capture the QDockWidget reference so that we can access the Qt widget</span>
+        <span class="c1"># and change things like the title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dock</span> <span class="o">=</span> <span class="n">dock</span>
+        <span class="c1"># Swap out the dock close event with our own provided close event. This</span>
+        <span class="c1"># is needed to manually delete the data reference, otherwise it is left</span>
+        <span class="c1"># hanging in the presenter</span>
+        <span class="n">dock</span><span class="o">.</span><span class="n">closeEvent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">closeEvent</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span> <span class="o">=</span> <span class="n">StackVisualiserPresenter</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">data_traversal_axis</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialise_canvas</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_roi</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolbar</span> <span class="o">=</span> <span class="n">StackNavigationToolbar</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolbar</span><span class="o">.</span><span class="n">stack_visualiser</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_selector_toolbar</span> <span class="o">=</span> <span class="n">ROISelectorWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_selector_toolbar</span> <span class="o">=</span> <span class="n">ImageSelectorWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_selector_toolbar</span><span class="o">.</span><span class="n">max_index</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">get_image_count_on_axis</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialise_slider</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialise_image</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_selector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_rectangle_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_axis</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolbar_layout</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolbar_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_selector_toolbar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolbar_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_selector_toolbar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolbar_layout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">matplotlib_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toolbar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matplotlib_layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toolbar_layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matplotlib_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_shortcuts</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">presenter_set_image_index</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">current_image_index</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_selected</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">presenter_set_image_index</span><span class="p">)</span>
+
+<div class="viewcode-block" id="StackVisualiserView.initialise_image"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.initialise_image">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialises the image axis and the image object</span>
+<span class="sd">        :param cmap: The color map which is to be used</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_axis</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">get_image</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_bar_axis</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_axis</span><span class="p">)</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span>
+                <span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_bar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">color_bar_axis</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_selector_toolbar</span><span class="o">.</span><span class="n">image_size</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">current_image</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_image_title_to_current_filename</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_updated</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.initialise_canvas"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.initialise_canvas">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_canvas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the canvas object from the figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="n">FigureCanvasQTAgg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">rectanglecolor</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">yellow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Create context menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas_context_menu</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">add_context_menu_action</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">)</span>
+            <span class="n">action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">canvas_context_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setActionGroup</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">action</span>
+
+        <span class="c1"># Add context menu items</span>
+        <span class="n">add_context_menu_action</span><span class="p">(</span>
+                <span class="s2">&quot;Clear ROI&quot;</span><span class="p">,</span>
+                <span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">CLEAR_ROI</span><span class="p">)</span>
+        <span class="n">add_context_menu_action</span><span class="p">(</span>
+                <span class="s2">&quot;Rename&quot;</span><span class="p">,</span>
+                <span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">RENAME_WINDOW</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas_context_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+
+        <span class="n">mode_group</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QActionGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">)</span>
+        <span class="n">add_context_menu_action</span><span class="p">(</span>
+                <span class="s2">&quot;Stack mode&quot;</span><span class="p">,</span>
+                <span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">STACK_MODE</span><span class="p">,</span>
+                <span class="n">group</span><span class="o">=</span><span class="n">mode_group</span><span class="p">)</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">add_context_menu_action</span><span class="p">(</span>
+                <span class="s2">&quot;Sum mode&quot;</span><span class="p">,</span>
+                <span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">SUM_MODE</span><span class="p">,</span>
+                <span class="n">group</span><span class="o">=</span><span class="n">mode_group</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas_context_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+
+        <span class="n">add_context_menu_action</span><span class="p">(</span>
+                <span class="s2">&quot;Show Histogram&quot;</span><span class="p">,</span>
+                <span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">HISTOGRAM</span><span class="p">)</span>
+        <span class="n">add_context_menu_action</span><span class="p">(</span>
+                <span class="s2">&quot;Show Histogram in new window&quot;</span><span class="p">,</span>
+                <span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">NEW_WINDOW_HISTOGRAM</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas_context_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+
+        <span class="n">add_context_menu_action</span><span class="p">(</span>
+                <span class="s2">&quot;Show metadata&quot;</span><span class="p">,</span>
+                <span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">SHOW_METADATA</span><span class="p">)</span>
+
+        <span class="c1"># Register mouse release callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span>
+                <span class="s1">&#39;button_press_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_button_press</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span>
+                <span class="s1">&#39;scroll_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_canvas_scroll_wheel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.initialise_slider"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.initialise_slider">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_slider</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the axis for the slider and initialises the slider</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">add_axes</span><span class="p">(</span>
+            <span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">],</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;lightgoldenrodyellow&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_slider</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">slider_axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">get_image_count_on_axis</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dock</span><span class="o">.</span><span class="n">windowTitle</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_roi</span>
+
+    <span class="nd">@current_roi</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">current_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_roi</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;ROI: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;Top left  (x, y): </span><span class="si">%i</span><span class="s2">, </span><span class="si">%i</span><span class="s2">   Bottom right (x, y): </span><span class="si">%i</span><span class="s2">, </span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="o">*</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="c1"># Update the ROI selector toolbar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_selector_toolbar</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="c1"># Update ROI selector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_selector</span><span class="o">.</span><span class="n">extents</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">value</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> \
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Notify of new ROI selected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_updated</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_roi</span><span class="p">)</span>
+
+<div class="viewcode-block" id="StackVisualiserView.handle_canvas_scroll_wheel"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.handle_canvas_scroll_wheel">[docs]</a>    <span class="k">def</span> <span class="nf">handle_canvas_scroll_wheel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles the mouse scroll wheeel event when the cursor is over the</span>
+<span class="sd">        canvas.</span>
+
+<span class="sd">        Increments or decrements the current image index depending on direction</span>
+<span class="sd">        of scroll wheel movement.</span>
+
+<span class="sd">        :param event: Mouse scroll wheel event</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="s1">&#39;up&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">SCROLL_UP</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="s1">&#39;down&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">SCROLL_DOWN</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.on_button_press"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.on_button_press">[docs]</a>    <span class="k">def</span> <span class="nf">on_button_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles mouse button release events.</span>
+
+<span class="sd">        On left click (mouse button 1) this removes the previously selected</span>
+<span class="sd">        ROI. This function is called on a single button click and 2 things can</span>
+<span class="sd">        happen:</span>
+
+<span class="sd">        - If a rectangle selection is present and the user just single clicked,</span>
+<span class="sd">          the ROI will be kept, because region_select_callback will be called</span>
+<span class="sd">          afterwards</span>
+
+<span class="sd">        - If a rectangle selection is no longer present the</span>
+<span class="sd">          region_select_callback will not be called and the ROI will be deleted</span>
+
+<span class="sd">        This assumes that the order will always be matplotlib on click event</span>
+<span class="sd">        first, and then the rectangle selector callback.</span>
+<span class="sd">        This might be a wrong assumption which could cause weird plotting</span>
+<span class="sd">        issues. For now I have not seen an issue and the order seems to always</span>
+<span class="sd">        be correct</span>
+
+<span class="sd">        On right click (mouse button 2) this opens the context menu.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_roi</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="c1"># Get the mouse position on the canvas widget, converting from</span>
+            <span class="c1"># figure space to Qt space</span>
+            <span class="n">point_on_canvas</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QPoint</span><span class="p">(</span>
+                    <span class="n">event</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">get_width_height</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">event</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+            <span class="c1"># Show the context menu at (or near to) the mouse position</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">canvas_context_menu</span><span class="o">.</span><span class="n">exec_</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mapToGlobal</span><span class="p">(</span><span class="n">point_on_canvas</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.region_select_callback"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.region_select_callback">[docs]</a>    <span class="k">def</span> <span class="nf">region_select_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eclick</span><span class="p">,</span> <span class="n">erelease</span><span class="p">):</span>
+        <span class="c1"># eclick and erelease are the press and release events</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">eclick</span><span class="o">.</span><span class="n">xdata</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">eclick</span><span class="o">.</span><span class="n">ydata</span><span class="p">)</span>
+        <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">erelease</span><span class="o">.</span><span class="n">xdata</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">erelease</span><span class="o">.</span><span class="n">ydata</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_roi</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.update_title_event"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.update_title_event">[docs]</a>    <span class="k">def</span> <span class="nf">update_title_event</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">text</span><span class="p">,</span> <span class="n">okPressed</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QInputDialog</span><span class="o">.</span><span class="n">getText</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Rename window&quot;</span><span class="p">,</span> <span class="s2">&quot;Enter new name&quot;</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QLineEdit</span><span class="o">.</span><span class="n">Normal</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">okPressed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dock</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.setup_shortcuts"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.setup_shortcuts">[docs]</a>    <span class="k">def</span> <span class="nf">setup_shortcuts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">histogram_shortcut</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QShortcut</span><span class="p">(</span>
+            <span class="n">Qt</span><span class="o">.</span><span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Shift+C&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dock</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">histogram_shortcut</span><span class="o">.</span><span class="n">activated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">HISTOGRAM</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_window_histogram_shortcut</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QShortcut</span><span class="p">(</span>
+            <span class="n">Qt</span><span class="o">.</span><span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+Shift+C&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dock</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_window_histogram_shortcut</span><span class="o">.</span><span class="n">activated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span>
+                <span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">NEW_WINDOW_HISTOGRAM</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_shortcut</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QShortcut</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;F2&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dock</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_shortcut</span><span class="o">.</span><span class="n">activated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span>
+                <span class="n">StackWindowNotification</span><span class="o">.</span><span class="n">RENAME_WINDOW</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.closeEvent"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.closeEvent">[docs]</a>    <span class="k">def</span> <span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="c1"># this removes all references to the data, allowing it to be GC&#39;ed</span>
+        <span class="c1"># otherwise there is a hanging reference</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">delete_data</span><span class="p">()</span>
+
+        <span class="c1"># setting floating to false makes window() to return the MainWindow</span>
+        <span class="c1"># because the window will be docked in, however we delete it</span>
+        <span class="c1"># immediately after so no visible change occurs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">setFloating</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># this could happen if run without a parent through see(..)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">(),</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QDockWidget</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">()</span><span class="o">.</span><span class="n">remove_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># refers to MainWindow</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+        <span class="c1"># refers to the QDockWidget within which the stack is contained</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.create_rectangle_selector"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.create_rectangle_selector">[docs]</a>    <span class="k">def</span> <span class="nf">create_rectangle_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">button</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># drawtype is &#39;box&#39; or &#39;line&#39; or &#39;none&#39;, we could use &#39;line&#39; to show</span>
+        <span class="c1"># COR, but the line doesn&#39;t want to flip horizontally so it only ends</span>
+        <span class="c1"># up leaning right</span>
+        <span class="k">return</span> <span class="n">RectangleSelector</span><span class="p">(</span>
+            <span class="n">axis</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">region_select_callback</span><span class="p">,</span>
+            <span class="n">drawtype</span><span class="o">=</span><span class="s1">&#39;box&#39;</span><span class="p">,</span>
+            <span class="n">useblit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">button</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># don&#39;t use middle button</span>
+            <span class="n">spancoords</span><span class="o">=</span><span class="s1">&#39;pixels&#39;</span><span class="p">,</span>
+            <span class="n">minspanx</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">minspany</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.create_slider"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.create_slider">[docs]</a>    <span class="k">def</span> <span class="nf">create_slider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slider_axis</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="n">slider</span> <span class="o">=</span> <span class="n">Slider</span><span class="p">(</span>
+                <span class="n">slider_axis</span><span class="p">,</span> <span class="s2">&quot;Images&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">valinit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">valfmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%i</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">slider</span><span class="o">.</span><span class="n">on_changed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_selected</span><span class="o">.</span><span class="n">emit</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">slider</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.current_image_roi"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.current_image_roi">[docs]</a>    <span class="k">def</span> <span class="nf">current_image_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: The selected region of the currently visualised image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">current_image</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_roi</span>
+        <span class="k">return</span> <span class="n">image</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.show_histogram_of_current_image"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.show_histogram_of_current_image">[docs]</a>    <span class="k">def</span> <span class="nf">show_histogram_of_current_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_window</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Event that will show a histogram of the current image (full or the</span>
+<span class="sd">        selected ROI).</span>
+
+<span class="sd">        :param new_window: Whether to put the new histogram into a new floating</span>
+<span class="sd">                           window, or append to the last focused plotting</span>
+<span class="sd">                           window</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This can work with histogram.show_transparent or histogram.show</span>
+        <span class="n">current_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">current_image_index</span>
+        <span class="n">current_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">get_image_filename</span><span class="p">(</span><span class="n">current_index</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dock</span><span class="o">.</span><span class="n">windowTitle</span><span class="p">()</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_label</span><span class="p">(</span><span class="n">current_filename</span><span class="p">,</span> <span class="n">current_index</span><span class="p">)</span>
+
+        <span class="c1"># Choose plotting function depending on whether we&#39;re creating a</span>
+        <span class="c1"># histogram in the same window, or a new window.</span>
+        <span class="c1"># The last window that was focused will be considered the &#39;active&#39;</span>
+        <span class="c1"># window.</span>
+        <span class="n">histogram_function</span> <span class="o">=</span> <span class="n">histogram</span><span class="o">.</span><span class="n">show_transparent</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">new_window</span> \
+            <span class="k">else</span> <span class="n">histogram</span><span class="o">.</span><span class="n">show_floating_transparent</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_roi</span><span class="p">:</span>
+            <span class="n">histogram_function</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">current_image_roi</span><span class="p">(),</span> <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">histogram_function</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">current_image</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_create_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_filename</span><span class="p">,</span> <span class="n">current_index</span><span class="p">):</span>
+        <span class="n">common_label</span> <span class="o">=</span> <span class="s2">&quot;Index: </span><span class="si">{current_index}</span><span class="s2">, </span><span class="si">{current_filename}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_roi</span><span class="p">:</span>
+            <span class="n">legend</span> <span class="o">=</span> <span class="p">(</span><span class="n">common_label</span> <span class="o">+</span> <span class="s2">&quot; </span><span class="si">{current_roi}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">current_filename</span><span class="o">=</span><span class="n">current_filename</span><span class="p">,</span>
+                <span class="n">current_index</span><span class="o">=</span><span class="n">current_index</span><span class="p">,</span>
+                <span class="n">current_roi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_roi</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">legend</span> <span class="o">=</span> <span class="n">common_label</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">current_filename</span><span class="o">=</span><span class="n">current_filename</span><span class="p">,</span>
+                                         <span class="n">current_index</span><span class="o">=</span><span class="n">current_index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">legend</span>
+
+<div class="viewcode-block" id="StackVisualiserView.show_current_image"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.show_current_image">[docs]</a>    <span class="k">def</span> <span class="nf">show_current_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shows the current image on the plot area.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">current_image</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_image_title_to_current_filename</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+        <span class="c1"># Update colour bar extents</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_bar</span><span class="o">.</span><span class="n">set_clim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">get_image_pixel_range</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_bar</span><span class="o">.</span><span class="n">draw_all</span><span class="p">()</span>
+
+        <span class="c1"># Update image extents</span>
+        <span class="n">old_extent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">get_extent</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">set_extent</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># If the size of the image is different then clear the old ROI</span>
+        <span class="k">if</span> <span class="n">old_extent</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">get_extent</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">do_clear_roi</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_selector_toolbar</span><span class="o">.</span><span class="n">image_size</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_updated</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.set_image_title_to_current_filename"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.set_image_title_to_current_filename">[docs]</a>    <span class="k">def</span> <span class="nf">set_image_title_to_current_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_axis</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">get_image_filename</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">current_image_index</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.change_value_range"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.change_value_range">[docs]</a>    <span class="k">def</span> <span class="nf">change_value_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">set_clim</span><span class="p">((</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.set_current_image_index"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.set_current_image_index">[docs]</a>    <span class="k">def</span> <span class="nf">set_current_image_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">BlockQtSignals</span><span class="p">([</span><span class="bp">self</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">set_val</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_selector_toolbar</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_current_image</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StackVisualiserView.show_image_metadata"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.StackVisualiserView.show_image_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">show_image_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shows image metadata in a dialog.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">MetadataDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">images</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="see"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.view.html#mantidimaging.gui.windows.stack_visualiser.view.see">[docs]</a><span class="k">def</span> <span class="nf">see</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_traversal_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Greys_r&#39;</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This method provides an option to run an independent stack visualiser.</span>
+<span class="sd">    It might be useful when using the MantidImaging package through IPython.</span>
+
+<span class="sd">    Warning: This function will internally hide a QApplication in order to show</span>
+<span class="sd">    the Stack Visualiser.  This can be accessed with see.q_application, and if</span>
+<span class="sd">    modified externally it might crash the caller process.</span>
+
+<span class="sd">    :param data: Data to be visualised</span>
+<span class="sd">    :param data_traversal_axis: axis on which we&#39;re traversing the data</span>
+<span class="sd">    :param cmap: Color map</span>
+<span class="sd">    :param block: Whether to block the calling process, or not</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running independent Stack Visualiser&quot;</span><span class="p">)</span>
+
+    <span class="c1"># We cache the QApplication reference, otherwise the interpreter will</span>
+    <span class="c1"># segfault when we try to create a second QApplication on a consecutive</span>
+    <span class="c1"># call. We cache it as a parameter of this function, because we don&#39;t want</span>
+    <span class="c1"># to expose the QApplication to the outside</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">see</span><span class="p">,</span> <span class="s1">&#39;q_application&#39;</span><span class="p">):</span>
+        <span class="n">see</span><span class="o">.</span><span class="n">q_application</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QApplication</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+
+    <span class="n">dock</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QDockWidget</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">StackVisualiserView</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">dock</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">data_traversal_axis</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+    <span class="n">dock</span><span class="o">.</span><span class="n">setWidget</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">dock</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">see</span><span class="o">.</span><span class="n">q_application</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="view.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.stack_visualiser.view</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

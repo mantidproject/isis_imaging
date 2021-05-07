@@ -1,0 +1,7 @@
+mantidimaging.core.cor\_tilt.auto module
+========================================
+
+.. automodule:: mantidimaging.core.cor_tilt.auto
+   :members:
+   :undoc-members:
+   :show-inheritance:

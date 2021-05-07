@@ -1,0 +1,7 @@
+mantidimaging.core.convert.test.convert\_test module
+====================================================
+
+.. automodule:: mantidimaging.core.convert.test.convert_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

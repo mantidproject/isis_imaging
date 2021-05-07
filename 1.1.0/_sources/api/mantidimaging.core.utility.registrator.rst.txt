@@ -1,0 +1,7 @@
+mantidimaging.core.utility.registrator module
+=============================================
+
+.. automodule:: mantidimaging.core.utility.registrator
+   :members:
+   :undoc-members:
+   :show-inheritance:

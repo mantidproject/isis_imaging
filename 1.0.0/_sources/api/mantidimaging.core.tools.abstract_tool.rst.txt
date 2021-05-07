@@ -1,0 +1,7 @@
+mantidimaging.core.tools.abstract\_tool module
+==============================================
+
+.. automodule:: mantidimaging.core.tools.abstract_tool
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.dialogs.cor_inspection.test.model_test - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.dialogs.cor_inspection.test.model_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.dialogs.cor_inspection.test.model_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.dialogs.cor_inspection</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">CORInspectionDialogModel</span><span class="p">,</span> <span class="n">ImageType</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CORInspectionDialogModelTest"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.dialogs.cor_inspection.test.model_test.html#mantidimaging.gui.dialogs.cor_inspection.test.model_test.CORInspectionDialogModelTest">[docs]</a><span class="k">class</span> <span class="nc">CORInspectionDialogModelTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CORInspectionDialogModelTest.test_construct_from_sinogram"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.dialogs.cor_inspection.test.model_test.html#mantidimaging.gui.dialogs.cor_inspection.test.model_test.CORInspectionDialogModelTest.test_construct_from_sinogram">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_from_sinogram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sino</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CORInspectionDialogModel</span><span class="p">(</span><span class="n">sino</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">sino</span><span class="p">,</span> <span class="n">sino</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cor_extents</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">63</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">proj_angles</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="mi">128</span><span class="p">,))</span></div>
+
+<div class="viewcode-block" id="CORInspectionDialogModelTest.test_construct_from_projections"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.dialogs.cor_inspection.test.model_test.html#mantidimaging.gui.dialogs.cor_inspection.test.model_test.CORInspectionDialogModelTest.test_construct_from_projections">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_from_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">proj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CORInspectionDialogModel</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">slice_idx</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">sino</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cor_extents</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">63</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">proj_angles</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="mi">128</span><span class="p">,))</span></div>
+
+<div class="viewcode-block" id="CORInspectionDialogModelTest.test_construct_from_sinogram_defaults"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.dialogs.cor_inspection.test.model_test.html#mantidimaging.gui.dialogs.cor_inspection.test.model_test.CORInspectionDialogModelTest.test_construct_from_sinogram_defaults">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_from_sinogram_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sino</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CORInspectionDialogModel</span><span class="p">(</span><span class="n">sino</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">centre_cor</span><span class="p">,</span> <span class="p">(</span><span class="mi">64</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CORInspectionDialogModelTest.test_current_cor"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.dialogs.cor_inspection.test.model_test.html#mantidimaging.gui.dialogs.cor_inspection.test.model_test.CORInspectionDialogModelTest.test_current_cor">[docs]</a>    <span class="k">def</span> <span class="nf">test_current_cor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sino</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CORInspectionDialogModel</span><span class="p">(</span><span class="n">sino</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">centre_cor</span> <span class="o">=</span> <span class="mi">30</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">cor_step</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cor</span><span class="p">(</span><span class="n">ImageType</span><span class="o">.</span><span class="n">LESS</span><span class="p">),</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cor</span><span class="p">(</span><span class="n">ImageType</span><span class="o">.</span><span class="n">CURRENT</span><span class="p">),</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cor</span><span class="p">(</span><span class="n">ImageType</span><span class="o">.</span><span class="n">MORE</span><span class="p">),</span> <span class="mi">40</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CORInspectionDialogModelTest.test_adjust_cor"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.dialogs.cor_inspection.test.model_test.html#mantidimaging.gui.dialogs.cor_inspection.test.model_test.CORInspectionDialogModelTest.test_adjust_cor">[docs]</a>    <span class="k">def</span> <span class="nf">test_adjust_cor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sino</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CORInspectionDialogModel</span><span class="p">(</span><span class="n">sino</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">centre_cor</span> <span class="o">=</span> <span class="mi">30</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">cor_step</span> <span class="o">=</span> <span class="mi">10</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">adjust_cor</span><span class="p">(</span><span class="n">ImageType</span><span class="o">.</span><span class="n">CURRENT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">centre_cor</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cor_step</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">adjust_cor</span><span class="p">(</span><span class="n">ImageType</span><span class="o">.</span><span class="n">LESS</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">centre_cor</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cor_step</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">adjust_cor</span><span class="p">(</span><span class="n">ImageType</span><span class="o">.</span><span class="n">CURRENT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">centre_cor</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cor_step</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">adjust_cor</span><span class="p">(</span><span class="n">ImageType</span><span class="o">.</span><span class="n">MORE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">centre_cor</span><span class="p">,</span> <span class="mf">27.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cor_step</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">adjust_cor</span><span class="p">(</span><span class="n">ImageType</span><span class="o">.</span><span class="n">CURRENT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">centre_cor</span><span class="p">,</span> <span class="mf">27.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cor_step</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="model_test.html">1.1.0</a></li>
+  <li><a href="../../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.dialogs.cor_inspection.test.model_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

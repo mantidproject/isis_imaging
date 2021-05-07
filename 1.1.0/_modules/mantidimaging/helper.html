@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.helper - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.helper</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.helper</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module for commonly used functions across the modules.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">gmtime</span><span class="p">,</span> <span class="n">strftime</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">_log_file_handler</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">_log_formatter</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">_time_start</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="initialise_logging"><a class="viewcode-back" href="../../api/mantidimaging.helper.html#mantidimaging.helper.initialise_logging">[docs]</a><span class="k">def</span> <span class="nf">initialise_logging</span><span class="p">(</span><span class="n">default_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">_log_formatter</span>
+    <span class="n">_log_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> [</span><span class="si">%(name)s</span><span class="s2">] </span><span class="si">%(levelname)s</span><span class="s2">: </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Add a very verbose logging level</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">addLevelName</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;TRACE&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Capture all warnings</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">captureWarnings</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Remove default handlers</span>
+    <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Stdout handler</span>
+    <span class="n">console_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+    <span class="n">console_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">_log_formatter</span><span class="p">)</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span>
+
+    <span class="c1"># Default log level</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">default_level</span><span class="p">)</span>
+
+    <span class="c1"># Don&#39;t ever print all the debug logging from Qt</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;PyQt5&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_logging_from_func_config"><a class="viewcode-back" href="../../api/mantidimaging.helper.html#mantidimaging.helper.set_logging_from_func_config">[docs]</a><span class="k">def</span> <span class="nf">set_logging_from_func_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">log_level</span><span class="p">))</span>
+
+    <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Log level set to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">log_level</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="check_config_class"><a class="viewcode-back" href="../../api/mantidimaging.helper.html#mantidimaging.helper.check_config_class">[docs]</a><span class="k">def</span> <span class="nf">check_config_class</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">mantidimaging.core.configs.recon_config</span> <span class="kn">import</span> <span class="n">ReconstructionConfig</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">ReconstructionConfig</span><span class="p">),</span> \
+        <span class="s2">&quot;The provided config is not of type ReconstructionConfig and cannot </span><span class="se">\</span>
+<span class="s2">        be used!&quot;</span></div>
+
+
+<div class="viewcode-block" id="initialise"><a class="viewcode-back" href="../../api/mantidimaging.helper.html#mantidimaging.helper.initialise">[docs]</a><span class="k">def</span> <span class="nf">initialise</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">saver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+
+    <span class="n">set_logging_from_func_config</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
+
+    <span class="c1"># File handler</span>
+    <span class="k">global</span> <span class="n">_log_file_handler</span>
+    <span class="k">if</span> <span class="n">_log_file_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">root_logger</span><span class="o">.</span><span class="n">removeLogger</span><span class="p">(</span><span class="n">_log_file_handler</span><span class="p">)</span>
+
+    <span class="c1"># Generate log file filename</span>
+    <span class="n">output_path</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">get_output_path</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># If no output path is provided then output the log in the current</span>
+        <span class="c1"># working directory with the filename log_DATE.txt</span>
+        <span class="n">log_path</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+        <span class="n">log_name_prefix</span> <span class="o">=</span> <span class="s1">&#39;log&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If an output path was provided then output the log in the same</span>
+        <span class="c1"># directory as the output directory with the filename OUTDIR_DATE.txt</span>
+        <span class="c1"># For example: &quot;-o out&quot; would give the log filename &quot;out_DATE.txt&quot;</span>
+        <span class="n">log_path</span> <span class="o">=</span> <span class="n">output_path</span>
+        <span class="n">log_name_prefix</span> <span class="o">=</span> <span class="n">output_path</span>
+    <span class="n">log_name_suffix</span> <span class="o">=</span> <span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;_</span><span class="si">%d</span><span class="s2">_%b_%Y_%H_%M_%S&quot;</span><span class="p">,</span> <span class="n">gmtime</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span>
+    <span class="n">log_fullpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="n">log_name_prefix</span> <span class="o">+</span> <span class="n">log_name_suffix</span><span class="p">)</span>
+    <span class="n">_log_file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">log_fullpath</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">_log_file_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">_log_formatter</span><span class="p">)</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">_log_file_handler</span><span class="p">)</span>
+
+    <span class="c1"># Start global execution timer</span>
+    <span class="k">global</span> <span class="n">_time_start</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_time_start</span><span class="p">:</span>
+        <span class="n">_time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Output run log header</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Time now (run begin): &#39;</span> <span class="o">+</span> <span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">(</span><span class="n">_time_start</span><span class="p">))</span>
+
+    <span class="n">alg_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+               <span class="s2">&quot;--------------------------</span><span class="se">\n</span><span class="s2">&quot;</span>
+               <span class="s2">&quot;Tool/Algorithm</span><span class="se">\n</span><span class="s2">&quot;</span>
+               <span class="s2">&quot;--------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">alg_hdr</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">alg_hdr</span><span class="p">)</span>
+
+    <span class="n">preproc_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                   <span class="s2">&quot;--------------------------</span><span class="se">\n</span><span class="s2">&quot;</span>
+                   <span class="s2">&quot;Filter parameters</span><span class="se">\n</span><span class="s2">&quot;</span>
+                   <span class="s2">&quot;--------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">preproc_hdr</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">preproc_hdr</span><span class="p">)</span>
+
+    <span class="n">cmd_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+               <span class="s2">&quot;--------------------------</span><span class="se">\n</span><span class="s2">&quot;</span>
+               <span class="s2">&quot;Command line</span><span class="se">\n</span><span class="s2">&quot;</span>
+               <span class="s2">&quot;--------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">cmd_hdr</span> <span class="o">+=</span> <span class="n">config</span><span class="o">.</span><span class="n">cmd_line</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">cmd_hdr</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Run initialised&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_config_integrity"><a class="viewcode-back" href="../../api/mantidimaging.helper.html#mantidimaging.helper.check_config_integrity">[docs]</a><span class="k">def</span> <span class="nf">check_config_integrity</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">check_config_class</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;No output path specified, no output will be produced!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_data_stack"><a class="viewcode-back" href="../../api/mantidimaging.helper.html#mantidimaging.helper.check_data_stack">[docs]</a><span class="k">def</span> <span class="nf">check_data_stack</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">expected_dims</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">expected_class</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Data is a None type.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">expected_class</span><span class="p">):</span>
+        <span class="n">to_check</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">to_check</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sample</span>
+
+    <span class="c1"># the data must be a np array, otherwise most functionality won&#39;t work</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_check</span><span class="p">,</span> <span class="n">expected_class</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid data type. It is not a Numpy ndarray: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span>
+            <span class="nb">format</span><span class="p">(</span><span class="n">to_check</span><span class="p">))</span>
+
+    <span class="c1"># the scripts are designed to work with a 3 dimensional dataset</span>
+    <span class="c1"># in the case of 4 dimensional data, it&#39;s typically reduced to 3 dimensions</span>
+    <span class="c1"># via the aggregate functionality</span>
+    <span class="k">if</span> <span class="n">expected_dims</span> <span class="o">!=</span> <span class="n">to_check</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid data format. It does not have 3 dimensions. &quot;</span>
+            <span class="s2">&quot;Shape: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">to_check</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="run_import_checks"><a class="viewcode-back" href="../../api/mantidimaging.helper.html#mantidimaging.helper.run_import_checks">[docs]</a><span class="k">def</span> <span class="nf">run_import_checks</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run the import checks to notify the user which features are available in</span>
+<span class="sd">    the execution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">utility</span> <span class="k">as</span> <span class="n">pu</span>
+
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pu</span><span class="o">.</span><span class="n">multiprocessing_available</span><span class="p">():</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Multiprocessing not available.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running process on </span><span class="si">{0}</span><span class="s2"> cores.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cores</span><span class="p">))</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../index.html">Latest</a></li>
+  <li><a href="../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="helper.html">1.1.0</a></li>
+  <li><a href="../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.helper</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

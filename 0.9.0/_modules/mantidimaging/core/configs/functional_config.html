@@ -1,0 +1,663 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.configs.functional_config - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.configs.functional_config</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.configs.functional_config</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.io.utility</span> <span class="kn">import</span> <span class="n">DEFAULT_IO_FILE_FORMAT</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.helper</span> <span class="kn">import</span> <span class="n">set_logging_from_func_config</span>
+
+
+<div class="viewcode-block" id="FunctionalConfig"><a class="viewcode-back" href="../../../../api/mantidimaging.core.configs.functional_config.html#mantidimaging.core.configs.functional_config.FunctionalConfig">[docs]</a><span class="k">class</span> <span class="nc">FunctionalConfig</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    All pre-processing options required to run a tomographic reconstruction</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds a default post-processing configuration with a sensible choice</span>
+<span class="sd">        of parameters</span>
+
+<span class="sd">        crash_on_failed_import: Default True, this option tells if the program</span>
+<span class="sd">                                should stop execution if an import fails and a</span>
+<span class="sd">                                step cannot be executed:</span>
+<span class="sd">            True - Raise an exception and stop execution immediately</span>
+<span class="sd">            False - Note the failure to import but continue execution without</span>
+<span class="sd">                    applying the filter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Functionality options</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_path_flat</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_path_dark</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_prefix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_format</span> <span class="o">=</span> <span class="n">DEFAULT_IO_FILE_FORMAT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">construct_sinograms</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_format</span> <span class="o">=</span> <span class="n">DEFAULT_IO_FILE_FORMAT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_slices_prefix</span> <span class="o">=</span> <span class="s1">&#39;recon_slice&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_horiz_slices_prefix</span> <span class="o">=</span> <span class="s1">&#39;recon_horiz&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_horiz_slices_subdir</span> <span class="o">=</span> <span class="s1">&#39;horiz_slices&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_horiz_slices</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Processing options</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_preproc</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reconstruction</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip_preproc</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preproc_subdir</span> <span class="o">=</span> <span class="s1">&#39;pre_processed&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">swap_axes</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cors</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># single member list so that interpolation doesn&#39;t fail in</span>
+        <span class="c1"># cor_interpolate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cor_slices</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">overwrite_all</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_port</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Reconstruction options</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool</span> <span class="o">=</span> <span class="s1">&#39;tomopy&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span> <span class="o">=</span> <span class="s1">&#39;gridrec&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_iter</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_angle</span> <span class="o">=</span> <span class="mf">360.0</span>
+
+        <span class="kn">import</span> <span class="nn">multiprocessing</span>
+        <span class="c1"># get max cores on the system as default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cores</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+
+        <span class="c1"># how to spread the image load per worker</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunksize</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallel_load</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># imopr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imopr</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># aggregate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregate_angles</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregate_single_folder_output</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># convert</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convert</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convert_prefix</span> <span class="o">=</span> <span class="s1">&#39;converted_images&#39;</span>
+
+        <span class="c1"># which indices of images to load</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_memory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span> <span class="o">=</span> <span class="mf">1.</span>
+
+        <span class="c1"># process list execution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># start the GUI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Input directory: </span><span class="si">{in_dir}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Flat directory: </span><span class="si">{flat_dir}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Dark directory: </span><span class="si">{dark_dir}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Input image prefix: </span><span class="si">{c.in_prefix}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Input image format: </span><span class="si">{c.in_format}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Output directory: </span><span class="si">{out_dir}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Output image format: </span><span class="si">{c.out_format}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Output slices filename prefix: </span><span class="si">{c.out_slices_prefix}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Output horizontal slices file name prefix: &quot;</span>
+             <span class="s2">&quot;</span><span class="si">{c.out_horiz_slices_prefix}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Output horizontal slices subdir: </span><span class="si">{c.out_horiz_slices_subdir}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Save horizontal slices: </span><span class="si">{c.save_horiz_slices}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Save preprocessed images: </span><span class="si">{c.save_preproc}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Do only pre processing and exit: </span><span class="si">{c.reconstruction}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Skip preprocessing step: </span><span class="si">{c.skip_preproc}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Pre processing images subdir: </span><span class="si">{preproc_dir}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Radiograms: </span><span class="si">{c.swap_axes}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Data type: </span><span class="si">{c.data_dtype}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Provided center of rotation: </span><span class="si">{c.cors}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Slice IDs for CORs: </span><span class="si">{c.cor_slices}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Log level: </span><span class="si">{c.log_level}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Overwrite files in output directory: </span><span class="si">{c.overwrite_all}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Debug: </span><span class="si">{c.debug}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Debug port: </span><span class="si">{c.debug_port}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Tool: </span><span class="si">{c.tool}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Algorithm: </span><span class="si">{c.algorithm}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Number of iterations: </span><span class="si">{c.num_iter}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Maximum angle: </span><span class="si">{c.max_angle}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Cores: </span><span class="si">{c.cores}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Chunk per worker: </span><span class="si">{c.chunksize}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Load data in parallel: </span><span class="si">{c.parallel_load}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Image operator mode: </span><span class="si">{c.imopr}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Aggregate mode: </span><span class="si">{c.aggregate}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Aggregate angles: </span><span class="si">{c.aggregate_angles}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Aggregate single folder output: &quot;</span>
+             <span class="s2">&quot;</span><span class="si">{c.aggregate_single_folder_output}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Convert images mode: </span><span class="si">{c.convert}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Prefix for the output converted images: </span><span class="si">{c.convert_prefix}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Which images will be loaded: </span><span class="si">{c.indices}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Split the execution into separate runs: </span><span class="si">{c.split}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Max memory for split execution: </span><span class="si">{c.max_memory}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Max ratio to memory for split execution: </span><span class="si">{c.max_ratio}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Use a process list for execution: </span><span class="si">{c.process_list}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Running the GUI: </span><span class="si">{c.gui}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                      <span class="n">in_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="p">)),</span>
+                      <span class="n">flat_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path_flat</span><span class="p">)),</span>
+                      <span class="n">dark_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path_dark</span><span class="p">)),</span>
+                      <span class="n">out_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">)),</span>
+                      <span class="n">preproc_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">preproc_subdir</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="n">s</span>
+
+    <span class="k">def</span> <span class="nf">_setup_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup the functional arguments for the script</span>
+<span class="sd">        :param parser: The parser which is set up</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">grp_func</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">&#39;Functionality options&#39;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--input-path&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Input directory&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-F&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--input-path-flat&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path_flat</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Input directory for flat images&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-D&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--input-path-dark&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path_dark</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Input directory for flat images&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--in-prefix&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">in_prefix</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Filename prefix to use when searching for input image files &quot;</span>
+                 <span class="s2">&quot;to load.&quot;</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.io</span> <span class="kn">import</span> <span class="n">loader</span>
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--in-format&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_format</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">choices</span><span class="o">=</span><span class="n">loader</span><span class="o">.</span><span class="n">supported_formats</span><span class="p">(),</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Format/file extension expected for the input images.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--construct-sinograms&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">construct_sinograms</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Construct the sinograms on load.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--output-path&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Where to write the output slice images (reconstructed &quot;</span>
+                 <span class="s2">&quot;volume)&quot;</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.io.saver</span> <span class="kn">import</span> <span class="n">Saver</span>
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--out-format&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_format</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">choices</span><span class="o">=</span><span class="n">Saver</span><span class="o">.</span><span class="n">supported_formats</span><span class="p">(),</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Format/file extension expected for the input images.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--out-slices-prefix&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_slices_prefix</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The prefix for the reconstructed slices files.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--out-horiz-slices-subdir&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_horiz_slices_subdir</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The subdirectory for the reconstructed horizontal slices.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--out-horiz-slices-prefix&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_horiz_slices_prefix</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The prefix for the reconstructed horizontal slices files.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-s&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--save-preproc&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Save out the pre-processed images.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--reconstruction&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Complete pre-processing of images and exit.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--skip-preproc&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The images loaded have already been pre-processed. &quot;</span>
+            <span class="s2">&quot;All pre-processing steps will be skipped.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--save-horiz-slices&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Save out the horizontal reconstructed files.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-p&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--preproc-subdir&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preproc_subdir</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The subdirectory for the pre-processed images.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Default output-path/pre_processed/.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--swap-axes&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">swap_axes</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;NOT RECOMMENDED: This means an additional conversion will &quot;</span>
+            <span class="s2">&quot;be done inside Tomopy, which will double the memory usage.&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">The axis will be flipped on the pre-processing images before &quot;</span>
+            <span class="s2">&quot;saving. This means if sinograms are passed, they will be turned &quot;</span>
+            <span class="s2">&quot;into radiograms, and vice versa.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--data-dtype&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Default (and recommended): float32</span><span class="se">\n</span><span class="s2">The data type in which &quot;</span>
+            <span class="s2">&quot;the data converted to after loading and processed. &quot;</span>
+            <span class="s2">&quot;Supported: float32, float64&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--log-level&quot;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Log verbosity level.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                 <span class="s2">&quot;Available options are: TRACE, DEBUG, INFO, WARN, CRITICAL&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-w&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--overwrite-all&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">overwrite_all</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;NO WARNINGS WILL BE GIVEN BEFORE OVERWRITING FILES. &quot;</span>
+            <span class="s2">&quot;USE WITH CAUTION!</span><span class="se">\n</span><span class="s2">Overwrite all conflicting files &quot;</span>
+            <span class="s2">&quot;found in the output directory.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--cores&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cores</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Default: </span><span class="si">%(default)s</span><span class="s2"> (maximum available on the system). &quot;</span>
+            <span class="s2">&quot;Number of CPU cores that will be used for reconstruction.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--chunksize&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chunksize</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;How to spread the load on each worker.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--parallel-load&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parallel_load</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Load the data with multiple reader processes. &quot;</span>
+            <span class="s2">&quot;This CAN MAKE THE LOADING slower on a local Hard Disk Drive.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_func</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--process-list&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">process_list</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use the process list parser. Intended use is for cluster &quot;</span>
+                 <span class="s2">&quot;submission. It can parse a string from command line, file &quot;</span>
+                 <span class="s2">&quot;containing the commands, or a saved process list.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_run_modes</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">&#39;Run Modes&#39;</span><span class="p">)</span>
+
+        <span class="n">grp_run_modes</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--convert&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convert</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Convert images to a different format. &quot;</span>
+            <span class="s2">&quot;The output format will be the one specified with --out-format&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_run_modes</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--convert-prefix&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convert_prefix</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Prefix for saved out files from conversion.&quot;</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.imopr</span> <span class="kn">import</span> <span class="n">imopr</span>
+        <span class="n">grp_run_modes</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--imopr&quot;</span><span class="p">,</span>
+            <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">imopr</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Image operator currently supports the following operators: &quot;</span>
+                 <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">imopr</span><span class="o">.</span><span class="n">get_available_operators</span><span class="p">()))</span>
+
+        <span class="n">grp_run_modes</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--aggregate&quot;</span><span class="p">,</span>
+            <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Aggregate the selected image energy levels. The expected &quot;</span>
+            <span class="s2">&quot;input is --aggregate &lt;start&gt; &lt;end&gt; &lt;method:{sum, avg}&gt;...&quot;</span>
+            <span class="s2">&quot; to select indices.</span><span class="se">\n</span><span class="s2">There must always be an even length of &quot;</span>
+            <span class="s2">&quot;indices: --aggregate 0 100 101 201 300 400 sum&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_run_modes</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--aggregate-angles&quot;</span><span class="p">,</span>
+            <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aggregate_angles</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Select which angles to be aggregated with --aggregate.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;This can be used to spread out the load on multiple nodes.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Sample command: --aggregate-angles 0 10, &quot;</span>
+            <span class="s2">&quot;will select only angles 0 - 10 inclusive.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_run_modes</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--aggregate-single-folder-output&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aggregate_single_folder_output</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The output will be images with increasing &quot;</span>
+            <span class="s2">&quot;number in a single folder.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_run_modes</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--debug&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Run debug to specified port, if no port is specified, &quot;</span>
+            <span class="s2">&quot;it will default to 59003&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_run_modes</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--debug-port&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug_port</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Port on which a debugger is listening.&#39;</span><span class="p">)</span>
+
+        <span class="n">grp_run_modes</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--gui&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Start the GUI.&#39;</span><span class="p">)</span>
+
+        <span class="n">grp_recon</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">&#39;Reconstruction options&#39;</span><span class="p">)</span>
+
+        <span class="n">supported_tools</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tomopy&#39;</span><span class="p">,</span> <span class="s1">&#39;astra&#39;</span><span class="p">]</span>
+        <span class="n">grp_recon</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--tool&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="p">,</span>
+            <span class="n">choices</span><span class="o">=</span><span class="n">supported_tools</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Default: </span><span class="si">%(default)s</span><span class="se">\n</span><span class="s2">&quot;</span>
+                 <span class="s2">&quot;Tomographic reconstruction tool to use.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                 <span class="s2">&quot;TODO: Describe pros and cons of each tool (Astra GPU). &quot;</span>
+                 <span class="s2">&quot;Available: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supported_tools</span><span class="p">)))</span>
+
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.tools.tomopy_tool</span> <span class="kn">import</span> <span class="n">TomoPyTool</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.core.tools.astra_tool</span> <span class="kn">import</span> <span class="n">AstraTool</span>
+        <span class="n">tomo_algs</span> <span class="o">=</span> <span class="n">TomoPyTool</span><span class="o">.</span><span class="n">tool_supported_methods</span><span class="p">()</span>
+        <span class="n">astra_algs</span> <span class="o">=</span> <span class="n">AstraTool</span><span class="o">.</span><span class="n">tool_supported_methods</span><span class="p">()</span>
+        <span class="n">grp_recon</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--algorithm&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Default: </span><span class="si">%(default)s</span><span class="se">\n</span><span class="s2">Reconstruction algorithm &quot;</span>
+            <span class="s2">&quot;(tool dependent).</span><span class="se">\n</span><span class="s2">Available:</span><span class="se">\n</span><span class="s2">TomoPy: </span><span class="si">{0}</span><span class="se">\n</span><span class="s2">Astra: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tomo_algs</span><span class="p">),</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">astra_algs</span><span class="p">)))</span>
+
+        <span class="n">grp_recon</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-n&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--num-iter&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_iter</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of iterations (only valid for iterative methods: &quot;</span>
+                 <span class="s2">&quot;art, bart, mlem, osem, ospml_hybrid, ospml_quad, &quot;</span>
+                 <span class="s2">&quot;pml_hybrid, pml_quad, sirt).&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_recon</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--max-angle&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_angle</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Maximum angle of the last projection.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Assuming first angle=0, and uniform angle increment &quot;</span>
+            <span class="s2">&quot;for every projection.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_recon</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--cors&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># will be converted to floats in self.update()</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cors</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Either a list of CORs or a file containing CORs.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;If a file is used it must be a text file with a pair of slice&quot;</span>
+            <span class="s2">&quot;index and COR on each line.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Provide the CORs for the selected slices with --cor-slices.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;If no slices are provided a SINGLE COR is expected, &quot;</span>
+            <span class="s2">&quot;that will be used for the whole stack.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;If slices are provided, the number of CORs provided &quot;</span>
+            <span class="s2">&quot;with this option MUST BE THE SAME as the slices.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_recon</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--cor-slices&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># will be converted to ints in self.update()</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cor_slices</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the Slice IDs to which the centers of rotation from &quot;</span>
+            <span class="s2">&quot;--cors correspond.</span><span class="se">\n</span><span class="s2">The number of slices passed here MUST be the &quot;</span>
+            <span class="s2">&quot;same as the number of CORs provided.</span><span class="se">\n</span><span class="s2">The slice IDs MUST be &quot;</span>
+            <span class="s2">&quot;ints. If no slice IDs are provided, then only 1 COR is &quot;</span>
+            <span class="s2">&quot;expected and will be used for the whole stack.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_recon</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--split&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Split execution based on --max-memory and ratio of data &quot;</span>
+                 <span class="s2">&quot;size to max memory.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_recon</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--max-memory&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_memory</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Default: All memory avialable on the system. &quot;</span>
+            <span class="s2">&quot;Works in MEGABYTES! Specify the maximum memory allowed &quot;</span>
+            <span class="s2">&quot;to the reconstruction.&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_recon</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--max-ratio&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Default: </span><span class="si">%(default)s</span><span class="s2">. Specify the maximum allowed ratio of &quot;</span>
+            <span class="s2">&quot;predicted memory / allowed memory. &quot;</span>
+            <span class="s2">&quot;This needs to be in range of 0 &lt; ratio &lt; 1&quot;</span><span class="p">)</span>
+
+        <span class="n">grp_recon</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--indices&quot;</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># will be converted to ints in self.update()</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify indices you want to be loaded.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;If not provided the whole stack will be loaded.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;If a single indice is provided: --indices 15, it will load &quot;</span>
+            <span class="s2">&quot;indices in range [0, 15).&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">parser</span>
+
+    <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Should be called after the parser has had a chance to</span>
+<span class="sd">        parse the real arguments from the user.</span>
+
+<span class="sd">        SPECIAL CASES ARE HANDLED IN:</span>
+<span class="sd">        recon_config.ReconstructionConfig.handle_special_arguments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># remove all the built-in parameters that start with __</span>
+        <span class="n">all_args</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">:</span> <span class="ow">not</span> <span class="n">param</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">),</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+        <span class="c1"># update all the arguments</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">all_args</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">arg</span><span class="p">))</span>
+
+        <span class="n">set_logging_from_func_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="functional_config.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.configs.functional_config</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

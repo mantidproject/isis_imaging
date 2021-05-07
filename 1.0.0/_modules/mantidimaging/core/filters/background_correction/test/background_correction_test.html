@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.filters.background_correction.test.background_correction_test - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.background_correction.test.background_correction_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.filters.background_correction.test.background_correction_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
+
+<span class="kn">import</span> <span class="nn">mantidimaging.core.testing.unit_test_helper</span> <span class="k">as</span> <span class="nn">th</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.filters</span> <span class="kn">import</span> <span class="n">background_correction</span>
+
+
+<div class="viewcode-block" id="BackgroundCorrectionTest"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.background_correction.test.background_correction_test.html#mantidimaging.core.filters.background_correction.test.background_correction_test.BackgroundCorrectionTest">[docs]</a><span class="k">class</span> <span class="nc">BackgroundCorrectionTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test background correction filter.</span>
+
+<span class="sd">    Tests return value and in-place modified data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BackgroundCorrectionTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BackgroundCorrectionTest.test_not_executed_empty_params"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.background_correction.test.background_correction_test.html#mantidimaging.core.filters.background_correction.test.background_correction_test.BackgroundCorrectionTest.test_not_executed_empty_params">[docs]</a>    <span class="k">def</span> <span class="nf">test_not_executed_empty_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+
+        <span class="c1"># empty params</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">background_correction</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BackgroundCorrectionTest.test_not_executed_no_dark"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.background_correction.test.background_correction_test.html#mantidimaging.core.filters.background_correction.test.background_correction_test.BackgroundCorrectionTest.test_not_executed_no_dark">[docs]</a>    <span class="k">def</span> <span class="nf">test_not_executed_no_dark</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+        <span class="n">flat</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># no dark</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">background_correction</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BackgroundCorrectionTest.test_not_executed_no_flat"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.background_correction.test.background_correction_test.html#mantidimaging.core.filters.background_correction.test.background_correction_test.BackgroundCorrectionTest.test_not_executed_no_flat">[docs]</a>    <span class="k">def</span> <span class="nf">test_not_executed_no_flat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+        <span class="n">dark</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># no flat</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">background_correction</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dark</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BackgroundCorrectionTest.test_not_executed_bad_flat"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.background_correction.test.background_correction_test.html#mantidimaging.core.filters.background_correction.test.background_correction_test.BackgroundCorrectionTest.test_not_executed_bad_flat">[docs]</a>    <span class="k">def</span> <span class="nf">test_not_executed_bad_flat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+        <span class="n">flat</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dark</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># bad flat</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">background_correction</span><span class="o">.</span><span class="n">execute</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span>
+                          <span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dark</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BackgroundCorrectionTest.test_not_executed_bad_dark"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.background_correction.test.background_correction_test.html#mantidimaging.core.filters.background_correction.test.background_correction_test.BackgroundCorrectionTest.test_not_executed_bad_dark">[docs]</a>    <span class="k">def</span> <span class="nf">test_not_executed_bad_dark</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+        <span class="n">flat</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dark</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># bad dark</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">background_correction</span><span class="o">.</span><span class="n">execute</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span>
+                          <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="BackgroundCorrectionTest.test_real_result"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.background_correction.test.background_correction_test.html#mantidimaging.core.filters.background_correction.test.background_correction_test.BackgroundCorrectionTest.test_real_result">[docs]</a>    <span class="k">def</span> <span class="nf">test_real_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_off</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_real_result</span><span class="p">()</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">switch_mp_on</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BackgroundCorrectionTest.do_real_result"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.background_correction.test.background_correction_test.html#mantidimaging.core.filters.background_correction.test.background_correction_test.BackgroundCorrectionTest.do_real_result">[docs]</a>    <span class="k">def</span> <span class="nf">do_real_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># the calculation here was designed on purpose to have a value</span>
+        <span class="c1"># below the np.clip in background_correction</span>
+        <span class="c1"># the operation is (sample - dark) / (flat - dark)</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_with_val</span><span class="p">(</span><span class="mf">26.</span><span class="p">)</span>
+        <span class="n">flat</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_with_val</span><span class="p">(</span>
+            <span class="mf">7.</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dark</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_with_val</span><span class="p">(</span>
+            <span class="mf">6.</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">expected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mf">20.</span><span class="p">)</span>
+
+        <span class="c1"># we dont want anything to be cropped out</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">background_correction</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">clip_max</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BackgroundCorrectionTest.test_clip_works"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.background_correction.test.background_correction_test.html#mantidimaging.core.filters.background_correction.test.background_correction_test.BackgroundCorrectionTest.test_clip_works">[docs]</a>    <span class="k">def</span> <span class="nf">test_clip_works</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># the calculation here was designed on purpose to have a value</span>
+        <span class="c1"># ABOVE the np.clip in background_correction</span>
+        <span class="c1"># the operation is (sample - dark) / (flat - dark)</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()</span>
+        <span class="n">sample</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">846.</span>
+        <span class="n">flat</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">flat</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">42.</span>
+        <span class="n">dark</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dark</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">6.</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mf">3.</span><span class="p">)</span>
+
+        <span class="c1"># we dont want anything to be cropped out</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">background_correction</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="background_correction_test.html">1.0.0</a></li>
+  <li><a href="../../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.background_correction.test.background_correction_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

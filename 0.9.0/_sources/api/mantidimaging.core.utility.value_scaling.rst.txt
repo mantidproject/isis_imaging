@@ -1,0 +1,7 @@
+mantidimaging.core.utility.value\_scaling module
+================================================
+
+.. automodule:: mantidimaging.core.utility.value_scaling
+   :members:
+   :undoc-members:
+   :show-inheritance:

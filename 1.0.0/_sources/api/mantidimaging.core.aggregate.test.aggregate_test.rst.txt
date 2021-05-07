@@ -1,0 +1,7 @@
+mantidimaging.core.aggregate.test.aggregate\_test module
+========================================================
+
+.. automodule:: mantidimaging.core.aggregate.test.aggregate_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

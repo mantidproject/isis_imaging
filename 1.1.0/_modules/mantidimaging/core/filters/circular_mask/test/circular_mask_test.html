@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.filters.circular_mask.test.circular_mask_test - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.circular_mask.test.circular_mask_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.filters.circular_mask.test.circular_mask_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
+
+<span class="kn">import</span> <span class="nn">mantidimaging.core.testing.unit_test_helper</span> <span class="k">as</span> <span class="nn">th</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.memory_usage</span> <span class="kn">import</span> <span class="n">get_memory_usage_linux</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.filters</span> <span class="kn">import</span> <span class="n">circular_mask</span>
+
+
+<div class="viewcode-block" id="CircularMaskTest"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.circular_mask.test.circular_mask_test.html#mantidimaging.core.filters.circular_mask.test.circular_mask_test.CircularMaskTest">[docs]</a><span class="k">class</span> <span class="nc">CircularMaskTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test circular mask filter.</span>
+
+<span class="sd">    Tests return value and in-place modified data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CircularMaskTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CircularMaskTest.test_not_executed"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.circular_mask.test.circular_mask_test.html#mantidimaging.core.filters.circular_mask.test.circular_mask_test.CircularMaskTest.test_not_executed">[docs]</a>    <span class="k">def</span> <span class="nf">test_not_executed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Check that the filter is not executed when:</span>
+        <span class="c1">#     - no ratio is provided</span>
+        <span class="c1">#     - 0 &lt; ratio &lt; 1 is false</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+
+        <span class="n">ratio</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">mask_val</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">circular_mask</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">mask_val</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+
+        <span class="n">ratio</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">circular_mask</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">mask_val</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+
+        <span class="n">ratio</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">circular_mask</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">mask_val</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+
+        <span class="n">ratio</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">circular_mask</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">mask_val</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CircularMaskTest.test_executed"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.circular_mask.test.circular_mask_test.html#mantidimaging.core.filters.circular_mask.test.circular_mask_test.CircularMaskTest.test_executed">[docs]</a>    <span class="k">def</span> <span class="nf">test_executed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+
+        <span class="n">ratio</span> <span class="o">=</span> <span class="mf">0.001</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">circular_mask</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">ratio</span><span class="p">)</span>
+
+        <span class="n">th</span><span class="o">.</span><span class="n">assert_not_equals</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">assert_not_equals</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+
+        <span class="c1"># reset the input images</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="mf">0.994</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">circular_mask</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">ratio</span><span class="p">)</span>
+
+        <span class="n">th</span><span class="o">.</span><span class="n">assert_not_equals</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">assert_not_equals</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">images</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CircularMaskTest.test_memory_change_acceptable"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.circular_mask.test.circular_mask_test.html#mantidimaging.core.filters.circular_mask.test.circular_mask_test.CircularMaskTest.test_memory_change_acceptable">[docs]</a>    <span class="k">def</span> <span class="nf">test_memory_change_acceptable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expected behaviour for the filter is to be done in place</span>
+<span class="sd">        without using more memory.</span>
+
+<span class="sd">        In reality the memory is increased by about 40MB (4 April 2017),</span>
+<span class="sd">        but this could change in the future.</span>
+
+<span class="sd">        The reason why a 10% window is given on the expected size is</span>
+<span class="sd">        to account for any library imports that may happen.</span>
+
+<span class="sd">        This will still capture if the data is doubled, which is the main goal.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">control</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">gen_img_shared_array_and_copy</span><span class="p">()</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="mf">0.001</span>
+
+        <span class="n">cached_memory</span> <span class="o">=</span> <span class="n">get_memory_usage_linux</span><span class="p">(</span><span class="n">kb</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">circular_mask</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">ratio</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertLess</span><span class="p">(</span>
+            <span class="n">get_memory_usage_linux</span><span class="p">(</span><span class="n">kb</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cached_memory</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">)</span>
+
+        <span class="n">th</span><span class="o">.</span><span class="n">assert_not_equals</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">assert_not_equals</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">images</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="circular_mask_test.html">1.1.0</a></li>
+  <li><a href="../../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.circular_mask.test.circular_mask_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

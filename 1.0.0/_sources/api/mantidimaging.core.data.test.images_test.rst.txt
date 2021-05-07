@@ -1,0 +1,7 @@
+mantidimaging.core.data.test.images\_test module
+================================================
+
+.. automodule:: mantidimaging.core.data.test.images_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

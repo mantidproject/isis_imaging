@@ -1,0 +1,7 @@
+mantidimaging.core.testing.unit\_test\_helper module
+====================================================
+
+.. automodule:: mantidimaging.core.testing.unit_test_helper
+   :members:
+   :undoc-members:
+   :show-inheritance:

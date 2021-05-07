@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Troubleshooting &#8212; MantidImaging 2.1.0 documentation</title>
+  
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="Testing" href="developer_guide/testing.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="developer_guide/testing.html" title="Testing"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">Troubleshooting</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="troubleshooting">
+<span id="id1"></span><h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h1>
+<section id="updating-mantid-imaging-on-idaaas">
+<h2>Updating Mantid Imaging on IDAaaS<a class="headerlink" href="#updating-mantid-imaging-on-idaaas" title="Permalink to this headline">¶</a></h2>
+<section id="updating-unstable-package">
+<h3>Updating Unstable package<a class="headerlink" href="#updating-unstable-package" title="Permalink to this headline">¶</a></h3>
+<p>To update the unstable package please copy and run this command in a terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> /opt/miniconda/bin/activate /opt/miniconda <span class="o">&amp;&amp;</span> <span class="nv">ENVIRONMENT_NAME</span><span class="o">=</span>mantidimaging_unstable <span class="nv">REPO_LABEL</span><span class="o">=</span>unstable <span class="nb">source</span> &lt;<span class="o">(</span>curl -s https://raw.githubusercontent.com/mantidproject/mantidimaging/master/install.sh<span class="o">)</span>
+</pre></div>
+</div>
+</section>
+<section id="updating-release-package">
+<h3>Updating Release package<a class="headerlink" href="#updating-release-package" title="Permalink to this headline">¶</a></h3>
+<p>To update the release package please copy and run this command in a terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> /opt/miniconda/bin/activate /opt/miniconda <span class="o">&amp;&amp;</span> <span class="nb">source</span> &lt;<span class="o">(</span>curl -s https://raw.githubusercontent.com/mantidproject/mantidimaging/master/install.sh<span class="o">)</span>
+</pre></div>
+</div>
+</section>
+<section id="updating-when-not-on-idaaas">
+<h3>Updating when not on IDAaaS<a class="headerlink" href="#updating-when-not-on-idaaas" title="Permalink to this headline">¶</a></h3>
+<p>When updating the package, and not on IDAaaS, you will have to:</p>
+<ul class="simple">
+<li><p>Open a terminal which has the <code class="code docutils literal notranslate"><span class="pre">base</span></code> Anaconda environment activated, or</p></li>
+<li><p>replace the <code class="code docutils literal notranslate"><span class="pre">/opt/miniconda/</span></code> paths in <code class="code docutils literal notranslate"><span class="pre">source</span> <span class="pre">/opt/miniconda/bin/activate</span> <span class="pre">/opt/miniconda</span></code></p></li>
+</ul>
+<p>command with the path where <code class="code docutils literal notranslate"><span class="pre">conda</span></code> is installed on your system.</p>
+<p>Afterwards run the remainder of the command to update the environment:</p>
+<ul class="simple">
+<li><p>For Unstable</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">ENVIRONMENT_NAME</span><span class="o">=</span>mantidimaging_unstable <span class="nv">REPO_LABEL</span><span class="o">=</span>unstable <span class="nb">source</span> &lt;<span class="o">(</span>curl -s https://raw.githubusercontent.com/mantidproject/mantidimaging/master/install.sh<span class="o">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>For Release</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;<span class="o">(</span>curl -s https://raw.githubusercontent.com/mantidproject/mantidimaging/master/install.sh<span class="o">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="can-t-reconstruct-with-fbp-cuda-and-sirt-cuda">
+<h2>Can’t reconstruct with FBP_CUDA and SIRT_CUDA<a class="headerlink" href="#can-t-reconstruct-with-fbp-cuda-and-sirt-cuda" title="Permalink to this headline">¶</a></h2>
+<p>These algorithms have 2 requirements:</p>
+<ul class="simple">
+<li><p>Having a CUDA-compatible graphics card (GPU)</p></li>
+<li><p>Having the CUDA Runtime 10.2 libraries installed</p></li>
+</ul>
+<section id="having-a-cuda-compatible-graphics-card">
+<h3>Having a CUDA-compatible graphics card<a class="headerlink" href="#having-a-cuda-compatible-graphics-card" title="Permalink to this headline">¶</a></h3>
+<p>Please check that your GPU is on the list of compatible GPUs <a class="reference external" href="https://developer.nvidia.com/cuda-gpus">https://developer.nvidia.com/cuda-gpus</a></p>
+</section>
+<section id="having-the-cuda-runtime-10-2-libraries-installed">
+<h3>Having the CUDA Runtime 10.2 libraries installed<a class="headerlink" href="#having-the-cuda-runtime-10-2-libraries-installed" title="Permalink to this headline">¶</a></h3>
+<p>Please install the CUDA Runtime version 10.2 binaries from <a class="reference external" href="https://developer.nvidia.com/cuda-10.2-download-archive">https://developer.nvidia.com/cuda-10.2-download-archive</a></p>
+<p>Reinstalling CUDA on Linux can be quickly done with this script</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># uninstall nvidia driver and cuda driver</span>
+nvidia-uninstall <span class="o">&amp;&amp;</span> /usr/local/cuda/bin/cuda-uninstaller
+
+<span class="c1"># download the CUDA installer</span>
+wget http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run ~/Downloads/cuda_10.2.89_440.33.01_linux.run
+
+<span class="c1"># install GPU driver and CUDA Toolkit from CLI silently</span>
+sudo bash ~/Downloads/cuda_10.2.89_440.33.01_linux.run --silent --driver --toolkit
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="specific-errors">
+<h1>Specific Errors<a class="headerlink" href="#specific-errors" title="Permalink to this headline">¶</a></h1>
+<section id="systemerror-built-in-function-connectslotsbyname-returned-a-result-with-an-error-set">
+<h2>SystemError: &lt;built-in function connectSlotsByName&gt; returned a result with an error set<a class="headerlink" href="#systemerror-built-in-function-connectslotsbyname-returned-a-result-with-an-error-set" title="Permalink to this headline">¶</a></h2>
+<p>This means that the PyQt package is missing or an old version (it must be newer than PyQt5==5.13.2)</p>
+<section id="suggested-fix">
+<h3>Suggested Fix<a class="headerlink" href="#suggested-fix" title="Permalink to this headline">¶</a></h3>
+<p>Install PyQt5 and pyqtgraph with <code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyqt5==5.15</span> <span class="pre">pyqtgraph==0.11</span></code></p>
+</section>
+</section>
+<section id="qt-qpa-plugin-could-not-load-the-qt-platform-plugin-xcb-in-even-though-it-was-found">
+<h2>qt.qpa.plugin: Could not load the Qt platform plugin “xcb” in “” even though it was found.<a class="headerlink" href="#qt-qpa-plugin-could-not-load-the-qt-platform-plugin-xcb-in-even-though-it-was-found" title="Permalink to this headline">¶</a></h2>
+<p>This might mean some system libraries are missing</p>
+<section id="id2">
+<h3>Suggested Fix<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Try installing <code class="code docutils literal notranslate"><span class="pre">apt</span> <span class="pre">install</span> <span class="pre">libxcb-xinerama0</span></code></p>
+</section>
+</section>
+<section id="qt-qpa-xcb-could-not-connect-to-display">
+<h2>qt.qpa.xcb: could not connect to display…<a class="headerlink" href="#qt-qpa-xcb-could-not-connect-to-display" title="Permalink to this headline">¶</a></h2>
+<p>Missing <code class="code docutils literal notranslate"><span class="pre">DISPLAY</span></code> variable. This means the application cannot find the display to show itself on.</p>
+<section id="id3">
+<h3>Suggested Fix<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>You can set this via <code class="code docutils literal notranslate"><span class="pre">export</span> <span class="pre">DISPLAY=:N</span></code> where <code class="code docutils literal notranslate"><span class="pre">:N</span></code> should be the number of your display</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#updating-mantid-imaging-on-idaaas">Updating Mantid Imaging on IDAaaS</a><ul>
+<li><a class="reference internal" href="#updating-unstable-package">Updating Unstable package</a></li>
+<li><a class="reference internal" href="#updating-release-package">Updating Release package</a></li>
+<li><a class="reference internal" href="#updating-when-not-on-idaaas">Updating when not on IDAaaS</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#can-t-reconstruct-with-fbp-cuda-and-sirt-cuda">Can’t reconstruct with FBP_CUDA and SIRT_CUDA</a><ul>
+<li><a class="reference internal" href="#having-a-cuda-compatible-graphics-card">Having a CUDA-compatible graphics card</a></li>
+<li><a class="reference internal" href="#having-the-cuda-runtime-10-2-libraries-installed">Having the CUDA Runtime 10.2 libraries installed</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#specific-errors">Specific Errors</a><ul>
+<li><a class="reference internal" href="#systemerror-built-in-function-connectslotsbyname-returned-a-result-with-an-error-set">SystemError: &lt;built-in function connectSlotsByName&gt; returned a result with an error set</a><ul>
+<li><a class="reference internal" href="#suggested-fix">Suggested Fix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#qt-qpa-plugin-could-not-load-the-qt-platform-plugin-xcb-in-even-though-it-was-found">qt.qpa.plugin: Could not load the Qt platform plugin “xcb” in “” even though it was found.</a><ul>
+<li><a class="reference internal" href="#id2">Suggested Fix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#qt-qpa-xcb-could-not-connect-to-display">qt.qpa.xcb: could not connect to display…</a><ul>
+<li><a class="reference internal" href="#id3">Suggested Fix</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="developer_guide/testing.html"
+                        title="previous chapter">Testing</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="api.html"
+                        title="next chapter">API Reference</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="./index.html">Latest</a></li>
+  <li><a href="./0.9.0/index.html">0.9.0</a></li>
+  <li><a href="./1.0.0/index.html">1.0.0</a></li>
+  <li><a href="./1.1.0/index.html">1.1.0</a></li>
+  <li><a href="./2.0.0/index.html">2.0.0</a></li>
+  <li><a href="./2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="developer_guide/testing.html" title="Testing"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">Troubleshooting</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

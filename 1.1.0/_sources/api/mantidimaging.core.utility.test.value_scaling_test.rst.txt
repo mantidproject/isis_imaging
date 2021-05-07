@@ -1,0 +1,7 @@
+mantidimaging.core.utility.test.value\_scaling\_test module
+===========================================================
+
+.. automodule:: mantidimaging.core.utility.test.value_scaling_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

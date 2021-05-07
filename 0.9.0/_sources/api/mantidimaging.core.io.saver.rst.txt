@@ -1,0 +1,7 @@
+mantidimaging.core.io.saver module
+==================================
+
+.. automodule:: mantidimaging.core.io.saver
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+mantidimaging.gui.mvp\_base.test.presenter\_test module
+=======================================================
+
+.. automodule:: mantidimaging.gui.mvp_base.test.presenter_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

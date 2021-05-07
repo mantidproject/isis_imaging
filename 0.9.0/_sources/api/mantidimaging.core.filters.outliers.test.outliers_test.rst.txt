@@ -1,0 +1,7 @@
+mantidimaging.core.filters.outliers.test.outliers\_test module
+==============================================================
+
+.. automodule:: mantidimaging.core.filters.outliers.test.outliers_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

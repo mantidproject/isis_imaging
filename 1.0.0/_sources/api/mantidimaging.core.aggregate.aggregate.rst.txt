@@ -1,0 +1,7 @@
+mantidimaging.core.aggregate.aggregate module
+=============================================
+
+.. automodule:: mantidimaging.core.aggregate.aggregate
+   :members:
+   :undoc-members:
+   :show-inheritance:

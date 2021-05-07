@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.stack\_visualiser.navigation\_toolbar module
+======================================================================
+
+.. automodule:: mantidimaging.gui.windows.stack_visualiser.navigation_toolbar
+   :members:
+   :undoc-members:
+   :show-inheritance:

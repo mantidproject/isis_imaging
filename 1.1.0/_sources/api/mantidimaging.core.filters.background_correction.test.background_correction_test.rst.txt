@@ -1,0 +1,7 @@
+mantidimaging.core.filters.background\_correction.test.background\_correction\_test module
+==========================================================================================
+
+.. automodule:: mantidimaging.core.filters.background_correction.test.background_correction_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

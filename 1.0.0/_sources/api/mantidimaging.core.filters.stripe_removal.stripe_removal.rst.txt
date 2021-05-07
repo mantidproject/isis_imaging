@@ -1,0 +1,7 @@
+mantidimaging.core.filters.stripe\_removal.stripe\_removal module
+=================================================================
+
+.. automodule:: mantidimaging.core.filters.stripe_removal.stripe_removal
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+mantidimaging.core.utility.cor\_interpolate module
+==================================================
+
+.. automodule:: mantidimaging.core.utility.cor_interpolate
+   :members:
+   :undoc-members:
+   :show-inheritance:

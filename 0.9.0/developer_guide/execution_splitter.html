@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Execution Splitter - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Visualisation" href="visualisation.html" />
+    <link rel="prev" title="Parallelism in Python" href="parallelism.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="visualisation.html" title="Visualisation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="parallelism.html" title="Parallelism in Python"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Execution Splitter</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="execution-splitter">
+<h1>Execution Splitter<a class="headerlink" href="#execution-splitter" title="Permalink to this headline">¶</a></h1>
+<p>Sometimes the datasets are too large to handle in a single run even on a 32GB
+machine. This is the reason the <code class="code docutils literal notranslate"><span class="pre">execution_splitter</span></code> was added.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">execution_splitter</span></code> is part of the <code class="code docutils literal notranslate"><span class="pre">algorithms</span></code> package. It
+will calculate the expected size, depending on whether we are doing a
+reconstruction (the memory usage will double, to allocate memory for the
+reconstructed volume) or just image processing (no doubling expected). Based on
+that it tries to have a ratio of expected size to available memory under 1,
+meaning we don’t run out of memory during execution.</p>
+<p>It will then split the indices in however many steps are needed to not run out
+of memory (let’s say split in 2, so each run will use half the original memory).
+If we have 1500 images, on the first run we will process the first [0-750), and
+on the second run we will process the [750-1500) (last index not included). Any
+associated centers of rotation will also be split according to the indices.</p>
+<p>The actual call to the <code class="code docutils literal notranslate"><span class="pre">execution_splitter</span></code> package happens in
+<code class="code docutils literal notranslate"><span class="pre">main.py</span></code>, if the <code class="code docutils literal notranslate"><span class="pre">--split</span></code> flag is detected, we go onto a different
+branch of execution.</p>
+<p>The reason we can split the data like that, is that nearly all filters are
+atomic operations on an image, and it does not matter what happens to the other
+images, or whether they are present at all. This is also true for a
+reconstruction, we only reconstruct a sinogram and do not care about the others.</p>
+<p>The exception to that is the Region of Interest normalisation filter, because we
+use the sums of _all_ provided images to calculate our scalar, meaning that if
+we process half, we calculate the number from only half the images, and the
+second half will be multiplied by a different number. This has not been found to
+be an issue, and the results are pretty much the same regardless of whether we
+process all of the images, half, a third, or even less. The reason for that is
+that most of the time only a very small number of images will actually have a
+contrast that’s different from the rest.</p>
+<section id="associated-cli-flags">
+<h2>Associated CLI flags<a class="headerlink" href="#associated-cli-flags" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--split</span></code></p>
+<p>This will activate the aforementioned functionality.</p>
+</li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--reconstruction</span></code></p>
+<p>Specifies whether this is a reconstruction or not. This is not a specific
+flag to <code class="code docutils literal notranslate"><span class="pre">execution_splitter</span></code>, but it will activate all
+reconstruction branches in the package. See the <code class="code docutils literal notranslate"><span class="pre">default_run.py</span></code>
+file to see more of what happens due to this flag.</p>
+</li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--max-ratio</span></code></p>
+<p>The maximum allowed ratio of expected size to available memory.</p>
+</li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--max-memory</span></code></p>
+<p>The maximum allowed memory.</p>
+</li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Execution Splitter</a><ul>
+<li><a class="reference internal" href="#associated-cli-flags">Associated CLI flags</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="parallelism.html"
+                        title="previous chapter">Parallelism in Python</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="visualisation.html"
+                        title="next chapter">Visualisation</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="execution_splitter.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/developer_guide/execution_splitter.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/developer_guide/execution_splitter.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="visualisation.html" title="Visualisation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="parallelism.html" title="Parallelism in Python"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Execution Splitter</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+mantidimaging.core.utility.projection\_angles module
+====================================================
+
+.. automodule:: mantidimaging.core.utility.projection_angles
+   :members:
+   :undoc-members:
+   :show-inheritance:

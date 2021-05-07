@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.data.images module - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.filters package" href="mantidimaging.core.filters.html" />
+    <link rel="prev" title="mantidimaging.core.data.const module" href="mantidimaging.core.data.const.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.filters.html" title="mantidimaging.core.filters package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.data.const.html" title="mantidimaging.core.data.const module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.data.html" accesskey="U">mantidimaging.core.data package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.data.images module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.data.images">
+<span id="mantidimaging-core-data-images-module"></span><h1>mantidimaging.core.data.images module<a class="headerlink" href="#module-mantidimaging.core.data.images" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.core.data.images.Images">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.core.data.images.</code><code class="sig-name descname">Images</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flat</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dark</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filenames</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/data/images.html#Images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.data.images.Images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.check_data_stack">
+<em class="property">static </em><code class="sig-name descname">check_data_stack</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">expected_dims=3</em>, <em class="sig-param">expected_class=&lt;class 'numpy.ndarray'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/data/images.html#Images.check_data_stack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.data.images.Images.check_data_stack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.dark">
+<em class="property">property </em><code class="sig-name descname">dark</code><a class="headerlink" href="#mantidimaging.core.data.images.Images.dark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.filenames">
+<em class="property">property </em><code class="sig-name descname">filenames</code><a class="headerlink" href="#mantidimaging.core.data.images.Images.filenames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.flat">
+<em class="property">property </em><code class="sig-name descname">flat</code><a class="headerlink" href="#mantidimaging.core.data.images.Images.flat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.has_history">
+<em class="property">property </em><code class="sig-name descname">has_history</code><a class="headerlink" href="#mantidimaging.core.data.images.Images.has_history" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.metadata_load">
+<code class="sig-name descname">metadata_load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/data/images.html#Images.metadata_load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.data.images.Images.metadata_load" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.metadata_loads">
+<code class="sig-name descname">metadata_loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/data/images.html#Images.metadata_loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.data.images.Images.metadata_loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.metadata_save">
+<code class="sig-name descname">metadata_save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/data/images.html#Images.metadata_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.data.images.Images.metadata_save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.metadata_saves">
+<code class="sig-name descname">metadata_saves</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/data/images.html#Images.metadata_saves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.data.images.Images.metadata_saves" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.properties_pretty">
+<em class="property">property </em><code class="sig-name descname">properties_pretty</code><a class="headerlink" href="#mantidimaging.core.data.images.Images.properties_pretty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.record_parameters_in_metadata">
+<code class="sig-name descname">record_parameters_in_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/data/images.html#Images.record_parameters_in_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.data.images.Images.record_parameters_in_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.data.images.Images.sample">
+<em class="property">property </em><code class="sig-name descname">sample</code><a class="headerlink" href="#mantidimaging.core.data.images.Images.sample" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.data.const.html"
+                        title="previous chapter">mantidimaging.core.data.const module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.filters.html"
+                        title="next chapter">mantidimaging.core.filters package</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="mantidimaging.core.data.images.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.filters.html" title="mantidimaging.core.filters package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.data.const.html" title="mantidimaging.core.data.const module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.data.html" >mantidimaging.core.data package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.data.images module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

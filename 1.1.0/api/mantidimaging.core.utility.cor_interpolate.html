@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.utility.cor_interpolate module - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.utility.execution_splitter module" href="mantidimaging.core.utility.execution_splitter.html" />
+    <link rel="prev" title="mantidimaging.core.utility.test.value_scaling_test module" href="mantidimaging.core.utility.test.value_scaling_test.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.utility.execution_splitter.html" title="mantidimaging.core.utility.execution_splitter module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.utility.test.value_scaling_test.html" title="mantidimaging.core.utility.test.value_scaling_test module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.utility.html" accesskey="U">mantidimaging.core.utility package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.cor_interpolate module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.utility.cor_interpolate">
+<span id="mantidimaging-core-utility-cor-interpolate-module"></span><h1>mantidimaging.core.utility.cor_interpolate module<a class="headerlink" href="#module-mantidimaging.core.utility.cor_interpolate" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="mantidimaging.core.utility.cor_interpolate.execute">
+<code class="sig-prename descclassname">mantidimaging.core.utility.cor_interpolate.</code><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_length</span></em>, <em class="sig-param"><span class="n">slice_ids</span></em>, <em class="sig-param"><span class="n">cors_for_sinograms</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/utility/cor_interpolate.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.utility.cor_interpolate.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interpolates the Centers of Rotation for the sinograms that are not
+provided.</p>
+<p>This expects CORs for only a few sinograms and will interpolate the rest,
+so that every single sinogram has an associated COR with it.</p>
+<p>This technique has so far produced good results, when using Tomopy to do
+the reconstruction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_length</strong> – The length of the data along the axis we’re traversing.
+E.g. the number of images</p></li>
+<li><p><strong>slice_ids</strong> – The slice IDs for which we are passing the corresponding
+CORs</p></li>
+<li><p><strong>cors_for_sinograms</strong> – The CORs for the sinograms</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A np.array with length equal to data_length containing the
+interpolated CORs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.utility.test.value_scaling_test.html"
+                        title="previous chapter">mantidimaging.core.utility.test.value_scaling_test module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.utility.execution_splitter.html"
+                        title="next chapter">mantidimaging.core.utility.execution_splitter module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="mantidimaging.core.utility.cor_interpolate.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.utility.execution_splitter.html" title="mantidimaging.core.utility.execution_splitter module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.utility.test.value_scaling_test.html" title="mantidimaging.core.utility.test.value_scaling_test module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.utility.html" >mantidimaging.core.utility package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.cor_interpolate module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

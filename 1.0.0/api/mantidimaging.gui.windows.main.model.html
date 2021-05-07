@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.gui.windows.main.model module - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.gui.windows.main.presenter module" href="mantidimaging.gui.windows.main.presenter.html" />
+    <link rel="prev" title="mantidimaging.gui.windows.main.load_dialog module" href="mantidimaging.gui.windows.main.load_dialog.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.main.presenter.html" title="mantidimaging.gui.windows.main.presenter module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.main.load_dialog.html" title="mantidimaging.gui.windows.main.load_dialog module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.gui.html" >mantidimaging.gui package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.gui.windows.html" >mantidimaging.gui.windows package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.gui.windows.main.html" accesskey="U">mantidimaging.gui.windows.main package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.main.model module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.gui.windows.main.model">
+<span id="mantidimaging-gui-windows-main-model-module"></span><h1>mantidimaging.gui.windows.main.model module<a class="headerlink" href="#module-mantidimaging.gui.windows.main.model" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.gui.windows.main.model.</code><code class="sig-name descname">MainWindowModel</code><a class="reference internal" href="../_modules/mantidimaging/gui/windows/main/model.html#MainWindowModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel.add_stack">
+<code class="sig-name descname">add_stack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stack_visualiser</span></em>, <em class="sig-param"><span class="n">dock_widget</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/main/model.html#MainWindowModel.add_stack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel.add_stack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel.create_name">
+<code class="sig-name descname">create_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/main/model.html#MainWindowModel.create_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel.create_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a suitable name for a newly loaded stack.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel.do_load_stack">
+<code class="sig-name descname">do_load_stack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample_path</span></em>, <em class="sig-param"><span class="n">image_format</span></em>, <em class="sig-param"><span class="n">parallel_load</span></em>, <em class="sig-param"><span class="n">indices</span></em>, <em class="sig-param"><span class="n">progress</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/main/model.html#MainWindowModel.do_load_stack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel.do_load_stack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel.do_remove_stack">
+<code class="sig-name descname">do_remove_stack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stack_uuid</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/main/model.html#MainWindowModel.do_remove_stack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel.do_remove_stack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the stack from the active_stacks dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stack_uuid</strong> – The unique ID of the stack that will be removed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel.do_saving">
+<code class="sig-name descname">do_saving</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stack_uuid</span></em>, <em class="sig-param"><span class="n">output_dir</span></em>, <em class="sig-param"><span class="n">name_prefix</span></em>, <em class="sig-param"><span class="n">image_format</span></em>, <em class="sig-param"><span class="n">overwrite</span></em>, <em class="sig-param"><span class="n">swap_axes</span></em>, <em class="sig-param"><span class="n">indices</span></em>, <em class="sig-param"><span class="n">progress</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/main/model.html#MainWindowModel.do_saving"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel.do_saving" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel.get_stack">
+<code class="sig-name descname">get_stack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stack_uuid</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/main/model.html#MainWindowModel.get_stack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel.get_stack" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stack_uuid</strong> – The unique ID of the stack that will be retrieved.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>:return The QDockWidget that contains the Stack Visualiser.</dt><dd><p>For direct access to the Stack Visualiser widget use
+get_stack_visualiser</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel.get_stack_visualiser">
+<code class="sig-name descname">get_stack_visualiser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stack_uuid</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/main/model.html#MainWindowModel.get_stack_visualiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel.get_stack_visualiser" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stack_uuid</strong> – The unique ID of the stack that will be retrieved.</p>
+</dd>
+</dl>
+<p>:return The Stack Visualiser widget that contains the data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel.have_active_stacks">
+<em class="property">property </em><code class="sig-name descname">have_active_stacks</code><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel.have_active_stacks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel.stack_list">
+<code class="sig-name descname">stack_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/main/model.html#MainWindowModel.stack_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel.stack_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel.stack_names">
+<code class="sig-name descname">stack_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/main/model.html#MainWindowModel.stack_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel.stack_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.main.model.MainWindowModel.stack_uuids">
+<code class="sig-name descname">stack_uuids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/main/model.html#MainWindowModel.stack_uuids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.main.model.MainWindowModel.stack_uuids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.gui.windows.main.load_dialog.html"
+                        title="previous chapter">mantidimaging.gui.windows.main.load_dialog module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.gui.windows.main.presenter.html"
+                        title="next chapter">mantidimaging.gui.windows.main.presenter module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="mantidimaging.gui.windows.main.model.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.main.presenter.html" title="mantidimaging.gui.windows.main.presenter module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.main.load_dialog.html" title="mantidimaging.gui.windows.main.load_dialog module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.gui.html" >mantidimaging.gui package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.gui.windows.html" >mantidimaging.gui.windows package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.gui.windows.main.html" >mantidimaging.gui.windows.main package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.main.model module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

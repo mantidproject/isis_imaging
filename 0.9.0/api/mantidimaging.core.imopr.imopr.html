@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.imopr.imopr module - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.imopr.opr module" href="mantidimaging.core.imopr.opr.html" />
+    <link rel="prev" title="mantidimaging.core.imopr.corwrite module" href="mantidimaging.core.imopr.corwrite.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.imopr.opr.html" title="mantidimaging.core.imopr.opr module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.imopr.corwrite.html" title="mantidimaging.core.imopr.corwrite module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.imopr.html" accesskey="U">mantidimaging.core.imopr package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.imopr.imopr module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.imopr.imopr">
+<span id="mantidimaging-core-imopr-imopr-module"></span><h1>mantidimaging.core.imopr.imopr module<a class="headerlink" href="#module-mantidimaging.core.imopr.imopr" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="mantidimaging.core.imopr.imopr.execute">
+<code class="sig-prename descclassname">mantidimaging.core.imopr.imopr.</code><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/imopr/imopr.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.imopr.imopr.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the image operator.</p>
+<p>This allows performing operations on single images, or specified images
+slices.</p>
+<p>This mode respects –indices &lt;start&gt; &lt;stop&gt; &lt;step&gt;.</p>
+<p>This means the operations will be performed only on the indices you have
+specified.</p>
+<dl>
+<dt>Currently available modes, more information in each module’s file:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>cor - get the COR for a slice or multiple slices using tomopy</dt><dd><p>find_center.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>corwrite - output a reconstructed image for different CORs for</dt><dd><p>slices.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>TODO outdated:
+- recon - do a reconstruction on a single or multiple slices, –imopr 1</p>
+<blockquote>
+<div><p>recon, –imopr 10 34 recon</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>sino - visualise the sinogram for single or multiple slices, –imopr</dt><dd><p>1 sino, –imopr 10 34 sino</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>vis - just visualise the single or multiple images, –imopr 1 vis,</dt><dd><p>–imopr 10 34 vis</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>corvo - get the COR for a slice or multiple slices using</dt><dd><p>tomopy find_center_vo, –imopr 1 corvo, –imopr 10 34 corvo</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>corpc - get the COR for a slice or multiple slices using</dt><dd><p>tomopy find_center_pc, –imopr 1 corpc, –imopr 10 34 corpc</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>opr - do operations on 2 images, that can be:</dt><dd><p>sum(also +), –imopr 1 3 sum, –imopr 10 34 +
+subtract(also sub, -), –imopr 1 3 sub, –imopr 10 34 -
+divide(also div, /), –imopr 1 3 div, –imopr 10 34 /
+multiply(also mul, <a href="#id1"><span class="problematic" id="id2">*</span></a>), –imopr 1 3 mul, –imopr 10 34 *
+mean(also avg, x), –imopr 1 3 avg, –imopr 10 34 x</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>COR functions reference:
+<a class="reference external" href="http://tomopy.readthedocs.io/en/latest/api/tomopy.recon.rotation.html">http://tomopy.readthedocs.io/en/latest/api/tomopy.recon.rotation.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.imopr.imopr.get_available_operators">
+<code class="sig-prename descclassname">mantidimaging.core.imopr.imopr.</code><code class="sig-name descname">get_available_operators</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/imopr/imopr.html#get_available_operators"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.imopr.imopr.get_available_operators" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.imopr.imopr.get_function">
+<code class="sig-prename descclassname">mantidimaging.core.imopr.imopr.</code><code class="sig-name descname">get_function</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/imopr/imopr.html#get_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.imopr.imopr.get_function" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.imopr.corwrite.html"
+                        title="previous chapter">mantidimaging.core.imopr.corwrite module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.imopr.opr.html"
+                        title="next chapter">mantidimaging.core.imopr.opr module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="mantidimaging.core.imopr.imopr.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.imopr.opr.html" title="mantidimaging.core.imopr.opr module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.imopr.corwrite.html" title="mantidimaging.core.imopr.corwrite module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.imopr.html" >mantidimaging.core.imopr package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.imopr.imopr module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

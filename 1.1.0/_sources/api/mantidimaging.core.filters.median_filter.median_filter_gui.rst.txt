@@ -1,0 +1,7 @@
+mantidimaging.core.filters.median\_filter.median\_filter\_gui module
+====================================================================
+
+.. automodule:: mantidimaging.core.filters.median_filter.median_filter_gui
+   :members:
+   :undoc-members:
+   :show-inheritance:

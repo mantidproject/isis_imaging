@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Documentation - MantidImaging 2.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Conda Packaging and Docker images" href="conda_packaging_and_docker_image.html" />
+    <link rel="prev" title="Developer Guide" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="conda_packaging_and_docker_image.html" title="Conda Packaging and Docker images"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Developer Guide"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Documentation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
+<p>The documents are written in RST and generated with Sphinx, the build is
+performed via the Sphinx integration with setuptools.</p>
+<p>The most recent release of Sphinx can be installed from PyPI via <code class="code docutils literal notranslate"><span class="pre">pip</span>
+<span class="pre">install</span> <span class="pre">sphinx</span></code> (the version available via the Ubuntu repositories does not
+include all extensions that are required to build the documentation).</p>
+<p>The documentation is version controlled along with the code, therefore it is
+beneficial to make relevant changes to the documentation as the code is
+modified.</p>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>TL;DR <code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">create</span> <span class="pre">-n</span> <span class="pre">mantidimaging</span> <span class="pre">-c</span> <span class="pre">conda-forge</span> <span class="pre">-c</span> <span class="pre">mantid/label/deps</span> <span class="pre">--only-deps</span> <span class="pre">mantidimaging</span> <span class="pre">&amp;&amp;</span> <span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">mantidimaging</span></code></p>
+<p>Setting up the correct environment requires installing a “deps” or dependencies
+package, hosted in the Anaconda repository. This requires using the channel and the label <code class="code docutils literal notranslate"><span class="pre">deps</span></code>.
+Additionally the channel <code class="code docutils literal notranslate"><span class="pre">conda-forge</span></code> is needed to supply some of the dependencies.</p>
+<p>The command for that is as follows:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">create</span> <span class="pre">-n</span> <span class="pre">mantidimaging</span> <span class="pre">-c</span> <span class="pre">conda-forge</span> <span class="pre">-c</span> <span class="pre">mantid/label/deps</span> <span class="pre">--only-deps</span> <span class="pre">mantidimaging</span></code></p>
+<p>This will create an environment called <code class="code docutils literal notranslate"><span class="pre">mantidimaging</span></code>, with the <code class="code docutils literal notranslate"><span class="pre">-n</span> <span class="pre">mantidimaging</span></code> flag.
+It also specifies the <code class="code docutils literal notranslate"><span class="pre">conda-forge</span></code> channel, and the <code class="code docutils literal notranslate"><span class="pre">deps</span></code> label using <code class="code docutils literal notranslate"><span class="pre">-c</span> <span class="pre">mantid/label/deps</span></code>.
+It will only install the dependencies by using the <code class="code docutils literal notranslate"><span class="pre">--only-deps</span></code> flag.</p>
+<p>Afterwards the environment needs to be activated. This is done with:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">mantidimaging</span></code></p>
+</section>
+<section id="workflow">
+<h2>Workflow<a class="headerlink" href="#workflow" title="Permalink to this headline">¶</a></h2>
+<p>TL;DR of building the documentation.</p>
+<p>Run the commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">docs_api</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">docs</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">docs</span> <span class="o">-</span><span class="n">b</span> <span class="n">qthelp</span>
+</pre></div>
+</div>
+<p>If you also want to publish the docs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">docs_publish</span>
+</pre></div>
+</div>
+</section>
+<section id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<p>The API documentation must be generated prior to building the documentation.
+This is done with the command: <code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">docs_api</span></code>.</p>
+</section>
+<section id="html">
+<h2>HTML<a class="headerlink" href="#html" title="Permalink to this headline">¶</a></h2>
+<p>The HTML pages can be built using <code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">docs</span></code>, which will build
+the documentation in <code class="code docutils literal notranslate"><span class="pre">docs/build.html</span></code>.</p>
+<p>There is a setuptools command configured to deploy the documentation to GitHub
+Pages where it will be visible at <a class="reference external" href="https://mantidproject.github.io/mantidimaging">https://mantidproject.github.io/mantidimaging</a></p>
+<p>This can be done via the command <code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">docs_publish</span></code>.  This
+assumes you are using SSH as your Git push protocol, if you are not you may
+specify an alternative remote URL using the <code class="code docutils literal notranslate"><span class="pre">-r</span></code> argument.</p>
+</section>
+<section id="qthelp">
+<h2>QtHelp<a class="headerlink" href="#qthelp" title="Permalink to this headline">¶</a></h2>
+<p>It is also possible to use Sphinx to build the documentation as a Qt Help
+project.</p>
+<p>This can be done  with the command: <code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">docs</span> <span class="pre">-b</span> <span class="pre">qthelp</span></code>.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Documentation</a><ul>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#workflow">Workflow</a></li>
+<li><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+<li><a class="reference internal" href="#html">HTML</a></li>
+<li><a class="reference internal" href="#qthelp">QtHelp</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Developer Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="conda_packaging_and_docker_image.html"
+                        title="next chapter">Conda Packaging and Docker images</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/developer_guide/documentation.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/developer_guide/documentation.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/developer_guide/documentation.html">1.1.0</a></li>
+  <li><a href="documentation.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/developer_guide/documentation.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="conda_packaging_and_docker_image.html" title="Conda Packaging and Docker images"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Developer Guide"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Documentation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

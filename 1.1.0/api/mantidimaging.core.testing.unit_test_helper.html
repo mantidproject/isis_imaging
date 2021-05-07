@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.testing.unit_test_helper module - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.tools package" href="mantidimaging.core.tools.html" />
+    <link rel="prev" title="mantidimaging.core.testing.file_outputting_test_case module" href="mantidimaging.core.testing.file_outputting_test_case.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.tools.html" title="mantidimaging.core.tools package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.testing.file_outputting_test_case.html" title="mantidimaging.core.testing.file_outputting_test_case module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.testing.html" accesskey="U">mantidimaging.core.testing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.testing.unit_test_helper module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.testing.unit_test_helper">
+<span id="mantidimaging-core-testing-unit-test-helper-module"></span><h1>mantidimaging.core.testing.unit_test_helper module<a class="headerlink" href="#module-mantidimaging.core.testing.unit_test_helper" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.core.testing.unit_test_helper.IgnoreOutputStreams">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">IgnoreOutputStreams</code><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#IgnoreOutputStreams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.IgnoreOutputStreams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.assert_files_exist">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">assert_files_exist</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cls</span></em>, <em class="sig-param"><span class="n">base_name</span></em>, <em class="sig-param"><span class="n">file_extension</span></em>, <em class="sig-param"><span class="n">file_extension_separator</span><span class="o">=</span><span class="default_value">'.'</span></em>, <em class="sig-param"><span class="n">single_file</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">num_images</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#assert_files_exist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.assert_files_exist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts that a file exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> – Must be a unittest.TestCase class, in order to use the
+assertTrue</p></li>
+<li><p><strong>base_name</strong> – The base name of the filename.</p></li>
+<li><p><strong>file_extension</strong> – The expected extension</p></li>
+<li><p><strong>file_extension_separator</strong> – The extension separator. It should
+normally always be ‘.’</p></li>
+<li><p><strong>single_file</strong> – Are we looking for a ‘stack’ of images</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.assert_not_equals">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">assert_not_equals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">numpy_ndarray1</span></em>, <em class="sig-param"><span class="n">numpy_ndarray2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#assert_not_equals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.assert_not_equals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert equality for numpy ndarrays using the numpy testing library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>numpy_ndarray1</strong> – The left side of the comparison</p></li>
+<li><p><strong>numpy_ndarray2</strong> – The right side of the comparison</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.debug">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">debug</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">switch</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.debug" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.deepcopy">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">deepcopy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#deepcopy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.deepcopy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.gen_empty_shared_array">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">gen_empty_shared_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shape</span><span class="o">=</span><span class="default_value">(10, 8, 10)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#gen_empty_shared_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.gen_empty_shared_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.gen_img_numpy_rand">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">gen_img_numpy_rand</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shape</span><span class="o">=</span><span class="default_value">(10, 8, 10)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#gen_img_numpy_rand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.gen_img_numpy_rand" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.gen_img_shared_array">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">gen_img_shared_array</code><span class="sig-paren">(</span><em class="sig-param">shape=(10</em>, <em class="sig-param">8</em>, <em class="sig-param">10)</em>, <em class="sig-param">dtype=&lt;class 'numpy.float32'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#gen_img_shared_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.gen_img_shared_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.gen_img_shared_array_and_copy">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">gen_img_shared_array_and_copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shape</span><span class="o">=</span><span class="default_value">(10, 8, 10)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#gen_img_shared_array_and_copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.gen_img_shared_array_and_copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.gen_img_shared_array_with_val">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">gen_img_shared_array_with_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">shape</span><span class="o">=</span><span class="default_value">(10, 8, 10)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#gen_img_shared_array_with_val"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.gen_img_shared_array_with_val" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.generate_images_class_random_shared_array">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">generate_images_class_random_shared_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shape</span><span class="o">=</span><span class="default_value">(10, 8, 10)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#generate_images_class_random_shared_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.generate_images_class_random_shared_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.mock_property">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">mock_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">object_property</span></em>, <em class="sig-param"><span class="n">property_return_value</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#mock_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.mock_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mock a property of the object. This is a helper function to work around the
+limitations of mocking a property with different return values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> – The object whose property will be mocked.</p></li>
+<li><p><strong>object_property</strong> – The property that will be mocked as a string.</p></li>
+<li><p><strong>property_return_value</strong> – The expected return value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The PropertyMock object that you can do assertions with</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.shared_deepcopy">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">shared_deepcopy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#shared_deepcopy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.shared_deepcopy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.switch_mp_off">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">switch_mp_off</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#switch_mp_off"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.switch_mp_off" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function does very bad things that should never be replicated.
+But it’s a unit test so it’s fine.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.switch_mp_on">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">switch_mp_on</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#switch_mp_on"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.switch_mp_on" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function does very bad things that should never be replicated.
+But it’s a unit test so it’s fine.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.testing.unit_test_helper.vsdebug">
+<code class="sig-prename descclassname">mantidimaging.core.testing.unit_test_helper.</code><code class="sig-name descname">vsdebug</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/testing/unit_test_helper.html#vsdebug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.testing.unit_test_helper.vsdebug" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.testing.file_outputting_test_case.html"
+                        title="previous chapter">mantidimaging.core.testing.file_outputting_test_case module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.tools.html"
+                        title="next chapter">mantidimaging.core.tools package</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="mantidimaging.core.testing.unit_test_helper.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.tools.html" title="mantidimaging.core.tools package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.testing.file_outputting_test_case.html" title="mantidimaging.core.testing.file_outputting_test_case module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.testing.html" >mantidimaging.core.testing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.testing.unit_test_helper module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

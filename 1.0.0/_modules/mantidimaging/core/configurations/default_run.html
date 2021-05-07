@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.configurations.default_run - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.configurations.default_run</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.configurations.default_run</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging</span> <span class="kn">import</span> <span class="n">helper</span> <span class="k">as</span> <span class="n">h</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.configurations</span> <span class="kn">import</span> <span class="n">default_filtering</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.io</span> <span class="kn">import</span> <span class="n">loader</span><span class="p">,</span> <span class="n">saver</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.tools</span> <span class="kn">import</span> <span class="n">importer</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility</span> <span class="kn">import</span> <span class="n">cor_interpolate</span><span class="p">,</span> <span class="n">size_calculator</span>
+
+
+<span class="k">def</span> <span class="nf">_print_expected_memory_usage</span><span class="p">(</span><span class="n">data_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+    <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Predicted memory usage for data: </span><span class="si">{0}</span><span class="s2"> MB&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">size_calculator</span><span class="o">.</span><span class="n">full_size_MB</span><span class="p">(</span><span class="n">data_shape</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)))</span>
+
+
+<div class="viewcode-block" id="initialise_run"><a class="viewcode-back" href="../../../../api/mantidimaging.core.configurations.default_run.html#mantidimaging.core.configurations.default_run.initialise_run">[docs]</a><span class="k">def</span> <span class="nf">initialise_run</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">saver_class</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">Saver</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">h</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">saver_class</span><span class="p">)</span>
+    <span class="n">h</span><span class="o">.</span><span class="n">run_import_checks</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">h</span><span class="o">.</span><span class="n">check_config_integrity</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># import early to check if tool is available</span>
+    <span class="n">tool</span> <span class="o">=</span> <span class="n">importer</span><span class="o">.</span><span class="n">timed_import</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># create directory, or throw if not empty and no --overwrite-all</span>
+    <span class="c1"># we get the output path from the saver, because</span>
+    <span class="c1"># that expands variables and gets the absolute path</span>
+    <span class="n">saver</span><span class="o">.</span><span class="n">make_dirs_if_needed</span><span class="p">(</span><span class="n">saver_class</span><span class="o">.</span><span class="n">get_output_path</span><span class="p">(),</span>
+                              <span class="n">saver_class</span><span class="o">.</span><span class="n">_overwrite_all</span><span class="p">)</span>
+
+    <span class="n">data_shape</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">read_in_shape_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">_print_expected_memory_usage</span><span class="p">(</span><span class="n">data_shape</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">data_dtype</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">saver_class</span><span class="p">,</span> <span class="n">tool</span></div>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../api/mantidimaging.core.configurations.default_run.html#mantidimaging.core.configurations.default_run.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run the whole reconstruction. The steps in the process are:</span>
+<span class="sd">        - load the data</span>
+<span class="sd">        - do pre_processing on the data</span>
+<span class="sd">        - (optional) save out pre_processing images</span>
+<span class="sd">        - do the reconstruction with the appropriate tool</span>
+<span class="sd">        - save out reconstruction images</span>
+
+<span class="sd">    The configuration for pre_processing and reconstruction are read from</span>
+<span class="sd">    the config parameter.</span>
+
+<span class="sd">    :param config: A ReconstructionConfig with all the necessary parameters to</span>
+<span class="sd">                   run a reconstruction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">saver_class</span><span class="p">,</span> <span class="n">tool</span> <span class="o">=</span> <span class="n">initialise_run</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">images</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">sample</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span> <span class="o">=</span> <span class="n">default_filtering</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">config</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">flat</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">dark</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">reconstruction</span><span class="p">:</span>
+        <span class="n">saver_class</span><span class="o">.</span><span class="n">save_preproc_images</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+        <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Skipping reconstruction because no &quot;</span>
+                                 <span class="s2">&quot;--reconstruction flag was passed.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sample</span>
+
+    <span class="n">cors</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span>
+    <span class="c1"># if they&#39;re the same length then we have a COR for each slice, so we don&#39;t</span>
+    <span class="c1"># have to generate anything</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cors</span><span class="p">)</span> <span class="o">!=</span> <span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="c1"># interpolate the CORs</span>
+        <span class="n">cor_slices</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cor_slices</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">cors</span> <span class="o">=</span> <span class="n">cor_interpolate</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                   <span class="n">cor_slices</span><span class="p">,</span> <span class="n">cors</span><span class="p">)</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">run_reconstruct</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="n">saver_class</span><span class="o">.</span><span class="n">save_recon_output</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sample</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="default_run.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.configurations.default_run</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

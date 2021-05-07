@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.tomopy\_recon.presenter module
+========================================================
+
+.. automodule:: mantidimaging.gui.windows.tomopy_recon.presenter
+   :members:
+   :undoc-members:
+   :show-inheritance:

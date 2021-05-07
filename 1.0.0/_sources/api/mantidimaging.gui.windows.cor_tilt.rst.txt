@@ -1,0 +1,26 @@
+mantidimaging.gui.windows.cor\_tilt package
+===========================================
+
+.. automodule:: mantidimaging.gui.windows.cor_tilt
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.cor_tilt.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.cor_tilt.model
+   mantidimaging.gui.windows.cor_tilt.point_table_model
+   mantidimaging.gui.windows.cor_tilt.presenter
+   mantidimaging.gui.windows.cor_tilt.view

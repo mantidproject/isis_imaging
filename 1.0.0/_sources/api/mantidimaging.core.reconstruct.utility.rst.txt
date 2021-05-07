@@ -1,0 +1,7 @@
+mantidimaging.core.reconstruct.utility module
+=============================================
+
+.. automodule:: mantidimaging.core.reconstruct.utility
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Immage Operator (imopr) mode - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Python Interface" href="../python/index.html" />
+    <link rel="prev" title="Converting images" href="convert.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../python/index.html" title="Python Interface"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="convert.html" title="Converting images"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Command Line</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Immage Operator (imopr) mode</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="immage-operator-imopr-mode">
+<h1>Immage Operator (imopr) mode<a class="headerlink" href="#immage-operator-imopr-mode" title="Permalink to this headline">¶</a></h1>
+<p>This mode helps find the COR of a sample.</p>
+<p>It also only operates on sinograms! If your images a radiograms, use the
+<code class="code docutils literal notranslate"><span class="pre">--convert</span> <span class="pre">--swap-axes</span></code> option, which will convert the data to sinograms.</p>
+<p>There are 2 main ways to find CORs on a sample; automatic and manual.</p>
+<section id="automatic">
+<h2>Automatic<a class="headerlink" href="#automatic" title="Permalink to this headline">¶</a></h2>
+<p>Automatic COR finding using <code class="code docutils literal notranslate"><span class="pre">--imopr</span> <span class="pre">&lt;start_slice&gt;</span> <span class="pre">&lt;end_slice&gt;</span> <span class="pre">&lt;step&gt;</span>
+<span class="pre">cor</span></code>.</p>
+<p>This will automatically find the COR guess on each of the slices you have
+specified.</p>
+<p>Example usage:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/data/</span> <span class="pre">--imopr</span> <span class="pre">100</span> <span class="pre">500</span> <span class="pre">50</span> <span class="pre">cor</span></code></p>
+<p>This will find the COR for every 50 slices, and print it out on the screen.</p>
+</section>
+<section id="manual">
+<h2>Manual<a class="headerlink" href="#manual" title="Permalink to this headline">¶</a></h2>
+<p>Manual COR finding using <code class="code docutils literal notranslate"><span class="pre">corwrite</span></code>, for this mode
+<code class="code docutils literal notranslate"><span class="pre">-o/--output-path</span></code> <strong>MUST</strong> be specified:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>For a single slice: <code class="code docutils literal notranslate"><span class="pre">--imopr</span> <span class="pre">&lt;slice_index&gt;</span> <span class="pre">&lt;start_cor&gt;</span> <span class="pre">&lt;end_cor&gt;</span>
+<span class="pre">&lt;step_for_cor&gt;</span> <span class="pre">corwrite</span></code></p></li>
+<li><p>For multiple slices: <code class="code docutils literal notranslate"><span class="pre">--imopr</span> <span class="pre">&lt;slice_start&gt;</span> <span class="pre">&lt;slice_end&gt;</span> <span class="pre">&lt;slice_step&gt;</span>
+<span class="pre">&lt;start_cor&gt;</span> <span class="pre">&lt;end_cor&gt;</span> <span class="pre">&lt;step_for_cor&gt;</span> <span class="pre">corwrite</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>Example usages:</p>
+<ul>
+<li><p>Single slice:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/data</span> <span class="pre">-o</span> <span class="pre">/some/data</span> <span class="pre">--imopr</span> <span class="pre">42</span> <span class="pre">250</span> <span class="pre">350</span> <span class="pre">10</span>
+<span class="pre">corwrite</span></code></p>
+</li>
+</ul>
+<p>This will reconstruct slice 42, with CORs starting from 250 up to 350, with a
+step of 10.</p>
+<p>The output will be a single folder with the name of the angle number (in this
+case it will be a folder with name <code class="code docutils literal notranslate"><span class="pre">42</span></code>), and inside it will save a
+reconstructed image for every COR.</p>
+<ul>
+<li><p>Multiple slices:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/data</span> <span class="pre">-o</span> <span class="pre">/some/data</span> <span class="pre">--imopr</span> <span class="pre">100</span> <span class="pre">500</span> <span class="pre">50</span> <span class="pre">250</span> <span class="pre">350</span> <span class="pre">10</span>
+<span class="pre">corwrite</span></code></p>
+</li>
+</ul>
+<p>This will reconstruct every 50 slices between 100 and 500, with the same COR
+range as the single slice: starting from 250 to 350, with a step of 10.</p>
+<p>The output will be a folder for <em>each</em> angle, with an image for <em>each</em> COR.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Immage Operator (imopr) mode</a><ul>
+<li><a class="reference internal" href="#automatic">Automatic</a></li>
+<li><a class="reference internal" href="#manual">Manual</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="convert.html"
+                        title="previous chapter">Converting images</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../python/index.html"
+                        title="next chapter">Python Interface</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../index.html">Latest</a></li>
+  <li><a href="imopr.html">0.9.0</a></li>
+  <li><a href="../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../python/index.html" title="Python Interface"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="convert.html" title="Converting images"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Command Line</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Immage Operator (imopr) mode</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

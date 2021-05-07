@@ -1,0 +1,7 @@
+mantidimaging.gui.utility.qt\_helpers module
+============================================
+
+.. automodule:: mantidimaging.gui.utility.qt_helpers
+   :members:
+   :undoc-members:
+   :show-inheritance:

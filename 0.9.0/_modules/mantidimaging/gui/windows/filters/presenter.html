@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.windows.filters.presenter - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.filters.presenter</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.windows.filters.presenter</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.histogram</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">generate_histogram_from_image</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.mvp_base</span> <span class="kn">import</span> <span class="n">BasePresenter</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.windows.stack_visualiser</span> <span class="kn">import</span> <span class="n">Parameters</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.utility</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">BlockQtSignals</span><span class="p">,</span> <span class="n">get_auto_params_from_stack</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">.model</span> <span class="kn">import</span> <span class="n">FiltersWindowModel</span>
+
+
+<div class="viewcode-block" id="Notification"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.Notification">[docs]</a><span class="k">class</span> <span class="nc">Notification</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">REGISTER_ACTIVE_FILTER</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">APPLY_FILTER</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">UPDATE_PREVIEWS</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">SCROLL_PREVIEW_UP</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">SCROLL_PREVIEW_DOWN</span> <span class="o">=</span> <span class="mi">5</span></div>
+
+
+<div class="viewcode-block" id="FiltersWindowPresenter"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.FiltersWindowPresenter">[docs]</a><span class="k">class</span> <span class="nc">FiltersWindowPresenter</span><span class="p">(</span><span class="n">BasePresenter</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">main_window</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FiltersWindowPresenter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">FiltersWindowModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_window</span> <span class="o">=</span> <span class="n">main_window</span>
+
+<div class="viewcode-block" id="FiltersWindowPresenter.notify"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.FiltersWindowPresenter.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">REGISTER_ACTIVE_FILTER</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_register_active_filter</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">APPLY_FILTER</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_apply_filter</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">UPDATE_PREVIEWS</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_update_previews</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">SCROLL_PREVIEW_UP</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_scroll_preview</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">SCROLL_PREVIEW_DOWN</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_scroll_preview</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Notification handler failed&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_preview_image_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">num_images_in_stack</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FiltersWindowPresenter.set_stack_uuid"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.FiltersWindowPresenter.set_stack_uuid">[docs]</a>    <span class="k">def</span> <span class="nf">set_stack_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_stack</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">main_window</span><span class="o">.</span><span class="n">get_stack_visualiser</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">uuid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FiltersWindowPresenter.set_stack"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.FiltersWindowPresenter.set_stack">[docs]</a>    <span class="k">def</span> <span class="nf">set_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stack</span><span class="p">):</span>
+        <span class="c1"># Disconnect ROI update singal from previous stack</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">stack</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">roi_updated</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_roi_selection</span><span class="p">)</span>
+
+        <span class="c1"># Connect ROI update signal to newly selected stack</span>
+        <span class="k">if</span> <span class="n">stack</span><span class="p">:</span>
+            <span class="n">stack</span><span class="o">.</span><span class="n">roi_updated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_roi_selection</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="n">stack</span>
+
+        <span class="c1"># Update the preview image index</span>
+        <span class="k">with</span> <span class="n">BlockQtSignals</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_preview_image_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">previewImageIndex</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_preview_image_idx</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_update_previews</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FiltersWindowPresenter.handle_roi_selection"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.FiltersWindowPresenter.handle_roi_selection">[docs]</a>    <span class="k">def</span> <span class="nf">handle_roi_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">roi</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_uses_auto_property</span><span class="p">(</span><span class="n">Parameters</span><span class="o">.</span><span class="n">ROI</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">auto_update_triggered</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FiltersWindowPresenter.set_preview_image_index"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.FiltersWindowPresenter.set_preview_image_index">[docs]</a>    <span class="k">def</span> <span class="nf">set_preview_image_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the current preview image index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">preview_image_idx</span> <span class="o">=</span> <span class="n">image_idx</span>
+
+        <span class="c1"># Set preview index spin box to new index</span>
+        <span class="n">preview_idx_spin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">previewImageIndex</span>
+        <span class="k">with</span> <span class="n">BlockQtSignals</span><span class="p">([</span><span class="n">preview_idx_spin</span><span class="p">]):</span>
+            <span class="n">preview_idx_spin</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">preview_image_idx</span><span class="p">)</span>
+
+        <span class="c1"># Trigger preview updating</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">auto_update_triggered</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FiltersWindowPresenter.do_register_active_filter"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.FiltersWindowPresenter.do_register_active_filter">[docs]</a>    <span class="k">def</span> <span class="nf">do_register_active_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">filter_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">filterSelector</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+
+        <span class="c1"># Get registration function for new filter</span>
+        <span class="n">register_func</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">filter_registration_func</span><span class="p">(</span><span class="n">filter_idx</span><span class="p">)</span>
+
+        <span class="c1"># Register new filter (adding it&#39;s property widgets to the properties</span>
+        <span class="c1"># layout)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setup_filter</span><span class="p">(</span>
+                <span class="n">register_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">filterPropertiesLayout</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">auto_update_triggered</span><span class="o">.</span><span class="n">emit</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="FiltersWindowPresenter.filter_uses_auto_property"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.FiltersWindowPresenter.filter_uses_auto_property">[docs]</a>    <span class="k">def</span> <span class="nf">filter_uses_auto_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">auto_props</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">auto_props</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="FiltersWindowPresenter.do_apply_filter"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.FiltersWindowPresenter.do_apply_filter">[docs]</a>    <span class="k">def</span> <span class="nf">do_apply_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">do_apply_filter</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FiltersWindowPresenter.do_update_previews"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.FiltersWindowPresenter.do_update_previews">[docs]</a>    <span class="k">def</span> <span class="nf">do_update_previews</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maintain_axes</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">()</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">task_name</span> <span class="o">=</span> <span class="s1">&#39;Filter preview&#39;</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">add_estimated_steps</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Getting stack&#39;</span><span class="p">)</span>
+            <span class="n">stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">stack_presenter</span>
+
+            <span class="c1"># If there is no stack then clear the preview area</span>
+            <span class="k">if</span> <span class="n">stack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">clear_preview_plots</span><span class="p">()</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Add the remaining steps for calculating the preview</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">add_estimated_steps</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+
+                <span class="n">before_image_data</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">get_image</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">preview_image_idx</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">maintain_axes</span><span class="p">:</span>
+                    <span class="c1"># Record the image axis range from the existing preview</span>
+                    <span class="c1"># image</span>
+                    <span class="n">image_axis_ranges</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">preview_image_before</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">(),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">preview_image_before</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+                    <span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">preview_image_before</span><span class="o">.</span><span class="n">images</span> <span class="k">else</span> <span class="kc">None</span>
+
+                <span class="c1"># Update image before</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_update_preview_image</span><span class="p">(</span>
+                        <span class="n">before_image_data</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">preview_image_before</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">preview_histogram_before</span><span class="p">,</span>
+                        <span class="n">progress</span><span class="p">)</span>
+
+                <span class="c1"># Generate sub-stack and run filter</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Running preview filter&#39;</span><span class="p">)</span>
+                <span class="n">exec_kwargs</span> <span class="o">=</span> <span class="n">get_auto_params_from_stack</span><span class="p">(</span>
+                        <span class="n">stack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">auto_props</span><span class="p">)</span>
+
+                <span class="n">filtered_image_data</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">sub_images</span> <span class="o">=</span> <span class="n">Images</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">before_image_data</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">apply_filter</span><span class="p">(</span><span class="n">sub_images</span><span class="p">,</span> <span class="n">exec_kwargs</span><span class="p">)</span>
+                    <span class="n">filtered_image_data</span> <span class="o">=</span> <span class="n">sub_images</span><span class="o">.</span><span class="n">sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="s2">&quot;Error applying filter for preview: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+                <span class="c1"># Update image after</span>
+                <span class="k">if</span> <span class="n">filtered_image_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_update_preview_image</span><span class="p">(</span>
+                            <span class="n">filtered_image_data</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">preview_image_after</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">preview_histogram_after</span><span class="p">,</span>
+                            <span class="n">progress</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">maintain_axes</span><span class="p">:</span>
+                    <span class="c1"># Set the axis range on the newly created image to keep</span>
+                    <span class="c1"># same zoom level/pan region</span>
+                    <span class="k">if</span> <span class="n">image_axis_ranges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">preview_image_before</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span>
+                                <span class="n">image_axis_ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">preview_image_before</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span>
+                                <span class="n">image_axis_ranges</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1"># Redraw</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Redraw canvas&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_update_preview_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_data</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">histogram</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="c1"># Generate histogram data</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Generating histogram&#39;</span><span class="p">)</span>
+        <span class="n">center</span><span class="p">,</span> <span class="n">hist</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">generate_histogram_from_image</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+
+        <span class="c1"># Update image</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Updating image&#39;</span><span class="p">)</span>
+        <span class="c1"># TODO: ideally this should update the data without replotting but a</span>
+        <span class="c1"># valid image must exist to start with (which may not always happen)</span>
+        <span class="c1"># and this only works as long as the extents do not change.</span>
+        <span class="n">image</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+        <span class="n">image</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image_data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">cmap</span><span class="p">)</span>
+
+        <span class="c1"># Update histogram</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Updating histogram&#39;</span><span class="p">)</span>
+        <span class="n">histogram</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">hist</span><span class="p">)</span>
+        <span class="n">histogram</span><span class="o">.</span><span class="n">relim</span><span class="p">()</span>
+        <span class="n">histogram</span><span class="o">.</span><span class="n">autoscale</span><span class="p">()</span>
+
+<div class="viewcode-block" id="FiltersWindowPresenter.do_scroll_preview"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.filters.presenter.html#mantidimaging.gui.windows.filters.presenter.FiltersWindowPresenter.do_scroll_preview">[docs]</a>    <span class="k">def</span> <span class="nf">do_scroll_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">preview_image_idx</span> <span class="o">+</span> <span class="n">offset</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_preview_image_idx</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_preview_image_index</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="presenter.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.filters.presenter</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

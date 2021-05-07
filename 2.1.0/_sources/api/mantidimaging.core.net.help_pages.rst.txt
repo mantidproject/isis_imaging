@@ -1,0 +1,7 @@
+mantidimaging.core.net.help\_pages module
+=========================================
+
+.. automodule:: mantidimaging.core.net.help_pages
+   :members:
+   :undoc-members:
+   :show-inheritance:

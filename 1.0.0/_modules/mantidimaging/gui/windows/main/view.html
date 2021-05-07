@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.windows.main.view - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.main.view</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.windows.main.view</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtWidgets</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.mvp_base</span> <span class="kn">import</span> <span class="n">BaseMainWindowView</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.windows.cor_tilt</span> <span class="kn">import</span> <span class="n">CORTiltWindowView</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.windows.filters</span> <span class="kn">import</span> <span class="n">FiltersWindowView</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.windows.stack_visualiser</span> <span class="kn">import</span> <span class="n">StackVisualiserView</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.windows.tomopy_recon</span> <span class="kn">import</span> <span class="n">TomopyReconWindowView</span>
+
+<span class="kn">from</span> <span class="nn">.load_dialog</span> <span class="kn">import</span> <span class="n">MWLoadDialog</span>
+<span class="kn">from</span> <span class="nn">.presenter</span> <span class="kn">import</span> <span class="n">MainWindowPresenter</span>
+<span class="kn">from</span> <span class="nn">.presenter</span> <span class="kn">import</span> <span class="n">Notification</span> <span class="k">as</span> <span class="n">PresNotification</span>
+<span class="kn">from</span> <span class="nn">.save_dialog</span> <span class="kn">import</span> <span class="n">MWSaveDialog</span>
+
+
+<div class="viewcode-block" id="MainWindowView"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView">[docs]</a><span class="k">class</span> <span class="nc">MainWindowView</span><span class="p">(</span><span class="n">BaseMainWindowView</span><span class="p">):</span>
+
+    <span class="n">active_stacks_changed</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MainWindowView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;gui/ui/main_window.ui&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">WA_DeleteOnClose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;MantidImaging&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span> <span class="o">=</span> <span class="n">MainWindowPresenter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_shortcuts</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_shortcuts</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MainWindowView.setup_shortcuts"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.setup_shortcuts">[docs]</a>    <span class="k">def</span> <span class="nf">setup_shortcuts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionLoad</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">show_load_dialogue</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSave</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">show_save_dialogue</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionExit</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionOnlineDocumentation</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">open_online_documentation</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionCorTilt</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">show_cor_tilt_window</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionImageOperations</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">show_filters_window</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionTomopyRecon</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">show_tomopy_recon_window</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_stacks_changed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_shortcuts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainWindowView.update_shortcuts"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.update_shortcuts">[docs]</a>    <span class="k">def</span> <span class="nf">update_shortcuts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSave</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">stack_names</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainWindowView.open_online_documentation"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.open_online_documentation">[docs]</a>    <span class="k">def</span> <span class="nf">open_online_documentation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QUrl</span><span class="p">(</span><span class="s1">&#39;https://mantidproject.github.io/mantidimaging/&#39;</span><span class="p">)</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QDesktopServices</span><span class="o">.</span><span class="n">openUrl</span><span class="p">(</span><span class="n">url</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainWindowView.show_load_dialogue"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.show_load_dialogue">[docs]</a>    <span class="k">def</span> <span class="nf">show_load_dialogue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_dialogue</span> <span class="o">=</span> <span class="n">MWLoadDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_dialogue</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainWindowView.execute_save"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.execute_save">[docs]</a>    <span class="k">def</span> <span class="nf">execute_save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">PresNotification</span><span class="o">.</span><span class="n">SAVE</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainWindowView.execute_load"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.execute_load">[docs]</a>    <span class="k">def</span> <span class="nf">execute_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">PresNotification</span><span class="o">.</span><span class="n">LOAD</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainWindowView.show_save_dialogue"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.show_save_dialogue">[docs]</a>    <span class="k">def</span> <span class="nf">show_save_dialogue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dialogue</span> <span class="o">=</span> <span class="n">MWSaveDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack_list</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dialogue</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainWindowView.show_cor_tilt_window"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.show_cor_tilt_window">[docs]</a>    <span class="k">def</span> <span class="nf">show_cor_tilt_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">CORTiltWindowView</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainWindowView.show_filters_window"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.show_filters_window">[docs]</a>    <span class="k">def</span> <span class="nf">show_filters_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">FiltersWindowView</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainWindowView.show_tomopy_recon_window"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.show_tomopy_recon_window">[docs]</a>    <span class="k">def</span> <span class="nf">show_tomopy_recon_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">TomopyReconWindowView</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainWindowView.stack_list"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.stack_list">[docs]</a>    <span class="k">def</span> <span class="nf">stack_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">stack_list</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainWindowView.stack_names"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.stack_names">[docs]</a>    <span class="k">def</span> <span class="nf">stack_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">stack_names</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainWindowView.stack_uuids"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.stack_uuids">[docs]</a>    <span class="k">def</span> <span class="nf">stack_uuids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">stack_uuids</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainWindowView.get_stack_visualiser"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.get_stack_visualiser">[docs]</a>    <span class="k">def</span> <span class="nf">get_stack_visualiser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stack_uuid</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">get_stack_visualiser</span><span class="p">(</span><span class="n">stack_uuid</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainWindowView.create_stack_window"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.create_stack_window">[docs]</a>    <span class="k">def</span> <span class="nf">create_stack_window</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                            <span class="n">stack</span><span class="p">,</span>
+                            <span class="n">title</span><span class="p">,</span>
+                            <span class="n">position</span><span class="o">=</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">TopDockWidgetArea</span><span class="p">,</span>
+                            <span class="n">floating</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">dock_widget</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QDockWidget</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># this puts the new stack window into the centre of the window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCentralWidget</span><span class="p">(</span><span class="n">dock_widget</span><span class="p">)</span>
+
+        <span class="c1"># add the dock widget into the main window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addDockWidget</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">dock_widget</span><span class="p">)</span>
+
+        <span class="c1"># we can get the stack visualiser widget with dock_widget.widget</span>
+        <span class="n">dock_widget</span><span class="o">.</span><span class="n">setWidget</span><span class="p">(</span>
+            <span class="n">StackVisualiserView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dock_widget</span><span class="p">,</span> <span class="n">stack</span><span class="p">))</span>
+
+        <span class="c1"># proof of concept above</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">dock_widget</span><span class="o">.</span><span class="n">widget</span><span class="p">(),</span> <span class="n">StackVisualiserView</span>
+        <span class="p">),</span> <span class="s2">&quot;Widget inside dock_widget is not an StackVisualiserView!&quot;</span>
+
+        <span class="n">dock_widget</span><span class="o">.</span><span class="n">setFloating</span><span class="p">(</span><span class="n">floating</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dock_widget</span></div>
+
+<div class="viewcode-block" id="MainWindowView.remove_stack"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.remove_stack">[docs]</a>    <span class="k">def</span> <span class="nf">remove_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Removing stack with uuid </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">remove_stack</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainWindowView.closeEvent"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.main.view.html#mantidimaging.gui.windows.main.view.MainWindowView.closeEvent">[docs]</a>    <span class="k">def</span> <span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles a request to quit the application from the user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">should_close</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">presenter</span><span class="o">.</span><span class="n">have_active_stacks</span><span class="p">:</span>
+            <span class="c1"># Show confirmation box asking if the user really wants to quit if</span>
+            <span class="c1"># they have data loaded</span>
+            <span class="n">msg_box</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">question</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="p">,</span>
+                    <span class="s2">&quot;Quit&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Are you sure you want to quit?&quot;</span><span class="p">,</span>
+                    <span class="n">defaultButton</span><span class="o">=</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">No</span><span class="p">)</span>
+            <span class="n">should_close</span> <span class="o">=</span> <span class="n">msg_box</span> <span class="o">==</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span>
+
+        <span class="k">if</span> <span class="n">should_close</span><span class="p">:</span>
+            <span class="c1"># Close all matplotlib PyPlot windows when exiting.</span>
+            <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Closing all PyPlot windows&quot;</span><span class="p">)</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Pass close event to parent</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">MainWindowView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">closeEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Ignore the close event, keeping window open</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">ignore</span><span class="p">()</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="view.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.main.view</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

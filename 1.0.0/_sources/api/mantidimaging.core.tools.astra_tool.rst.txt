@@ -1,0 +1,7 @@
+mantidimaging.core.tools.astra\_tool module
+===========================================
+
+.. automodule:: mantidimaging.core.tools.astra_tool
+   :members:
+   :undoc-members:
+   :show-inheritance:

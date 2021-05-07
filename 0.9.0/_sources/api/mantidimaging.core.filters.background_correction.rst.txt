@@ -1,0 +1,24 @@
+mantidimaging.core.filters.background\_correction package
+=========================================================
+
+.. automodule:: mantidimaging.core.filters.background_correction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.background_correction.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.background_correction.background_correction
+   mantidimaging.core.filters.background_correction.background_correction_gui

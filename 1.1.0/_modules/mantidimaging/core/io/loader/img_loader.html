@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.io.loader.img_loader - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.loader.img_loader</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.io.loader.img_loader</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module handles the loading of FIT, FITS, TIF, TIFF</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.io.utility</span> <span class="kn">import</span> <span class="n">get_file_names</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">two_shared_mem</span> <span class="k">as</span> <span class="n">ptsm</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">utility</span> <span class="k">as</span> <span class="n">pu</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">stack_loader</span>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.io.loader.img_loader.html#mantidimaging.core.io.loader.img_loader.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">load_func</span><span class="p">,</span> <span class="n">input_file_names</span><span class="p">,</span> <span class="n">input_path_flat</span><span class="p">,</span> <span class="n">input_path_dark</span><span class="p">,</span>
+            <span class="n">img_format</span><span class="p">,</span> <span class="n">data_dtype</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">,</span> <span class="n">parallel_load</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span>
+            <span class="n">construct_sinograms</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads a stack of images into memory, assuming dark and flat images</span>
+<span class="sd">    are in separate directories.</span>
+
+<span class="sd">    If several files are found in the same directory (for example you</span>
+<span class="sd">    give image0001.fits and there&#39;s also image0002.fits,</span>
+<span class="sd">    image0003.fits) these will also be loaded as the usual convention</span>
+<span class="sd">    in ImageJ and related imaging tools, using the last digits to sort</span>
+<span class="sd">    the images in the stack.</span>
+
+<span class="sd">    Usual type in fits is 16-bit pixel depth, data type is denoted with:</span>
+<span class="sd">        &#39;&gt;i2&#39; - uint16</span>
+<span class="sd">        &#39;&gt;f2&#39; - float16</span>
+<span class="sd">        &#39;&gt;f4&#39; - float32</span>
+
+<span class="sd">    :return: sample, average flat image, average dark image</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Assumed that all images have the same size and properties as the first.</span>
+    <span class="n">first_sample_img</span> <span class="o">=</span> <span class="n">load_func</span><span class="p">(</span><span class="n">input_file_names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">indices</span><span class="p">:</span>
+        <span class="n">input_file_names</span> <span class="o">=</span> <span class="n">input_file_names</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">indices</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+
+    <span class="c1"># get the shape of all images</span>
+    <span class="n">img_shape</span> <span class="o">=</span> <span class="n">first_sample_img</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="c1"># forward all arguments to internal class for easy re-usage</span>
+    <span class="n">il</span> <span class="o">=</span> <span class="n">ImageLoader</span><span class="p">(</span><span class="n">load_func</span><span class="p">,</span> <span class="n">input_file_names</span><span class="p">,</span> <span class="n">input_path_flat</span><span class="p">,</span>
+                     <span class="n">input_path_dark</span><span class="p">,</span> <span class="n">img_format</span><span class="p">,</span> <span class="n">img_shape</span><span class="p">,</span> <span class="n">data_dtype</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span>
+                     <span class="n">chunksize</span><span class="p">,</span> <span class="n">parallel_load</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">construct_sinograms</span><span class="p">,</span>
+                     <span class="n">progress</span><span class="p">)</span>
+
+    <span class="c1"># we load the flat and dark first, because if they fail we don&#39;t want to</span>
+    <span class="c1"># fail after we&#39;ve loaded a big stack into memory</span>
+    <span class="n">flat_avg</span> <span class="o">=</span> <span class="n">il</span><span class="o">.</span><span class="n">load_and_avg_data</span><span class="p">(</span><span class="n">input_path_flat</span><span class="p">,</span> <span class="s2">&quot;Flat&quot;</span><span class="p">)</span>
+
+    <span class="n">dark_avg</span> <span class="o">=</span> <span class="n">il</span><span class="o">.</span><span class="n">load_and_avg_data</span><span class="p">(</span><span class="n">input_path_dark</span><span class="p">,</span> <span class="s2">&quot;Dark&quot;</span><span class="p">)</span>
+
+    <span class="n">sample_data</span> <span class="o">=</span> <span class="n">il</span><span class="o">.</span><span class="n">load_sample_data</span><span class="p">(</span><span class="n">input_file_names</span><span class="p">)</span>
+
+    <span class="c1"># if this is true, then the loaded sample data was created via the</span>
+    <span class="c1"># stack_loader</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample_data</span><span class="p">,</span> <span class="n">Images</span><span class="p">):</span>
+        <span class="n">sample_data</span> <span class="o">=</span> <span class="n">sample_data</span><span class="o">.</span><span class="n">sample</span>
+
+    <span class="k">return</span> <span class="n">Images</span><span class="p">(</span><span class="n">sample_data</span><span class="p">,</span> <span class="n">flat_avg</span><span class="p">,</span> <span class="n">dark_avg</span><span class="p">,</span> <span class="n">input_file_names</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ImageLoader"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.io.loader.img_loader.html#mantidimaging.core.io.loader.img_loader.ImageLoader">[docs]</a><span class="k">class</span> <span class="nc">ImageLoader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_func</span><span class="p">,</span> <span class="n">input_file_names</span><span class="p">,</span> <span class="n">input_path_flat</span><span class="p">,</span>
+                 <span class="n">input_path_dark</span><span class="p">,</span> <span class="n">img_format</span><span class="p">,</span> <span class="n">img_shape</span><span class="p">,</span> <span class="n">data_dtype</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span>
+                 <span class="n">chunksize</span><span class="p">,</span> <span class="n">parallel_load</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">construct_sinograms</span><span class="p">,</span>
+                 <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_func</span> <span class="o">=</span> <span class="n">load_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_file_names</span> <span class="o">=</span> <span class="n">input_file_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_path_flat</span> <span class="o">=</span> <span class="n">input_path_flat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_path_dark</span> <span class="o">=</span> <span class="n">input_path_dark</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_format</span> <span class="o">=</span> <span class="n">img_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_shape</span> <span class="o">=</span> <span class="n">img_shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dtype</span> <span class="o">=</span> <span class="n">data_dtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cores</span> <span class="o">=</span> <span class="n">cores</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunksize</span> <span class="o">=</span> <span class="n">chunksize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallel_load</span> <span class="o">=</span> <span class="n">parallel_load</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">construct_sinograms</span> <span class="o">=</span> <span class="n">construct_sinograms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress</span> <span class="o">=</span> <span class="n">progress</span>
+
+<div class="viewcode-block" id="ImageLoader.load_sample_data"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.io.loader.img_loader.html#mantidimaging.core.io.loader.img_loader.ImageLoader.load_sample_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_sample_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file_names</span><span class="p">):</span>
+        <span class="c1"># determine what the loaded data was</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># the loaded file was a single image</span>
+            <span class="n">sample_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_files</span><span class="p">(</span><span class="n">input_file_names</span><span class="p">,</span> <span class="s2">&quot;Sample&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="c1"># the loaded file was a file containing a stack of images</span>
+            <span class="n">sample_data</span> <span class="o">=</span> <span class="n">stack_loader</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_func</span><span class="p">,</span> <span class="n">input_file_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dtype</span><span class="p">,</span> <span class="s2">&quot;Sample&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cores</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunksize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_load</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span>
+                <span class="n">progress</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Data loaded has invalid shape: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_shape</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sample_data</span></div>
+
+<div class="viewcode-block" id="ImageLoader.load_and_avg_data"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.io.loader.img_loader.html#mantidimaging.core.io.loader.img_loader.ImageLoader.load_and_avg_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_and_avg_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">file_path</span><span class="p">:</span>
+            <span class="n">file_names</span> <span class="o">=</span> <span class="n">get_file_names</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_format</span><span class="p">)</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_files</span><span class="p">(</span><span class="n">file_names</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_get_data_average</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_do_files_load_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="p">,</span>
+                                            <span class="n">num_steps</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">),</span>
+                                            <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Load&#39;</span><span class="p">)</span>
+
+        <span class="n">num_images</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">add_estimated_steps</span><span class="p">(</span><span class="n">num_images</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">in_file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">_inplace_load</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">in_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_func</span><span class="p">)</span>
+                    <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Image </span><span class="si">{}</span><span class="s1"> of </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">idx</span><span class="p">,</span> <span class="n">num_images</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;An image has different width and/or height &quot;</span>
+                        <span class="s2">&quot;dimensions! All images must have the same &quot;</span>
+                        <span class="s2">&quot;dimensions. Expected dimensions: </span><span class="si">{0}</span><span class="s2"> Error &quot;</span>
+                        <span class="s2">&quot;message: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_shape</span><span class="p">,</span> <span class="n">exc</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                            <span class="s2">&quot;Could not load file </span><span class="si">{0}</span><span class="s2">. Error details: &quot;</span>
+                            <span class="s2">&quot;</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_file</span><span class="p">,</span> <span class="n">exc</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">_do_files_sinogram_load_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="p">,</span>
+                                            <span class="n">num_steps</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">),</span>
+                                            <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Sinogram Load&#39;</span><span class="p">)</span>
+
+        <span class="n">progress</span><span class="o">.</span><span class="n">add_estimated_steps</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">in_file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">_inplace_load</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">,</span> <span class="p">:],</span> <span class="n">in_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_func</span><span class="p">)</span>
+                    <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;An image has different width and/or height &quot;</span>
+                        <span class="s2">&quot;dimensions! All images must have the same &quot;</span>
+                        <span class="s2">&quot;dimensions. Expected dimensions: </span><span class="si">{0}</span><span class="s2"> Error &quot;</span>
+                        <span class="s2">&quot;message: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_shape</span><span class="p">,</span> <span class="n">exc</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                            <span class="s2">&quot;Could not load file </span><span class="si">{0}</span><span class="s2">. Error details: &quot;</span>
+                            <span class="s2">&quot;</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_file</span><span class="p">,</span> <span class="n">exc</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">_do_files_load_par</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">ptsm</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span>
+            <span class="n">_inplace_load</span><span class="p">,</span> <span class="n">ptsm</span><span class="o">.</span><span class="n">inplace</span><span class="p">,</span> <span class="n">load_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">load_func</span><span class="p">)</span>
+
+        <span class="n">ptsm</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cores</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunksize</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+<div class="viewcode-block" id="ImageLoader.load_files"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.io.loader.img_loader.html#mantidimaging.core.io.loader.img_loader.ImageLoader.load_files">[docs]</a>    <span class="k">def</span> <span class="nf">load_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Zeroing here to make sure that we can allocate the memory.</span>
+        <span class="c1"># If it&#39;s not possible better crash here than later.</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">allocate_data</span><span class="p">(</span><span class="n">num_images</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">construct_sinograms</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_files_sinogram_load_seq</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_load</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_files_load_par</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_files_load_seq</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageLoader.allocate_data"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.io.loader.img_loader.html#mantidimaging.core.io.loader.img_loader.ImageLoader.allocate_data">[docs]</a>    <span class="k">def</span> <span class="nf">allocate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_images</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">construct_sinograms</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_shared_array</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">num_images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dtype</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_shared_array</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">num_images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dtype</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_inplace_load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">load_func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">load_func</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_data_average</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="img_loader.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.loader.img_loader</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

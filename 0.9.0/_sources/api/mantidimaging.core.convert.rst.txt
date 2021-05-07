@@ -1,0 +1,23 @@
+mantidimaging.core.convert package
+==================================
+
+.. automodule:: mantidimaging.core.convert
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.convert.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.convert.convert

@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.parallel.two_shared_mem - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../parallel.html" accesskey="U">mantidimaging.core.parallel</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.two_shared_mem</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.parallel.two_shared_mem</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">utility</span> <span class="k">as</span> <span class="n">pu</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+<span class="c1"># this global is necessary for the child processes to access the original</span>
+<span class="c1"># array and overwrite the values in-place</span>
+<span class="n">shared_data</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">second_shared_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="inplace"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.two_shared_mem.html#mantidimaging.core.parallel.two_shared_mem.inplace">[docs]</a><span class="k">def</span> <span class="nf">inplace</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use if the parameter function will do the following:</span>
+<span class="sd">        - Perform an operation on the input data that is dependent on another</span>
+<span class="sd">          container</span>
+<span class="sd">        - DOES NOT have a return statement</span>
+<span class="sd">        - The data is NOT RESIZED</span>
+<span class="sd">        - The data will be changed INPLACE inside the function being forwarded</span>
+<span class="sd">          (the parameter function)</span>
+
+<span class="sd">    You HAVE to be careful when using this, for example the func:</span>
+
+<span class="sd">    def _apply_normalise_inplace(</span>
+<span class="sd">            data, dark=None, norm_divide=None, clip_min=None, clip_max=None):</span>
+<span class="sd">        data = np.clip(np.true_divide(</span>
+<span class="sd">            data - dark, norm_divide), clip_min, clip_max)</span>
+
+<span class="sd">    DOES NOT CHANGE THE DATA! Because the data = ... variable inside is just a</span>
+<span class="sd">    LOCAL VARIABLE that is discarded.</span>
+
+<span class="sd">    The proper way to write this function is:</span>
+<span class="sd">    def _apply_normalise_inplace(</span>
+<span class="sd">            data, dark=None, norm_divide=None, clip_min=None, clip_max=None):</span>
+<span class="sd">        data[:] = np.clip(np.true_divide(</span>
+<span class="sd">            data - dark, norm_divide), clip_min, clip_max)</span>
+
+<span class="sd">    Notice the data[:], what this does is REFER to the ACTUAL parameter, and</span>
+<span class="sd">    then changes it&#39;s contents, as [:] gives a reference back to the inner</span>
+<span class="sd">    contents.</span>
+
+<span class="sd">    :param func: Function that will be executed</span>
+<span class="sd">    :param i: index from the shared_data on which to operate</span>
+<span class="sd">    :param kwargs: kwargs to forward to the function func that will be executed</span>
+<span class="sd">    :return: nothing is returned, as the data is replaced in place</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">func</span><span class="p">(</span><span class="n">shared_data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">second_shared_data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="inplace_second_2d"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.two_shared_mem.html#mantidimaging.core.parallel.two_shared_mem.inplace_second_2d">[docs]</a><span class="k">def</span> <span class="nf">inplace_second_2d</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use if the parameter function will do the following:</span>
+<span class="sd">        - Perform an operation on the input data that is dependent on the same</span>
+<span class="sd">          second parameter</span>
+<span class="sd">        - DOES NOT have a return statement</span>
+<span class="sd">        - The data is NOT RESIZED</span>
+<span class="sd">        - The data will be changed INPLACE inside the function being forwarded</span>
+<span class="sd">          (the parameter function)</span>
+
+<span class="sd">    Use if the parameter function does NOT have a return statement, and will</span>
+<span class="sd">    overwrite the data in place.</span>
+
+<span class="sd">    Use to share a single 2D second_shared_data, i.e. a single averaged flat</span>
+<span class="sd">    image.</span>
+
+<span class="sd">    You HAVE to be careful when using this, for example the func:</span>
+<span class="sd">    def _apply_normalise_inplace(</span>
+<span class="sd">            data, dark=None, norm_divide=None, clip_min=None, clip_max=None):</span>
+<span class="sd">        data = np.clip(np.true_divide(</span>
+<span class="sd">            data - dark, norm_divide), clip_min, clip_max)</span>
+
+<span class="sd">    DOES NOT CHANGE THE DATA! Because the data = ... variable inside is just a</span>
+<span class="sd">    local variable that is discarded.</span>
+
+<span class="sd">    The proper way to write this function is:</span>
+<span class="sd">    def _apply_normalise_inplace(</span>
+<span class="sd">            data, dark=None, norm_divide=None, clip_min=None, clip_max=None):</span>
+<span class="sd">        data[:] = np.clip(np.true_divide(</span>
+<span class="sd">            data - dark, norm_divide), clip_min, clip_max)</span>
+
+<span class="sd">    Notice the data[:], what this does is refer to the ACTUAL parameter, and</span>
+<span class="sd">    then changes it&#39;s contents, as [:] gives a reference back to the inner</span>
+<span class="sd">    contents.</span>
+
+<span class="sd">    :param func: Function that will be executed</span>
+<span class="sd">    :param i: index from the shared_data on which to operate</span>
+<span class="sd">    :param kwargs: kwargs to forward to the function func that will be executed</span>
+<span class="sd">    :return: nothing is returned, as the data is replaced in place</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">func</span><span class="p">(</span><span class="n">shared_data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">second_shared_data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="return_to_first"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.two_shared_mem.html#mantidimaging.core.parallel.two_shared_mem.return_to_first">[docs]</a><span class="k">def</span> <span class="nf">return_to_first</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use if the parameter function will do the following:</span>
+<span class="sd">        - Perform an operation on the input data that is dependent on another</span>
+<span class="sd">          container</span>
+<span class="sd">        - DOES have a return statement</span>
+<span class="sd">        - The data is NOT RESIZED</span>
+<span class="sd">        - The output will be stored in the FIRST INPUT CONTAINER</span>
+
+<span class="sd">    :param func: Function that will be executed</span>
+<span class="sd">    :param i: index from the shared_data on which to operate</span>
+<span class="sd">    :param kwargs: kwargs to forward to the function func that will be executed</span>
+<span class="sd">    :return: nothing is returned, as the data is replaced in place</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">shared_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">shared_data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">second_shared_data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="return_to_second"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.two_shared_mem.html#mantidimaging.core.parallel.two_shared_mem.return_to_second">[docs]</a><span class="k">def</span> <span class="nf">return_to_second</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use if the parameter function will do the following:</span>
+<span class="sd">        - Perform an operation on the input data that is dependent on another</span>
+<span class="sd">          container</span>
+<span class="sd">        - DOES have a return statement</span>
+<span class="sd">        - The data is NOT RESIZED</span>
+<span class="sd">        - The output will be stored in the SECOND INPUT CONTAINER</span>
+
+<span class="sd">    :param func: Function that will be executed</span>
+<span class="sd">    :param i: index from the shared_data on which to operate</span>
+<span class="sd">    :param kwargs: kwargs to forward to the function func that will be executed</span>
+<span class="sd">    :return: nothing is returned, as the data is replaced in place</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">second_shared_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">shared_data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">second_shared_data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_partial"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.two_shared_mem.html#mantidimaging.core.parallel.two_shared_mem.create_partial">[docs]</a><span class="k">def</span> <span class="nf">create_partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">fwd_function</span><span class="o">=</span><span class="n">inplace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a partial using functools.partial, to forward the kwargs to the</span>
+<span class="sd">    parallel execution of imap.</span>
+
+<span class="sd">    If you seem to be getting nans, check if the correct fwd_function is set!</span>
+
+<span class="sd">    :param func: Function that will be executed</span>
+<span class="sd">    :param fwd_function: The function will be forwarded through function.</span>
+<span class="sd">            It must be one of:</span>
+<span class="sd">            - two_shared_mem.inplace: if the function replaces</span>
+<span class="sd">            - two_shared_mem.inplace_second_2d: if the function returns a value</span>
+<span class="sd">            - two_shared_mem.return_to_first: if the function returns a value</span>
+<span class="sd">            - two_shared_mem.return_to_second: if the function will overwrite</span>
+<span class="sd">              the data in place</span>
+<span class="sd">    :param kwargs: kwargs to forward to the function func that will be executed</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">fwd_function</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../api/mantidimaging.core.parallel.two_shared_mem.html#mantidimaging.core.parallel.two_shared_mem.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">second_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">partial_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Progress&quot;</span><span class="p">,</span>
+            <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes a function in parallel with shared memory between the processes.</span>
+
+<span class="sd">    The array must have been created using</span>
+<span class="sd">    parallel.utility.create_shared_array(shape, dtype).</span>
+
+<span class="sd">    If the input array IS NOT a shared array, the data will NOT BE CHANGED!</span>
+
+<span class="sd">    The reason for that is that the processes don&#39;t work on the data, but on a</span>
+<span class="sd">    copy.</span>
+
+<span class="sd">    When they process it and return the result, THE RESULT IS NOT ASSIGNED BACK</span>
+<span class="sd">    TO REPLACE THE ORIGINAL as is done in parallel.exclusive_mem, it is merely</span>
+<span class="sd">    discarded.</span>
+
+<span class="sd">    - imap_unordered gives the images back in random order</span>
+<span class="sd">    - map and map_async do not improve speed performance</span>
+<span class="sd">    - imap seems to be the best choice</span>
+
+<span class="sd">    Using _ in the for _ enumerate is slightly faster, because the tuple</span>
+<span class="sd">    from enumerate isn&#39;t unpacked, and thus some time is saved.</span>
+
+<span class="sd">    From performance tests, the chunksize doesn&#39;t seem to make much of a</span>
+<span class="sd">    difference, but having larger chunks usually led to slower performance:</span>
+
+<span class="sd">    Shape: (50,512,512)</span>
+<span class="sd">    1 chunk 3.06s</span>
+<span class="sd">    2 chunks 3.05s</span>
+<span class="sd">    3 chunks 3.07s</span>
+<span class="sd">    4 chunks 3.06s</span>
+<span class="sd">    5 chunks 3.16s</span>
+<span class="sd">    6 chunks 3.06s</span>
+<span class="sd">    7 chunks 3.058s</span>
+<span class="sd">    8 chunks 3.25s</span>
+<span class="sd">    9 chunks 3.45s</span>
+
+<span class="sd">    :param data: the shared data array that will be processed in parallel</span>
+<span class="sd">    :param second_data: the second shared data array that will be processed in</span>
+<span class="sd">                        parallel</span>
+<span class="sd">    :param partial_func: a function constructed using partial to pass the</span>
+<span class="sd">                         correct arguments</span>
+<span class="sd">    :param cores: number of cores that the processing will use</span>
+<span class="sd">    :param chunksize: chunk of work per process(worker)</span>
+<span class="sd">    :param name: name of the task used in progress reporting</span>
+<span class="sd">    :param progress: Progress instance to use for progress reporting (optional)</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cores</span><span class="p">:</span>
+        <span class="n">cores</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">get_cores</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">chunksize</span><span class="p">:</span>
+        <span class="n">chunksize</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">calculate_chunksize</span><span class="p">(</span><span class="n">cores</span><span class="p">)</span>
+
+    <span class="k">global</span> <span class="n">shared_data</span>
+    <span class="c1"># get reference to output data</span>
+    <span class="c1"># if different shape it will get the reference to the new array</span>
+    <span class="n">shared_data</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="k">global</span> <span class="n">second_shared_data</span>
+    <span class="n">second_shared_data</span> <span class="o">=</span> <span class="n">second_data</span>
+
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">cores</span><span class="p">)</span>
+    <span class="n">img_num</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">task_name</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cores</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;c &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">chunksize</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;chs&quot;</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                        <span class="n">num_steps</span><span class="o">=</span><span class="n">img_num</span><span class="p">,</span>
+                                        <span class="n">task_name</span><span class="o">=</span><span class="n">task_name</span><span class="p">)</span>
+
+    <span class="n">indices_list</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">generate_indices</span><span class="p">(</span><span class="n">img_num</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span>
+            <span class="n">partial_func</span><span class="p">,</span> <span class="n">indices_list</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="n">chunksize</span><span class="p">)):</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+    <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+    <span class="n">progress</span><span class="o">.</span><span class="n">mark_complete</span><span class="p">()</span>
+
+    <span class="c1"># remove the global references to remove unused dangling handles to the</span>
+    <span class="c1"># data, which might prevent it from being GCed</span>
+    <span class="n">temp_data_ref</span> <span class="o">=</span> <span class="n">shared_data</span>
+    <span class="k">del</span> <span class="n">shared_data</span>
+    <span class="n">temp_data_2_ref</span> <span class="o">=</span> <span class="n">second_shared_data</span>
+    <span class="k">del</span> <span class="n">second_shared_data</span>
+
+    <span class="k">return</span> <span class="n">temp_data_ref</span><span class="p">,</span> <span class="n">temp_data_2_ref</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="two_shared_mem.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../parallel.html" >mantidimaging.core.parallel</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.two_shared_mem</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

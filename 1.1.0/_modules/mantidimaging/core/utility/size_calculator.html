@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.utility.size_calculator - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.size_calculator</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.utility.size_calculator</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="to_KB"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.size_calculator.html#mantidimaging.core.utility.size_calculator.to_KB">[docs]</a><span></span><span class="k">def</span> <span class="nf">to_KB</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">to_bits</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="p">))</span> <span class="o">/</span> <span class="mi">1024</span></div>
+
+
+<div class="viewcode-block" id="to_MB"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.size_calculator.html#mantidimaging.core.utility.size_calculator.to_MB">[docs]</a><span class="k">def</span> <span class="nf">to_MB</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">to_KB</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1024</span></div>
+
+
+<div class="viewcode-block" id="to_GB"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.size_calculator.html#mantidimaging.core.utility.size_calculator.to_GB">[docs]</a><span class="k">def</span> <span class="nf">to_GB</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">to_MB</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1024</span></div>
+
+
+<div class="viewcode-block" id="single_size"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.size_calculator.html#mantidimaging.core.utility.size_calculator.single_size">[docs]</a><span class="k">def</span> <span class="nf">single_size</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Size of a single unit across the axis we are traversing.</span>
+<span class="sd">    This does not take into account data type, it returns the pure size.</span>
+
+<span class="sd">    - To get bits from this, multiply by the data size.</span>
+<span class="sd">    - To get bytes, divide the bits by 8.</span>
+<span class="sd">    - To get the size of the whole dataset, multiply by the length axis (the</span>
+<span class="sd">      one that we are traversing across).</span>
+<span class="sd">    - To get kilobytes, divide by 1024.</span>
+<span class="sd">    - To get megabytes, divide by 1024 again.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">single</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">curr_shape</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">axis</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">single</span> <span class="o">*=</span> <span class="n">curr_shape</span>
+
+    <span class="k">return</span> <span class="n">single</span></div>
+
+
+<span class="k">def</span> <span class="nf">_determine_dtype_size</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s1">&#39;16&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">16</span>
+    <span class="k">elif</span> <span class="s1">&#39;32&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">32</span>
+    <span class="k">elif</span> <span class="s1">&#39;64&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">64</span>
+    <span class="k">return</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="to_bytes"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.size_calculator.html#mantidimaging.core.utility.size_calculator.to_bytes">[docs]</a><span class="k">def</span> <span class="nf">to_bytes</span><span class="p">(</span><span class="n">bits</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">bits</span> <span class="o">/</span> <span class="mi">8</span></div>
+
+
+<div class="viewcode-block" id="to_bits"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.size_calculator.html#mantidimaging.core.utility.size_calculator.to_bits">[docs]</a><span class="k">def</span> <span class="nf">to_bits</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dtype</span><span class="p">:</span>
+        <span class="n">mul</span> <span class="o">=</span> <span class="n">_determine_dtype_size</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mul</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">size</span> <span class="o">*</span> <span class="n">mul</span></div>
+
+
+<div class="viewcode-block" id="full_size"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.size_calculator.html#mantidimaging.core.utility.size_calculator.full_size">[docs]</a><span class="k">def</span> <span class="nf">full_size</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the full size of the data and return in Megabytes.</span>
+
+<span class="sd">    :param shape: The shape of the data for which the size will be calculated</span>
+
+<span class="sd">    :param axis: The axis on which the shape is going to be traversed</span>
+
+<span class="sd">    :param dtype: The data type</span>
+
+<span class="sd">    :returns: The size as a float in Megabytes</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">single</span> <span class="o">=</span> <span class="n">single_size</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">single</span> <span class="o">*</span> <span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="full_size_MB"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.size_calculator.html#mantidimaging.core.utility.size_calculator.full_size_MB">[docs]</a><span class="k">def</span> <span class="nf">full_size_MB</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">to_MB</span><span class="p">(</span><span class="n">full_size</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">axis</span><span class="p">),</span> <span class="n">dtype</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="number_of_images_from_indices"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.size_calculator.html#mantidimaging.core.utility.size_calculator.number_of_images_from_indices">[docs]</a><span class="k">def</span> <span class="nf">number_of_images_from_indices</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">((</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="n">step</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="size_calculator.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.size_calculator</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.main.test.model\_test module
+======================================================
+
+.. automodule:: mantidimaging.gui.windows.main.test.model_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

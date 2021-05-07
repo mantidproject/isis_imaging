@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.io.utility module - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.parallel package" href="mantidimaging.core.parallel.html" />
+    <link rel="prev" title="mantidimaging.core.io.saver module" href="mantidimaging.core.io.saver.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.html" title="mantidimaging.core.parallel package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.saver.html" title="mantidimaging.core.io.saver module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.io.html" accesskey="U">mantidimaging.core.io package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.utility module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.io.utility">
+<span id="mantidimaging-core-io-utility-module"></span><h1>mantidimaging.core.io.utility module<a class="headerlink" href="#module-mantidimaging.core.io.utility" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="mantidimaging.core.io.utility.get_candidate_file_extensions">
+<code class="sig-prename descclassname">mantidimaging.core.io.utility.</code><code class="sig-name descname">get_candidate_file_extensions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ext</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/utility.html#get_candidate_file_extensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.utility.get_candidate_file_extensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a list of file extensions which can be used to load files.
+:param ext: User provided file extension
+:returns: List of extensions in the order they should be tested</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.utility.get_file_extension">
+<code class="sig-prename descclassname">mantidimaging.core.io.utility.</code><code class="sig-name descname">get_file_extension</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/utility.html#get_file_extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.utility.get_file_extension" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_file_extension</span><span class="p">(</span><span class="s2">&quot;/home/user/file_path.test&quot;</span><span class="p">)</span>
+<span class="go">&#39;test&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_file_extension</span><span class="p">(</span><span class="s2">&quot;/home/user/file.path.test&quot;</span><span class="p">)</span>
+<span class="go">&#39;test&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_file_extension</span><span class="p">(</span><span class="s2">&quot;/home/&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p># above is expecting a None which.. well doesn’t show as anything so just
+# an empty line with a comment explaining it</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.utility.get_file_names">
+<code class="sig-prename descclassname">mantidimaging.core.io.utility.</code><code class="sig-name descname">get_file_names</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">img_format</span></em>, <em class="sig-param"><span class="n">prefix</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">essential</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/utility.html#get_file_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.utility.get_file_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all file names in a directory with a specific format.
+:param path: The path to be checked.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_format</strong> – The image format used as a postfix after the .</p></li>
+<li><p><strong>prefix</strong> – A specific prefix for the images</p></li>
+<li><p><strong>essential</strong> – Flag indicating if failure to find file should raise and
+exception</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>All the file names, sorted by ascending</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.utility.get_folder_names">
+<code class="sig-prename descclassname">mantidimaging.core.io.utility.</code><code class="sig-name descname">get_folder_names</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/utility.html#get_folder_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.utility.get_folder_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all folder names in a specific path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> – The path to be checked.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>All the folder names, sorted by ascending</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.io.saver.html"
+                        title="previous chapter">mantidimaging.core.io.saver module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.parallel.html"
+                        title="next chapter">mantidimaging.core.parallel package</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="mantidimaging.core.io.utility.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.html" title="mantidimaging.core.parallel package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.saver.html" title="mantidimaging.core.io.saver module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.io.html" >mantidimaging.core.io package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.utility module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

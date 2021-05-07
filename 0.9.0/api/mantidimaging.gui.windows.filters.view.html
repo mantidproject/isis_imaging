@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.gui.windows.filters.view module - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.gui.windows.main package" href="mantidimaging.gui.windows.main.html" />
+    <link rel="prev" title="mantidimaging.gui.windows.filters.presenter module" href="mantidimaging.gui.windows.filters.presenter.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.main.html" title="mantidimaging.gui.windows.main package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.filters.presenter.html" title="mantidimaging.gui.windows.filters.presenter module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.gui.html" >mantidimaging.gui package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.gui.windows.html" >mantidimaging.gui.windows package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.gui.windows.filters.html" accesskey="U">mantidimaging.gui.windows.filters package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.filters.view module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.gui.windows.filters.view">
+<span id="mantidimaging-gui-windows-filters-view-module"></span><h1>mantidimaging.gui.windows.filters.view module<a class="headerlink" href="#module-mantidimaging.gui.windows.filters.view" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.gui.windows.filters.view.FiltersWindowView">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.gui.windows.filters.view.</code><code class="sig-name descname">FiltersWindowView</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">main_window</span></em>, <em class="sig-param"><span class="n">cmap</span><span class="o">=</span><span class="default_value">'Greys_r'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/filters/view.html#FiltersWindowView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.filters.view.FiltersWindowView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="mantidimaging.gui.mvp_base.view.html#mantidimaging.gui.mvp_base.view.BaseMainWindowView" title="mantidimaging.gui.mvp_base.view.BaseMainWindowView"><code class="xref py py-class docutils literal notranslate"><span class="pre">mantidimaging.gui.mvp_base.view.BaseMainWindowView</span></code></a></p>
+<dl class="py attribute">
+<dt id="mantidimaging.gui.windows.filters.view.FiltersWindowView.auto_update_triggered">
+<code class="sig-name descname">auto_update_triggered</code><a class="headerlink" href="#mantidimaging.gui.windows.filters.view.FiltersWindowView.auto_update_triggered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.filters.view.FiltersWindowView.cleanup">
+<code class="sig-name descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/filters/view.html#FiltersWindowView.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.filters.view.FiltersWindowView.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs when the window is closed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.filters.view.FiltersWindowView.clear_preview_plots">
+<code class="sig-name descname">clear_preview_plots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/filters/view.html#FiltersWindowView.clear_preview_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.filters.view.FiltersWindowView.clear_preview_plots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears the plotted data from the preview images and plots.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.filters.view.FiltersWindowView.handle_filter_selection">
+<code class="sig-name descname">handle_filter_selection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filter_idx</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/filters/view.html#FiltersWindowView.handle_filter_selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.filters.view.FiltersWindowView.handle_filter_selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle selection of a filter from the drop down list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.filters.view.FiltersWindowView.on_auto_update_triggered">
+<code class="sig-name descname">on_auto_update_triggered</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/filters/view.html#FiltersWindowView.on_auto_update_triggered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.filters.view.FiltersWindowView.on_auto_update_triggered" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the signal indicating the filter, filter properties or data
+has changed such that the previews are now out of date.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.filters.view.FiltersWindowView.show">
+<code class="sig-name descname">show</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/filters/view.html#FiltersWindowView.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.filters.view.FiltersWindowView.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.gui.windows.filters.presenter.html"
+                        title="previous chapter">mantidimaging.gui.windows.filters.presenter module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.gui.windows.main.html"
+                        title="next chapter">mantidimaging.gui.windows.main package</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="mantidimaging.gui.windows.filters.view.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.main.html" title="mantidimaging.gui.windows.main package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.filters.presenter.html" title="mantidimaging.gui.windows.filters.presenter module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.gui.html" >mantidimaging.gui package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.gui.windows.html" >mantidimaging.gui.windows package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.gui.windows.filters.html" >mantidimaging.gui.windows.filters package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.filters.view module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

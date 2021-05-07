@@ -1,0 +1,7 @@
+mantidimaging.gui.dialogs.async\_task.presenter module
+======================================================
+
+.. automodule:: mantidimaging.gui.dialogs.async_task.presenter
+   :members:
+   :undoc-members:
+   :show-inheritance:

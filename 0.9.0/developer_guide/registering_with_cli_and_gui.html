@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Dynamic Registering - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Parallelism in Python" href="parallelism.html" />
+    <link rel="prev" title="Python &lt;=3.6 Performance Issues" href="python_3x_performance_issues.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parallelism.html" title="Parallelism in Python"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="python_3x_performance_issues.html" title="Python &lt;=3.6 Performance Issues"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Dynamic Registering</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="dynamic-registering">
+<h1>Dynamic Registering<a class="headerlink" href="#dynamic-registering" title="Permalink to this headline">¶</a></h1>
+<p>The Command Line Interface (CLI) and the Graphical User Interface (GUI) are both
+built at runtime.</p>
+<section id="common-module-for-registering">
+<h2>Common module for Registering<a class="headerlink" href="#common-module-for-registering" title="Permalink to this headline">¶</a></h2>
+<p>The work for the registering is done in a common module -
+<code class="code docutils literal notranslate"><span class="pre">algorithms.registrator</span></code>. The <code class="code docutils literal notranslate"><span class="pre">registrator.py</span></code> file provides the
+generic functions are used for each interface. In order for the functions to be
+generic they take an object in which to register (for CLI it will be an
+<code class="code docutils literal notranslate"><span class="pre">ArgumentParser</span></code>, for GUI it will be the <code class="code docutils literal notranslate"><span class="pre">QMainWindow</span></code>), referred to
+as <code class="code docutils literal notranslate"><span class="pre">the_object</span></code> in the file.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">register_into</span></code> function will only do some sanity checks and then loops over
+the files in the directory/package that’s been provided. Then it will call the
+<code class="code docutils literal notranslate"><span class="pre">func</span></code> parameter, which will be a different function depending on whether
+we are registering into the CLI or the GUI, and will forward <code class="code docutils literal notranslate"><span class="pre">the_object</span></code>
+into which we’re registering and the module directory. It will not do any
+importing.</p>
+<p>At this point the <code class="code docutils literal notranslate"><span class="pre">func</span></code> parameter function is executed and it will go to
+function that’s been provided. Currently only CLI and GUI are available, and
+that may change, but the following text will assume it only has one of those
+two.</p>
+<p>When the <code class="code docutils literal notranslate"><span class="pre">func</span></code> parameter is executed we go into either
+<code class="code docutils literal notranslate"><span class="pre">cli_registrator.py</span></code> or <code class="code docutils literal notranslate"><span class="pre">gui_registrator.py</span></code> and execute the
+<code class="code docutils literal notranslate"><span class="pre">xxx_register</span></code> function that will assert the state of the program - that
+we have the correct object. It will them proceed to call the importing function
+from the generic <code class="code docutils literal notranslate"><span class="pre">registrator</span></code> module which will try the importing and the
+extended importing (looks for a module with _cli or _gui appended to the name),
+and, if it succeeds importing either the normal or extended, it will execute the
+<code class="code docutils literal notranslate"><span class="pre">func_to_do_registering</span></code> function, which will either be from the
+<code class="code docutils literal notranslate"><span class="pre">cli</span></code> or the <code class="code docutils literal notranslate"><span class="pre">gui</span></code> module, depending on the caller.</p>
+<p>If not found a warning will be shown to the user that the package was not found.</p>
+</section>
+<section id="command-line-interface-cli">
+<h2>Command Line Interface (CLI)<a class="headerlink" href="#command-line-interface-cli" title="Permalink to this headline">¶</a></h2>
+<p>The registering here is simply to add the flags to the <code class="code docutils literal notranslate"><span class="pre">ArgumentParser</span></code>.
+It will add a new group for each filter.</p>
+</section>
+<section id="graphical-user-interface-gui">
+<h2>Graphical User Interface (GUI)<a class="headerlink" href="#graphical-user-interface-gui" title="Permalink to this headline">¶</a></h2>
+<p>The registering here is a bit more complicated, we call the module that contains
+the <code class="code docutils literal notranslate"><span class="pre">_gui_register</span></code> function, and that function will build the dialog’s
+visuals. Afterwards we assert that the function has returned the correct class
+and has set an execute function. Then we create a <code class="code docutils literal notranslate"><span class="pre">QAction</span></code> that either uses the
+module’s name as it’s name, or a special constant <code class="code docutils literal notranslate"><span class="pre">GUI_MENU_NAME</span></code>. The name here
+will be the one that shows in the drop down menu in the GUI.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">QAction</span></code> is then set up to show the dialog when it’s triggered (clicked by
+the user), and the action is added to the menu.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Dynamic Registering</a><ul>
+<li><a class="reference internal" href="#common-module-for-registering">Common module for Registering</a></li>
+<li><a class="reference internal" href="#command-line-interface-cli">Command Line Interface (CLI)</a></li>
+<li><a class="reference internal" href="#graphical-user-interface-gui">Graphical User Interface (GUI)</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="python_3x_performance_issues.html"
+                        title="previous chapter">Python &lt;=3.6 Performance Issues</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="parallelism.html"
+                        title="next chapter">Parallelism in Python</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="registering_with_cli_and_gui.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parallelism.html" title="Parallelism in Python"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="python_3x_performance_issues.html" title="Python &lt;=3.6 Performance Issues"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Dynamic Registering</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.filters.background_correction.background_correction - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.background_correction.background_correction</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.filters.background_correction.background_correction</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging</span> <span class="kn">import</span> <span class="n">helper</span> <span class="k">as</span> <span class="n">h</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">two_shared_mem</span> <span class="k">as</span> <span class="n">ptsm</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">utility</span> <span class="k">as</span> <span class="n">pu</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+<span class="c1"># The smallest and largest allowed pixel value</span>
+<span class="n">MINIMUM_PIXEL_VALUE</span> <span class="o">=</span> <span class="mf">1e-9</span>
+<span class="n">MAXIMUM_PIXEL_VALUE</span> <span class="o">=</span> <span class="mi">3</span>
+
+
+<span class="k">def</span> <span class="nf">_cli_register</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="c1"># this doesn&#39;t have anything to add,</span>
+    <span class="c1"># the options are added in the functional config,</span>
+    <span class="c1"># which should be moved to here TODO</span>
+    <span class="k">return</span> <span class="n">parser</span>
+
+
+<span class="k">def</span> <span class="nf">_divide</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">norm_divide</span><span class="p">):</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">norm_divide</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_subtract</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dark</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># specify out to do in place, otherwise the data is copied</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../../user_guide/filters/background_correction.html#mantidimaging.core.filters.background_correction.background_correction.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">flat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">dark</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">clip_min</span><span class="o">=</span><span class="n">MINIMUM_PIXEL_VALUE</span><span class="p">,</span>
+            <span class="n">clip_max</span><span class="o">=</span><span class="n">MAXIMUM_PIXEL_VALUE</span><span class="p">,</span>
+            <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Do background correction with flat and dark images.</span>
+
+<span class="sd">    :param data: Sample data which is to be processed. Expected in radiograms</span>
+<span class="sd">    :param flat: Flat (open beam) image to use in normalization</span>
+<span class="sd">    :param dark: Dark image to use in normalization</span>
+<span class="sd">    :param clip_min: After normalisation, clip any pixels under this value.</span>
+<span class="sd">    :param clip_max: After normalisation, clip any pixels over this value.</span>
+<span class="sd">    :param cores: The number of cores that will be used to process the data.</span>
+<span class="sd">    :param chunksize: The number of chunks that each worker will receive.</span>
+<span class="sd">    :return: Filtered data (stack of images)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">flat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dark</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">flat</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dark</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="mi">2</span> <span class="o">!=</span> <span class="n">flat</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">or</span> <span class="mi">2</span> <span class="o">!=</span> <span class="n">dark</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Incorrect shape of the flat image (</span><span class="si">{0}</span><span class="s2">) or dark image (</span><span class="si">{1}</span><span class="s2">) </span><span class="se">\</span>
+<span class="s2">                which should match the shape of the sample images (</span><span class="si">{2}</span><span class="s2">)&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">flat</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dark</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">pu</span><span class="o">.</span><span class="n">multiprocessing_available</span><span class="p">():</span>
+            <span class="n">_execute_par</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">clip_min</span><span class="p">,</span> <span class="n">clip_max</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span>
+                         <span class="n">chunksize</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_execute_seq</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">clip_min</span><span class="p">,</span> <span class="n">clip_max</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+
+    <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<span class="k">def</span> <span class="nf">_execute_par</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+                 <span class="n">flat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dark</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">clip_min</span><span class="o">=</span><span class="n">MINIMUM_PIXEL_VALUE</span><span class="p">,</span>
+                 <span class="n">clip_max</span><span class="o">=</span><span class="n">MAXIMUM_PIXEL_VALUE</span><span class="p">,</span>
+                 <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A benchmark justifying the current implementation, performed on</span>
+<span class="sd">    500x2048x2048 images.</span>
+
+<span class="sd">    #1 Separate runs</span>
+<span class="sd">    Subtract (sequential with np.subtract(data, dark, out=data)) - 13s</span>
+<span class="sd">    Divide (par) - 1.15s</span>
+
+<span class="sd">    #2 Separate parallel runs</span>
+<span class="sd">    Subtract (par) - 5.5s</span>
+<span class="sd">    Divide (par) - 1.15s</span>
+
+<span class="sd">    #3 Added subtract into _divide so that it is:</span>
+<span class="sd">                np.true_divide(</span>
+<span class="sd">                    np.subtract(data, dark, out=data), norm_divide, out=data)</span>
+<span class="sd">    Subtract then divide (par) - 55s</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                        <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Background Correction&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;PARALLEL normalization by flat/dark images&quot;</span><span class="p">)</span>
+
+        <span class="n">norm_divide</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_shared_array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="c1"># remove a dimension, I found this to be the easiest way to do it</span>
+        <span class="n">norm_divide</span> <span class="o">=</span> <span class="n">norm_divide</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="c1"># subtract dark from flat and copy into shared array with [:]</span>
+        <span class="n">norm_divide</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">)</span>
+
+        <span class="c1"># prevent divide-by-zero issues, and negative pixels make no sense</span>
+        <span class="n">norm_divide</span><span class="p">[</span><span class="n">norm_divide</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">MINIMUM_PIXEL_VALUE</span>
+
+        <span class="c1"># subtract the dark from all images</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">ptsm</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span><span class="n">_subtract</span><span class="p">,</span> <span class="n">fwd_function</span><span class="o">=</span><span class="n">ptsm</span><span class="o">.</span><span class="n">inplace_second_2d</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">dark</span> <span class="o">=</span> <span class="n">ptsm</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">,</span> <span class="s2">&quot;Subtract Dark&quot;</span><span class="p">)</span>
+
+        <span class="c1"># divide the data by (flat - dark)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">ptsm</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span><span class="n">_divide</span><span class="p">,</span> <span class="n">fwd_function</span><span class="o">=</span><span class="n">ptsm</span><span class="o">.</span><span class="n">inplace_second_2d</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">norm_divide</span> <span class="o">=</span> <span class="n">ptsm</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">norm_divide</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">,</span> <span class="s2">&quot;Norm by Flat&quot;</span><span class="p">)</span>
+
+        <span class="c1"># After scaling back the values some images will have pixels with big</span>
+        <span class="c1"># negative values -25626262 which throws off contrast adjustments.</span>
+        <span class="c1"># This will crop those negative pixels out, and set them to nearly</span>
+        <span class="c1"># zero.</span>
+        <span class="c1"># The negative values will also get scaled back after this in</span>
+        <span class="c1"># value_scaling which will increase their values futher!</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">clip_min</span><span class="p">,</span> <span class="n">clip_max</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span> <span class="nf">_execute_seq</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+                 <span class="n">flat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dark</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">clip_min</span><span class="o">=</span><span class="n">MINIMUM_PIXEL_VALUE</span><span class="p">,</span>
+                 <span class="n">clip_max</span><span class="o">=</span><span class="n">MAXIMUM_PIXEL_VALUE</span><span class="p">,</span>
+                 <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                        <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Background Correction&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Normalization by flat/dark images&quot;</span><span class="p">)</span>
+
+        <span class="n">norm_divide</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">)</span>
+
+        <span class="c1"># prevent divide-by-zero issues</span>
+        <span class="n">norm_divide</span><span class="p">[</span><span class="n">norm_divide</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">MINIMUM_PIXEL_VALUE</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">flat</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">clip_min</span><span class="p">,</span> <span class="n">clip_max</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="background_correction.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.background_correction.background_correction</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

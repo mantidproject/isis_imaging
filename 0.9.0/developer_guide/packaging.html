@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Packaging - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Jupyter Notebooks Tutorial" href="notebooks.html" />
+    <link rel="prev" title="Documentation" href="documentation.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="notebooks.html" title="Jupyter Notebooks Tutorial"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="documentation.html" title="Documentation"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Packaging</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="packaging">
+<h1>Packaging<a class="headerlink" href="#packaging" title="Permalink to this headline">¶</a></h1>
+<p>The preferred method of packaging the package is as a Conda package.</p>
+<p>This is most likely to be the simplest way to distribute the package; for users
+Anaconda Cloud is the simplest way to obtain dependencies (for instance,
+TomoPy), for clusters a Conda package is one of the less painful ways of
+deploying something (so I am told).</p>
+<section id="tl-dr">
+<h2>TL;DR<a class="headerlink" href="#tl-dr" title="Permalink to this headline">¶</a></h2>
+<p>Building:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">cd</span> <span class="pre">buildscripts/conda/</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">./build.sh</span></code></p></li>
+</ol>
+</div></blockquote>
+<p>Installing:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">config</span> <span class="pre">--add</span> <span class="pre">channel</span> <span class="pre">dgursoy</span></code> (once)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">file:///tmp/mantidimaging-conda/linux-64</span> <span class="pre">mantidimaging</span></code></p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="building-the-package">
+<h2>Building the package<a class="headerlink" href="#building-the-package" title="Permalink to this headline">¶</a></h2>
+<p>Before you go any further make sure you have <code class="code docutils literal notranslate"><span class="pre">conda-build</span></code> installed, this
+should be as simple as <code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">conda-build</span></code>.</p>
+<p>The metadata is in <code class="code docutils literal notranslate"><span class="pre">buildscripts/conda/mantidimaging</span></code> and a script to
+start the build is included in the <code class="code docutils literal notranslate"><span class="pre">buildscripts/conda</span></code> directory, all
+this really does is call <code class="code docutils literal notranslate"><span class="pre">conda-build</span></code>.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">build.sh</span></code> script defaults the output directory to
+<code class="code docutils literal notranslate"><span class="pre">/tmp/mantidimaging-conda</span></code>, this is to get around the issue where
+encrypted volumes under Linux have longer file paths (or at least that’s the
+error <code class="code docutils literal notranslate"><span class="pre">conda-build</span></code> gives you), regardless it fails if the output
+directory is on an encrypted volume.</p>
+<p>Conda packages are created for both Python 2.7 and Python 3.5.</p>
+</section>
+<section id="installing-the-package">
+<h2>Installing the package<a class="headerlink" href="#installing-the-package" title="Permalink to this headline">¶</a></h2>
+<p>Before installing the Conda package the channel from which TomoPy will be
+installed must be added to the local Conda configuration. This is done with the
+command: <code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">config</span> <span class="pre">--add</span> <span class="pre">channels</span> <span class="pre">dgursoy</span></code>. This only has to be done
+once per machine.</p>
+<p>The package can be installed from a local build using: <code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span>
+<span class="pre">file:///tmp/mantidimaging-conda/linux-64</span> <span class="pre">mantidimaging</span></code> (assuming the package is
+still in the directory it was built).</p>
+<p>Here you are essentially using a directory as a channel, don’t try to install
+directly from the archive as it will not resolve dependencies.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Packaging</a><ul>
+<li><a class="reference internal" href="#tl-dr">TL;DR</a></li>
+<li><a class="reference internal" href="#building-the-package">Building the package</a></li>
+<li><a class="reference internal" href="#installing-the-package">Installing the package</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="documentation.html"
+                        title="previous chapter">Documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="notebooks.html"
+                        title="next chapter">Jupyter Notebooks Tutorial</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="packaging.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/developer_guide/packaging.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/developer_guide/packaging.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="notebooks.html" title="Jupyter Notebooks Tutorial"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="documentation.html" title="Documentation"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Packaging</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

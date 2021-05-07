@@ -1,0 +1,27 @@
+mantidimaging.gui package
+=========================
+
+.. automodule:: mantidimaging.gui
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.dialogs
+   mantidimaging.gui.mvp_base
+   mantidimaging.gui.utility
+   mantidimaging.gui.widgets
+   mantidimaging.gui.windows
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.gui

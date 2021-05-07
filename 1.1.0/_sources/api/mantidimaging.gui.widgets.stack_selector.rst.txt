@@ -1,0 +1,16 @@
+mantidimaging.gui.widgets.stack\_selector package
+=================================================
+
+.. automodule:: mantidimaging.gui.widgets.stack_selector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.widgets.stack_selector.presenter
+   mantidimaging.gui.widgets.stack_selector.view

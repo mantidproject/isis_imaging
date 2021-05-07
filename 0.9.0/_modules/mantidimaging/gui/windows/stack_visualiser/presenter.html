@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.windows.stack_visualiser.presenter - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.stack_visualiser.presenter</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.windows.stack_visualiser.presenter</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.mvp_base</span> <span class="kn">import</span> <span class="n">BasePresenter</span>
+
+
+<div class="viewcode-block" id="Notification"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.Notification">[docs]</a><span class="k">class</span> <span class="nc">Notification</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">RENAME_WINDOW</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">HISTOGRAM</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">NEW_WINDOW_HISTOGRAM</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">SCROLL_UP</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">SCROLL_DOWN</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">CLEAR_ROI</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">STACK_MODE</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">SUM_MODE</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">REFRESH_IMAGE</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">SHOW_METADATA</span> <span class="o">=</span> <span class="mi">9</span></div>
+
+
+<div class="viewcode-block" id="Parameters"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.Parameters">[docs]</a><span class="k">class</span> <span class="nc">Parameters</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">ROI</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="ImageMode"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.ImageMode">[docs]</a><span class="k">class</span> <span class="nc">ImageMode</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">STACK</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">SUM</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="StackVisualiserPresenter"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter">[docs]</a><span class="k">class</span> <span class="nc">StackVisualiserPresenter</span><span class="p">(</span><span class="n">BasePresenter</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">data_traversal_axis</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StackVisualiserPresenter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">images</span> <span class="o">=</span> <span class="n">images</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">=</span> <span class="n">data_traversal_axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">ImageMode</span><span class="o">.</span><span class="n">STACK</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summed_image</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_image_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.notify"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">RENAME_WINDOW</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_rename_view</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">HISTOGRAM</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_histogram</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">NEW_WINDOW_HISTOGRAM</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_new_window_histogram</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">SCROLL_UP</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_scroll_stack</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">SCROLL_DOWN</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_scroll_stack</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">CLEAR_ROI</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_clear_roi</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">STACK_MODE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image_mode</span> <span class="o">=</span> <span class="n">ImageMode</span><span class="o">.</span><span class="n">STACK</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">SUM_MODE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image_mode</span> <span class="o">=</span> <span class="n">ImageMode</span><span class="o">.</span><span class="n">SUM</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">REFRESH_IMAGE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">show_current_image</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">SHOW_METADATA</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">show_image_metadata</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Notification handler failed&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.do_rename_view"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.do_rename_view">[docs]</a>    <span class="k">def</span> <span class="nf">do_rename_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">update_title_event</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.do_histogram"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.do_histogram">[docs]</a>    <span class="k">def</span> <span class="nf">do_histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executed when the shortcut is pressed by the user.</span>
+<span class="sd">        For the current shortcut please check setup_shortcuts in view.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">show_histogram_of_current_image</span><span class="p">(</span><span class="n">new_window</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.do_new_window_histogram"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.do_new_window_histogram">[docs]</a>    <span class="k">def</span> <span class="nf">do_new_window_histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executed when the shortcut is pressed by the user.</span>
+<span class="sd">        For the current shortcut please check setup_shortcuts in view.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">show_histogram_of_current_image</span><span class="p">(</span><span class="n">new_window</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.do_clear_roi"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.do_clear_roi">[docs]</a>    <span class="k">def</span> <span class="nf">do_clear_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clears the active ROI selection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">current_roi</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.delete_data"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.delete_data">[docs]</a>    <span class="k">def</span> <span class="nf">delete_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span>
+
+    <span class="nd">@image_mode</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">image_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the mode used to display images.</span>
+
+<span class="sd">        STACK mode allows scrolling through the stack of individual images.</span>
+
+<span class="sd">        SUM mode summes the entire stack into a single image, divided by the</span>
+<span class="sd">        number of images in the stack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+
+        <span class="c1"># Create the summed image lazily</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">ImageMode</span><span class="o">.</span><span class="n">SUM</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">summed_image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">summed_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Update image view</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">show_current_image</span><span class="p">()</span>
+
+        <span class="c1"># Disable slider in sum mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">set_active</span><span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="n">ImageMode</span><span class="o">.</span><span class="n">STACK</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_image_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_image_index</span>
+
+    <span class="nd">@current_image_index</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">current_image_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="n">ImageMode</span><span class="o">.</span><span class="n">STACK</span><span class="p">:</span>
+            <span class="n">max_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_image_count_on_axis</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_current_image_index</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_index</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">set_current_image_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_image_index</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: The currently visualised image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_image_index</span><span class="p">)</span>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.get_image"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.get_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="n">ImageMode</span><span class="o">.</span><span class="n">STACK</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="p">[:,</span> <span class="n">index</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">index</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="n">ImageMode</span><span class="o">.</span><span class="n">SUM</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">summed_image</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown image mode&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.get_image_fullpath"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.get_image_fullpath">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_fullpath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">filenames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">filenames</span>
+        <span class="k">return</span> <span class="n">filenames</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">if</span> <span class="n">filenames</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.get_image_filename"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.get_image_filename">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">filenames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">filenames</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span>
+                <span class="n">filenames</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">if</span> <span class="n">filenames</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.get_image_count_on_axis"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.get_image_count_on_axis">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_count_on_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of images on a given axis.</span>
+<span class="sd">        :param axis: Axis on which to count images (defaults to data traversal</span>
+<span class="sd">                     axis)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.get_image_pixel_range"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.get_image_pixel_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_pixel_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the range of pixel intensities across all images.</span>
+
+<span class="sd">        :return: Tuple of (min, max) pixel intensities</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">max</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.do_scroll_stack"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.do_scroll_stack">[docs]</a>    <span class="k">def</span> <span class="nf">do_scroll_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scrolls through the stack by a given number of images.</span>
+<span class="sd">        :param offset: Number of images to scroll through stack</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_image_index</span> <span class="o">+</span> <span class="n">offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_image_index</span> <span class="o">=</span> <span class="n">idx</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.get_parameter_value"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.get_parameter_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a parameter from the stack visualiser for use elsewhere (e.g.</span>
+<span class="sd">        filters).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">parameter</span> <span class="o">==</span> <span class="n">Parameters</span><span class="o">.</span><span class="n">ROI</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">current_roi</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Invalid parameter name has been requested from the Stack &quot;</span>
+                    <span class="s2">&quot;Visualiser, parameter: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">parameter</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StackVisualiserPresenter.getattr_and_clear"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.windows.stack_visualiser.presenter.html#mantidimaging.gui.windows.stack_visualiser.presenter.StackVisualiserPresenter.getattr_and_clear">[docs]</a>    <span class="k">def</span> <span class="nf">getattr_and_clear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm_dialog</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">algorithm_dialog</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">attr</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">algorithm_dialog</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">attr</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="presenter.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.stack_visualiser.presenter</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+mantidimaging.core.filters.circular\_mask.test package
+======================================================
+
+.. automodule:: mantidimaging.core.filters.circular_mask.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.circular_mask.test.circular_mask_test

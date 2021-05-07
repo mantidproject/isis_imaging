@@ -1,0 +1,7 @@
+mantidimaging.gui.widgets.mpl\_navigation\_toolbar\_simple module
+=================================================================
+
+.. automodule:: mantidimaging.gui.widgets.mpl_navigation_toolbar_simple
+   :members:
+   :undoc-members:
+   :show-inheritance:

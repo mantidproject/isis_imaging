@@ -1,0 +1,7 @@
+mantidimaging.core.filters.rebin.rebin\_gui module
+==================================================
+
+.. automodule:: mantidimaging.core.filters.rebin.rebin_gui
+   :members:
+   :undoc-members:
+   :show-inheritance:

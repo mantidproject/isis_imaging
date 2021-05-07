@@ -1,0 +1,7 @@
+mantidimaging.gui.dialogs.async\_task.test.model\_test module
+=============================================================
+
+.. automodule:: mantidimaging.gui.dialogs.async_task.test.model_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

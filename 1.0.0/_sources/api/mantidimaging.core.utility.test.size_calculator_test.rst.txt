@@ -1,0 +1,7 @@
+mantidimaging.core.utility.test.size\_calculator\_test module
+=============================================================
+
+.. automodule:: mantidimaging.core.utility.test.size_calculator_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

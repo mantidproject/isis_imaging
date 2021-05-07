@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.operations.base_filter - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.base_filter</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.operations.base_filter</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QFormLayout</span><span class="p">,</span> <span class="n">QWidget</span>  <span class="c1"># noqa: F401   # pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">mantidimaging.gui.mvp_base</span> <span class="kn">import</span> <span class="n">BaseMainWindowView</span>  <span class="c1"># pragma: no cover</span>
+
+
+<div class="viewcode-block" id="FilterGroup"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.FilterGroup">[docs]</a><span class="k">class</span> <span class="nc">FilterGroup</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">NoGroup</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">Basic</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">Advanced</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="BaseFilter"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.BaseFilter">[docs]</a><span class="k">class</span> <span class="nc">BaseFilter</span><span class="p">:</span>
+    <span class="n">filter_name</span> <span class="o">=</span> <span class="s2">&quot;Unnamed Filter&quot;</span>
+    <span class="n">link_histograms</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;BaseFilter&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The base class for filter algorithms, which should extend this class.</span>
+
+<span class="sd">    All of this classes methods must be overridden, except sv_params and the do_before and do_after wrappers</span>
+<span class="sd">    which are optional.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="BaseFilter.filter_func"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.BaseFilter.filter_func">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_func</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Images</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Images</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the filter algorithm on a given set of image data with the given parameters.</span>
+
+<span class="sd">        :param data: the image data to apply the filter to</span>
+<span class="sd">        :param kwargs: any additional arguments which the specific filter uses</span>
+<span class="sd">        :return: the image data after applying the filter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">raise_not_implemented</span><span class="p">(</span><span class="s2">&quot;filter_func&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Images</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([]))</span></div>
+
+<div class="viewcode-block" id="BaseFilter.execute_wrapper"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.BaseFilter.execute_wrapper">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">execute_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">partial</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Should construct a partial call to _filter_func using values taken from the widgets passed to this function</span>
+<span class="sd">        as kwargs.</span>
+<span class="sd">        :param kwargs: widgets which contain values required for _filter_func.</span>
+<span class="sd">        :return: a partial call to _filter_func using parameters taken from the input widgets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">raise_not_implemented</span><span class="p">(</span><span class="s2">&quot;execute_wrapper&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BaseFilter.register_gui"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.BaseFilter.register_gui">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">register_gui</span><span class="p">(</span><span class="n">form</span><span class="p">:</span> <span class="s1">&#39;QFormLayout&#39;</span><span class="p">,</span> <span class="n">on_change</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">view</span><span class="p">:</span> <span class="s1">&#39;BaseMainWindowView&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;QWidget&#39;</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds any required input widgets to the given form and returns references to them.</span>
+
+<span class="sd">        The return values should be in a dict which can be unpacked as kwargs for a call to</span>
+<span class="sd">        the operations `execute_wrapper`.</span>
+
+<span class="sd">        :param view:</span>
+<span class="sd">        :param form: the layout to create input widgets in</span>
+<span class="sd">        :param on_change: the filter view action to be bound to all created inputs</span>
+<span class="sd">        :return: the widgets bound as kwargs which are needed to call execute_wrapper</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">raise_not_implemented</span><span class="p">(</span><span class="s2">&quot;register_gui&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="BaseFilter.sv_params"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.BaseFilter.sv_params">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sv_params</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Any parameters required from the StackVisualizer ie. ROI</span>
+<span class="sd">        :return: a map of parameters names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="BaseFilter.validate_execute_kwargs"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.BaseFilter.validate_execute_kwargs">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">validate_execute_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BaseFilter.group_name"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.BaseFilter.group_name">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">group_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FilterGroup</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FilterGroup</span><span class="o">.</span><span class="n">NoGroup</span></div></div>
+
+
+<div class="viewcode-block" id="raise_not_implemented"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.raise_not_implemented">[docs]</a><span class="k">def</span> <span class="nf">raise_not_implemented</span><span class="p">(</span><span class="n">function_name</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Required method &#39;</span><span class="si">{</span><span class="n">function_name</span><span class="si">}</span><span class="s2">&#39; not implemented for filter&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="base_filter.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.base_filter</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

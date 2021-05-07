@@ -1,0 +1,7 @@
+mantidimaging.core.parallel.test.two\_shared\_mem\_test module
+==============================================================
+
+.. automodule:: mantidimaging.core.parallel.test.two_shared_mem_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

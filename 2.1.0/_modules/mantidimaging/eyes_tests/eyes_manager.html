@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.eyes_tests.eyes_manager - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.eyes_tests.eyes_manager</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.eyes_tests.eyes_manager</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">mkdtemp</span>
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QApplication</span>
+<span class="kn">from</span> <span class="nn">applitools.common</span> <span class="kn">import</span> <span class="n">BatchInfo</span><span class="p">,</span> <span class="n">MatchLevel</span>
+<span class="kn">from</span> <span class="nn">applitools.images</span> <span class="kn">import</span> <span class="n">Eyes</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.windows.main</span> <span class="kn">import</span> <span class="n">MainWindowView</span>
+
+
+<div class="viewcode-block" id="EyesManager"><a class="viewcode-back" href="../../../api/mantidimaging.eyes_tests.eyes_manager.html#mantidimaging.eyes_tests.eyes_manager.EyesManager">[docs]</a><span class="k">class</span> <span class="nc">EyesManager</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_name</span><span class="o">=</span><span class="s2">&quot;Mantid Imaging&quot;</span><span class="p">,</span> <span class="n">test_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">application_name</span> <span class="o">=</span> <span class="n">application_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span> <span class="o">=</span> <span class="n">Eyes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="o">.</span><span class="n">match_level</span> <span class="o">=</span> <span class="n">MatchLevel</span><span class="o">.</span><span class="n">LAYOUT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_directory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imaging</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">test_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">test_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application_name</span> <span class="o">+</span> <span class="s2">&quot; Tests&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_name</span> <span class="o">=</span> <span class="n">test_name</span>
+
+<div class="viewcode-block" id="EyesManager.set_match_level"><a class="viewcode-back" href="../../../api/mantidimaging.eyes_tests.eyes_manager.html#mantidimaging.eyes_tests.eyes_manager.EyesManager.set_match_level">[docs]</a>    <span class="k">def</span> <span class="nf">set_match_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="n">MatchLevel</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="o">.</span><span class="n">match_level</span> <span class="o">=</span> <span class="n">level</span></div>
+
+<div class="viewcode-block" id="EyesManager.set_batch"><a class="viewcode-back" href="../../../api/mantidimaging.eyes_tests.eyes_manager.html#mantidimaging.eyes_tests.eyes_manager.EyesManager.set_batch">[docs]</a>    <span class="k">def</span> <span class="nf">set_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_id</span><span class="p">):</span>
+        <span class="n">batch_info</span> <span class="o">=</span> <span class="n">BatchInfo</span><span class="p">()</span>
+        <span class="n">batch_info</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_name</span>
+        <span class="n">batch_info</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">batch_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="o">.</span><span class="n">batch</span> <span class="o">=</span> <span class="n">batch_info</span></div>
+
+<div class="viewcode-block" id="EyesManager.abort"><a class="viewcode-back" href="../../../api/mantidimaging.eyes_tests.eyes_manager.html#mantidimaging.eyes_tests.eyes_manager.EyesManager.abort">[docs]</a>    <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="o">.</span><span class="n">abort_if_not_closed</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EyesManager.check_target"><a class="viewcode-back" href="../../../api/mantidimaging.eyes_tests.eyes_manager.html#mantidimaging.eyes_tests.eyes_manager.EyesManager.check_target">[docs]</a>    <span class="k">def</span> <span class="nf">check_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widget</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">test_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">test_method_name</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">test_image_name</span> <span class="o">=</span> <span class="n">test_file_name</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">test_method_name</span>
+
+        <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_take_screenshot</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">widget</span><span class="p">,</span> <span class="n">image_name</span><span class="o">=</span><span class="n">test_image_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="o">.</span><span class="n">api_key</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">application_name</span><span class="p">,</span> <span class="n">test_file_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="o">.</span><span class="n">check_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">test_method_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EyesManager.close_imaging"><a class="viewcode-back" href="../../../api/mantidimaging.eyes_tests.eyes_manager.html#mantidimaging.eyes_tests.eyes_manager.EyesManager.close_imaging">[docs]</a>    <span class="k">def</span> <span class="nf">close_imaging</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imaging</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EyesManager.start_imaging"><a class="viewcode-back" href="../../../api/mantidimaging.eyes_tests.eyes_manager.html#mantidimaging.eyes_tests.eyes_manager.EyesManager.start_imaging">[docs]</a>    <span class="k">def</span> <span class="nf">start_imaging</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imaging</span> <span class="o">=</span> <span class="n">MainWindowView</span><span class="p">(</span><span class="n">open_dialogs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imaging</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">QApplication</span><span class="o">.</span><span class="n">processEvents</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_take_screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widget</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">image_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param widget: Widget to take screen shot of or main window if None.</span>
+<span class="sd">        :param image_name: File name for screenshot</span>
+<span class="sd">        :return: Will return the path to the saved image, or None if failed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="n">mkdtemp</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_directory</span>
+
+        <span class="k">if</span> <span class="n">widget</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">imaging</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imaging</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">widget</span><span class="p">,</span> <span class="n">QWidget</span><span class="p">):</span>
+            <span class="n">QApplication</span><span class="o">.</span><span class="n">processEvents</span><span class="p">()</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">grab</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">image_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">image_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
+
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">image_name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span>
+
+        <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;PNG&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">file_path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Failed to save&quot;</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EyesManager.close_eyes"><a class="viewcode-back" href="../../../api/mantidimaging.eyes_tests.eyes_manager.html#mantidimaging.eyes_tests.eyes_manager.EyesManager.close_eyes">[docs]</a>    <span class="k">def</span> <span class="nf">close_eyes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../index.html">Latest</a></li>
+  <li><a href="../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="eyes_manager.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.eyes_tests.eyes_manager</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

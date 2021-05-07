@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.tomopy\_recon.navigation\_toolbar module
+==================================================================
+
+.. automodule:: mantidimaging.gui.windows.tomopy_recon.navigation_toolbar
+   :members:
+   :undoc-members:
+   :show-inheritance:

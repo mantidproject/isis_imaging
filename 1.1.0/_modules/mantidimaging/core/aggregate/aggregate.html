@@ -1,0 +1,345 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.aggregate.aggregate - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.aggregate.aggregate</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.aggregate.aggregate</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.io</span> <span class="kn">import</span> <span class="n">loader</span><span class="p">,</span> <span class="n">saver</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.io.utility</span> <span class="kn">import</span> <span class="n">get_file_names</span><span class="p">,</span> <span class="n">get_folder_names</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+<span class="n">DEFAULT_AGGREGATE_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;out&#39;</span>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../api/mantidimaging.core.aggregate.aggregate.html#mantidimaging.core.aggregate.aggregate.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregates images.</span>
+
+<span class="sd">    Energy levels can be selected with</span>
+<span class="sd">    --aggregate &lt;start_energy&gt; &lt;end_energy&gt; &lt;sum/avg&gt;,</span>
+<span class="sd">    --aggregate 0 100 sum, this selects energy levels from 0 to 100</span>
+
+<span class="sd">    Multiple energy ranges can also be accepted:</span>
+<span class="sd">    --aggregate 0 100 500 1000 1300 1700 3000 4000</span>
+<span class="sd">    This will aggregate ranges:</span>
+<span class="sd">    - 0 to 100</span>
+<span class="sd">    - 500 to 1000</span>
+<span class="sd">    - 1300 to 1700</span>
+<span class="sd">    - 3000 to 4000</span>
+
+<span class="sd">    Angles can be selected with --aggregate-angles 0 10,</span>
+<span class="sd">    this selects angles 0 to 10.</span>
+
+<span class="sd">    Output can be in a single folder --aggregate-single-folder-output,</span>
+<span class="sd">    or in a separate folder for each angle</span>
+
+<span class="sd">    :param config: The full reconstruction config</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">input_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">input_path</span>
+    <span class="n">img_format</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">in_format</span>
+    <span class="n">output_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_path</span>
+    <span class="n">single_folder</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">aggregate_single_folder_output</span>
+    <span class="c1"># force overwrite_all or we will fail after the first angle has been saved!</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">overwrite_all</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># get the aggregation method {sum, avg}</span>
+    <span class="n">commands</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">aggregate</span>
+    <span class="n">agg_method</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="n">do_sanity_checks</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">agg_method</span><span class="p">,</span> <span class="n">commands</span><span class="p">)</span>
+
+    <span class="c1"># get the range of energy levels, in pairs of 2, [start, end]</span>
+    <span class="n">energy_levels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">]</span>
+
+    <span class="c1"># this will drop the indices for energies that are not selected</span>
+    <span class="n">selected_indices</span> <span class="o">=</span> <span class="n">get_indices_for_energy_levels</span><span class="p">(</span><span class="n">energy_levels</span><span class="p">)</span>
+
+    <span class="c1"># create the label that will be appended to the image file names</span>
+    <span class="c1"># it looks like:</span>
+    <span class="c1"># out_...&lt;start_energy&gt;_&lt;end_energy&gt;.&lt;img_format&gt;</span>
+    <span class="c1"># out_...0_10.&lt;img_format&gt;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">energy_levels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">energies_label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">energies_label</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">selected_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="n">selected_indices</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_indices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># get the angle folders</span>
+    <span class="n">selected_angles</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">aggregate_angles</span>
+    <span class="n">angle_folders</span><span class="p">,</span> <span class="n">selected_angles</span> <span class="o">=</span> <span class="n">get_angle_folders</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">img_format</span><span class="p">,</span>
+                                                       <span class="n">selected_angles</span><span class="p">)</span>
+    <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s1">&#39;Applying aggregating method </span><span class="si">{0}</span><span class="s1"> on angles: </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">agg_method</span><span class="p">,</span> <span class="n">angle_folders</span><span class="p">))</span>
+
+    <span class="c1"># generate the file names in each angle folder</span>
+    <span class="n">angle_image_paths</span> <span class="o">=</span> <span class="n">get_image_files_paths</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">angle_folders</span><span class="p">,</span>
+                                              <span class="n">img_format</span><span class="p">,</span> <span class="n">selected_indices</span><span class="p">)</span>
+
+    <span class="c1"># create an enumerator for easy looping over the image paths for each angle</span>
+    <span class="c1"># this will make tuples like: (angle_number, list_of_all_files)</span>
+    <span class="c1"># TODO check if this is necessary, because get_angle_folders should remove</span>
+    <span class="c1"># ALL angles except the selected one, so the start=.. would be unnecessary</span>
+    <span class="k">if</span> <span class="n">selected_angles</span><span class="p">:</span>
+        <span class="n">angle_image_paths</span> <span class="o">=</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="n">angle_image_paths</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">selected_angles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">angle_image_paths</span> <span class="o">=</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">angle_image_paths</span><span class="p">)</span>
+
+    <span class="n">do_aggregating</span><span class="p">(</span><span class="n">angle_image_paths</span><span class="p">,</span> <span class="n">img_format</span><span class="p">,</span> <span class="n">agg_method</span><span class="p">,</span> <span class="n">energies_label</span><span class="p">,</span>
+                   <span class="n">single_folder</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="do_aggregating"><a class="viewcode-back" href="../../../../api/mantidimaging.core.aggregate.aggregate.html#mantidimaging.core.aggregate.aggregate.do_aggregating">[docs]</a><span class="k">def</span> <span class="nf">do_aggregating</span><span class="p">(</span><span class="n">angle_image_paths</span><span class="p">,</span> <span class="n">img_format</span><span class="p">,</span> <span class="n">agg_method</span><span class="p">,</span> <span class="n">energies_label</span><span class="p">,</span>
+                   <span class="n">single_folder</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param angle_image_paths: Enumerated generator that contains pairs of</span>
+<span class="sd">                              (angle number, list of all files for angle)</span>
+<span class="sd">    :param img_format: The input and output format of the images</span>
+<span class="sd">    :param agg_method: Which method to be used for aggregation, sum or mean</span>
+<span class="sd">    :param energies_label: Which energy levels are we aggregating</span>
+<span class="sd">    :param single_folder: Is the output in a single folder, or a folder per</span>
+<span class="sd">                          aggregate angle</span>
+<span class="sd">    :param config: The reconstruction config</span>
+<span class="sd">    :param progress: The progress monitoring instance</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Aggregate&#39;</span><span class="p">)</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">Saver</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>  <span class="c1"># this also sets the output format from the config</span>
+    <span class="n">parallel_load</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">parallel_load</span>
+    <span class="n">saver</span><span class="o">.</span><span class="n">make_dirs_if_needed</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">get_output_path</span><span class="p">(),</span> <span class="n">s</span><span class="o">.</span><span class="n">_overwrite_all</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">angle</span><span class="p">,</span> <span class="n">image_paths</span> <span class="ow">in</span> <span class="n">angle_image_paths</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="c1"># load all the images from angle, [0] to get the sample path data</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Aggregating data for angle </span><span class="si">{0}</span><span class="s2"> from path </span><span class="si">{1}</span><span class="s2">&quot;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span>
+                                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">image_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+
+            <span class="n">images</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_names</span><span class="o">=</span><span class="n">image_paths</span><span class="p">,</span>
+                                 <span class="n">in_format</span><span class="o">=</span><span class="n">img_format</span><span class="p">,</span>
+                                 <span class="n">parallel_load</span><span class="o">=</span><span class="n">parallel_load</span><span class="p">)</span>
+
+            <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">sample</span>
+            <span class="c1"># sum or average them</span>
+            <span class="k">if</span> <span class="s1">&#39;sum&#39;</span> <span class="o">==</span> <span class="n">agg_method</span><span class="p">:</span>
+                <span class="n">aggregated_images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">aggregated_images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="n">custom_index</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">name_postfix</span><span class="p">,</span> <span class="n">subdir</span> <span class="o">=</span> <span class="n">create_name</span><span class="p">(</span>
+            <span class="n">DEFAULT_AGGREGATE_PREFIX</span><span class="p">,</span> <span class="n">agg_method</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">energies_label</span><span class="p">,</span>
+            <span class="n">single_folder</span><span class="p">)</span>
+
+        <span class="n">s</span><span class="o">.</span><span class="n">save_single_image</span><span class="p">(</span>
+            <span class="n">aggregated_images</span><span class="p">,</span>
+            <span class="n">subdir</span><span class="o">=</span><span class="n">subdir</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">custom_index</span><span class="o">=</span><span class="n">custom_index</span><span class="p">,</span>
+            <span class="n">name_postfix</span><span class="o">=</span><span class="n">name_postfix</span><span class="p">,</span>
+            <span class="n">use_preproc_folder</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_name"><a class="viewcode-back" href="../../../../api/mantidimaging.core.aggregate.aggregate.html#mantidimaging.core.aggregate.aggregate.create_name">[docs]</a><span class="k">def</span> <span class="nf">create_name</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">agg_method</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">energies_label</span><span class="p">,</span> <span class="n">single_folder</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">single_folder</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">create_name_multiple_files</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="p">,</span> <span class="n">agg_method</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">energies_label</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">create_name_single_folder</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="p">,</span> <span class="n">agg_method</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">energies_label</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_name_single_folder"><a class="viewcode-back" href="../../../../api/mantidimaging.core.aggregate.aggregate.html#mantidimaging.core.aggregate.aggregate.create_name_single_folder">[docs]</a><span class="k">def</span> <span class="nf">create_name_single_folder</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">agg_method</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">energies_label</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">agg_method</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">energies_label</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span>
+    <span class="n">name_postfix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">subdir</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">custom_index</span> <span class="o">=</span> <span class="n">angle</span>
+    <span class="k">return</span> <span class="n">custom_index</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">name_postfix</span><span class="p">,</span> <span class="n">subdir</span></div>
+
+
+<div class="viewcode-block" id="create_name_multiple_files"><a class="viewcode-back" href="../../../../api/mantidimaging.core.aggregate.aggregate.html#mantidimaging.core.aggregate.aggregate.create_name_multiple_files">[docs]</a><span class="k">def</span> <span class="nf">create_name_multiple_files</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">agg_method</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">energies_label</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">agg_method</span>
+    <span class="n">name_postfix</span> <span class="o">=</span> <span class="n">energies_label</span>
+    <span class="n">subdir</span> <span class="o">=</span> <span class="s1">&#39;angle_&#39;</span> <span class="o">+</span> <span class="n">agg_method</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+    <span class="n">custom_index</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">custom_index</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">name_postfix</span><span class="p">,</span> <span class="n">subdir</span></div>
+
+
+<div class="viewcode-block" id="do_sanity_checks"><a class="viewcode-back" href="../../../../api/mantidimaging.core.aggregate.aggregate.html#mantidimaging.core.aggregate.aggregate.do_sanity_checks">[docs]</a><span class="k">def</span> <span class="nf">do_sanity_checks</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">agg_method</span><span class="p">,</span> <span class="n">commands</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">output_path</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The flag -o/--output-path MUST be passed for this &quot;</span>
+                         <span class="s2">&quot;IMOPR COR mode!&quot;</span><span class="p">)</span>
+
+    <span class="n">agg_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sum&#39;</span><span class="p">,</span> <span class="s1">&#39;avg&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">agg_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">agg_methods</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid method provided for --aggregate, the &quot;</span>
+                         <span class="s2">&quot;allowed methods are: &quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">agg_methods</span><span class="p">))</span>
+
+    <span class="c1"># the length of energy levels must be an even number</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">commands</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The length of energy levels must be an even number, the submission format is </span><span class="se">\</span>
+<span class="s2">            --aggregate &lt;start&gt; &lt;end&gt;... &lt;method:{sum, avg}&gt;: &quot;</span>
+            <span class="s2">&quot;--aggregate 1 100 101 200 201 300 sum&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_image_files_paths"><a class="viewcode-back" href="../../../../api/mantidimaging.core.aggregate.aggregate.html#mantidimaging.core.aggregate.aggregate.get_image_files_paths">[docs]</a><span class="k">def</span> <span class="nf">get_image_files_paths</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">angle_folders</span><span class="p">,</span> <span class="n">img_format</span><span class="p">,</span>
+                          <span class="n">selected_indices</span><span class="p">):</span>
+    <span class="n">angle_image_paths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">angle_folders</span><span class="p">:</span>
+        <span class="n">angle_fullpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">folder</span><span class="p">)</span>
+        <span class="c1"># get the names of all images</span>
+        <span class="n">all_images</span> <span class="o">=</span> <span class="n">get_file_names</span><span class="p">(</span><span class="n">angle_fullpath</span><span class="p">,</span> <span class="n">img_format</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># if none are excluded, select all</span>
+            <span class="n">angle_image_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_images</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># exclude all image paths that are not selected</span>
+            <span class="n">current_angle_names</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">img_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_images</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">selected_indices</span><span class="p">:</span>
+                    <span class="n">current_angle_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+
+            <span class="n">angle_image_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_angle_names</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">angle_image_paths</span></div>
+
+
+<div class="viewcode-block" id="get_indices_for_energy_levels"><a class="viewcode-back" href="../../../../api/mantidimaging.core.aggregate.aggregate.html#mantidimaging.core.aggregate.aggregate.get_indices_for_energy_levels">[docs]</a><span class="k">def</span> <span class="nf">get_indices_for_energy_levels</span><span class="p">(</span><span class="n">energy_levels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This converts the indice range from --aggregate 0 100 300 400 500 600</span>
+<span class="sd">    to a list of indices [0, 100, 300, 400, 500, 600]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># generate the ranges for the energy levels</span>
+    <span class="n">selected_indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">energy_levels</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">selected_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">expand_index_range</span><span class="p">(</span><span class="n">energy_levels</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]))</span>
+
+    <span class="c1"># flatten the list</span>
+    <span class="n">selected_indices</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">indices</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">selected_indices</span> <span class="k">for</span> <span class="n">indices</span> <span class="ow">in</span> <span class="n">sublist</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">selected_indices</span></div>
+
+
+<div class="viewcode-block" id="get_angle_folders"><a class="viewcode-back" href="../../../../api/mantidimaging.core.aggregate.aggregate.html#mantidimaging.core.aggregate.aggregate.get_angle_folders">[docs]</a><span class="k">def</span> <span class="nf">get_angle_folders</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">img_format</span><span class="p">,</span> <span class="n">selected_angles</span><span class="p">):</span>
+    <span class="c1"># get all the angles folders</span>
+    <span class="n">angle_folders</span> <span class="o">=</span> <span class="n">get_folder_names</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+
+    <span class="c1"># if --aggregate-angles &lt;id1&gt; &lt;id2&gt; specifies anything,</span>
+    <span class="c1"># exclude all other angle folders</span>
+    <span class="n">selected_folders</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">selected_angles</span><span class="p">:</span>
+        <span class="n">selected_folders</span> <span class="o">=</span> <span class="n">expand_index_range</span><span class="p">(</span><span class="n">selected_angles</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">angle_folders</span> <span class="o">=</span> <span class="p">[</span><span class="n">angle_folders</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">selected_folders</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+                <span class="s2">&quot;The selected angles are not present in the input directory!&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">angle_folders</span><span class="p">,</span> <span class="n">selected_folders</span></div>
+
+
+<div class="viewcode-block" id="expand_index_range"><a class="viewcode-back" href="../../../../api/mantidimaging.core.aggregate.aggregate.html#mantidimaging.core.aggregate.aggregate.expand_index_range">[docs]</a><span class="k">def</span> <span class="nf">expand_index_range</span><span class="p">(</span><span class="n">_list</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;This must only be used with &lt;start&gt; &lt;end&gt; indices&quot;</span>
+    <span class="k">return</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="aggregate.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.aggregate.aggregate</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

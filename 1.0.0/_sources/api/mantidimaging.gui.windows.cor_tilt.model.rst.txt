@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.cor\_tilt.model module
+================================================
+
+.. automodule:: mantidimaging.gui.windows.cor_tilt.model
+   :members:
+   :undoc-members:
+   :show-inheritance:

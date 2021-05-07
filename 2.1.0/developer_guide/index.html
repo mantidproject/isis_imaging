@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Developer Guide - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Documentation" href="documentation.html" />
+    <link rel="prev" title="Reconstruction Filters" href="../user_guide/reconstructions/filters.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="documentation.html" title="Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../user_guide/reconstructions/filters.html" title="Reconstruction Filters"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">Developer Guide</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="developer-guide">
+<h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Permalink to this headline">¶</a></h1>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>You will need conda, CUDA and gcc installed, see the <a class="reference internal" href="../installation.html#installation"><span class="std std-ref">Installation</span></a> instructions.</p>
+<p>First download the Mantid Imaging source code using Git.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/mantidproject/mantidimaging.git</span></code></p>
+<p>If you have a github account you can use ssh access:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">git&#64;github.com:mantidproject/mantidimaging.git</span></code></p>
+<p>To set up a developer environment, from with in the cloned directory run:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">create</span> <span class="pre">-f</span> <span class="pre">environment-dev.yml</span></code></p>
+<p>This will create a conda environment containing all the packages needed to run and develop Mantid Imaging. The activate command will activate the environment.</p>
+<p>Afterwards the environment can be activated by running:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">mantidimaging-dev</span></code></p>
+<p>(Note: This method will also install the mantidimaging package in the environment. Be aware that if you run <cite>python -m mantidimaging</cite> from outside the source directory it will use the installed version).</p>
+<p>To check that the set up was successful, try running the tests from the source directory:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span></code></p>
+<div class="toctree-wrapper compound">
+<p><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_conventions.html">Developer Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conda_packaging_and_docker_image.html">Conda Packaging and Docker images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Creating a Release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Developer Guide</a><ul>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../user_guide/reconstructions/filters.html"
+                        title="previous chapter">Reconstruction Filters</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="documentation.html"
+                        title="next chapter">Documentation</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/developer_guide/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/developer_guide/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/developer_guide/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/developer_guide/index.html">2.0.0</a></li>
+  <li><a href="index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="documentation.html" title="Documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../user_guide/reconstructions/filters.html" title="Reconstruction Filters"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+        <li class="nav-item nav-item-this"><a href="">Developer Guide</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

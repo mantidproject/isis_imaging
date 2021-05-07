@@ -1,0 +1,24 @@
+mantidimaging.gui.widgets package
+=================================
+
+.. automodule:: mantidimaging.gui.widgets
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.widgets.stack_selector
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.widgets.mpl_navigation_toolbar_simple
+   mantidimaging.gui.widgets.removable_row_table_view

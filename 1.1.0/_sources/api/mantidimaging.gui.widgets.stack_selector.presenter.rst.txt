@@ -1,0 +1,7 @@
+mantidimaging.gui.widgets.stack\_selector.presenter module
+==========================================================
+
+.. automodule:: mantidimaging.gui.widgets.stack_selector.presenter
+   :members:
+   :undoc-members:
+   :show-inheritance:

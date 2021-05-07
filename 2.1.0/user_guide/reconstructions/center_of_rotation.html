@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Center of Rotation and Tilt - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Reconstruction Algorithms" href="algorithms.html" />
+    <link rel="prev" title="Reconstruction Help page" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="algorithms.html" title="Reconstruction Algorithms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Reconstruction Help page"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Reconstruction Help page</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Center of Rotation and Tilt</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="center-of-rotation-and-tilt">
+<span id="center-of-rotation"></span><h1>Center of Rotation and Tilt<a class="headerlink" href="#center-of-rotation-and-tilt" title="Permalink to this headline">¶</a></h1>
+<section id="center-of-rotation-cor-and-tilt-usage">
+<h2>Center of Rotation (COR) and Tilt usage<a class="headerlink" href="#center-of-rotation-cor-and-tilt-usage" title="Permalink to this headline">¶</a></h2>
+<p>The correct center of rotation is required for a good reconstruction.
+We provide two automatic ways of getting a center of rotation.
+However, sometimes the values they find are not accurate, so there is also a manual way
+to adjust the center of rotation.</p>
+<p>The algorithms used for reconstruction require a COR for each sinogram,
+i.e. a list of CORs equal to the number of sinograms (also equal to the number of rows in a projection).
+This is abstracted away and the two final values that are used are: center of rotation and tilt.</p>
+<p>In that case the COR refers to the value at sinogram 0 (also referred to as slice 0).
+Using the tilt we then use a linear regression to calculate the COR for each sinogram in the data.</p>
+</section>
+<section id="entering-known-cor-and-tilt">
+<h2>Entering known COR and tilt<a class="headerlink" href="#entering-known-cor-and-tilt" title="Permalink to this headline">¶</a></h2>
+<p>If the COR and tilt are already known you can enter them in the “Enter known COR/Tilt manually here” section
+and press “Fit from COR/Tilt above”. In this case you can go immediately to reconstruction.</p>
+</section>
+<section id="correlate-0-and-180">
+<h2>Correlate 0 and 180<a class="headerlink" href="#correlate-0-and-180" title="Permalink to this headline">¶</a></h2>
+<p>This automatic COR algorithm finds the shift between the projections at 0 and 180 degrees.
+The projection exactly at 180 degrees is necessary for the best result.
+We provide the option of loading a 180 degree projection in the load dialog.</p>
+<p>If not provided with a 180 degree projection, the algorithm will use the projection
+at the middle of the stack. This is usually not exactly 180 degrees, and
+so the resulting COR  will be a few pixels off.</p>
+<p>This is not a problem and could be rectified either by adding a manual COR or using
+the minimisation algorithm.</p>
+</section>
+<section id="minimise-error">
+<h2>Minimise error<a class="headerlink" href="#minimise-error" title="Permalink to this headline">¶</a></h2>
+<p>This automatic COR algorithm uses the square sum of the projection as a noise heuristic.
+It minimises the noise in order to find the best COR for that sinogram.</p>
+<p>It does so for a number of sinograms (slices) and adds the result in the COR table.</p>
+<p>This algorithm may not work well on noisy data or with very bright outliers, as the
+minimisation can get lost in a local minima and not find the best reconstructed slice.
+As the same heuristic is also used in the manual “Refine” window, to highlight
+one of the choices as the best, the behaviour can also be seen there.</p>
+<p>In this case the best action is to use the correlate as a starting point,
+and go immediately to manual COR correction.</p>
+</section>
+<section id="manual-cor-correction">
+<h2>Manual COR correction<a class="headerlink" href="#manual-cor-correction" title="Permalink to this headline">¶</a></h2>
+<p>Due to the limitations of the algorithms above there is also a manual way of calculating the COR -
+using the “COR Table - refine manually” part of the GUI.</p>
+<p>In that table you can click Add to add a new COR for the currently selected slice. Once added
+you can click the row and then “Refine” which will take you
+to a window that reconstructs the sinogram with multiple CORs simultaneously, and allows you
+to visually pick the best one.</p>
+<p>After you have two or more CORs in the table, a fit will be performed in order to find the COR and tilt
+using the data from the table rows.</p>
+<p>It is sometimes good enough to add a COR at the top of your data and the bottom.
+Once the best CORs for those are found, the resulting tilt should be accurate.
+To increase the accuracy further add more COR rows.</p>
+</section>
+<section id="to-reconstruction">
+<h2>To reconstruction<a class="headerlink" href="#to-reconstruction" title="Permalink to this headline">¶</a></h2>
+<p>Once you have a satisfactory value of COR or tilt, you are ready to proceed to the “Reconstruct” tab.</p>
+<p>Information about the filters and algorithms can be found in the other pages of the <a class="reference internal" href="index.html#reconstruction-help-page"><span class="std std-ref">Reconstruction Help page</span></a>.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Center of Rotation and Tilt</a><ul>
+<li><a class="reference internal" href="#center-of-rotation-cor-and-tilt-usage">Center of Rotation (COR) and Tilt usage</a></li>
+<li><a class="reference internal" href="#entering-known-cor-and-tilt">Entering known COR and tilt</a></li>
+<li><a class="reference internal" href="#correlate-0-and-180">Correlate 0 and 180</a></li>
+<li><a class="reference internal" href="#minimise-error">Minimise error</a></li>
+<li><a class="reference internal" href="#manual-cor-correction">Manual COR correction</a></li>
+<li><a class="reference internal" href="#to-reconstruction">To reconstruction</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Reconstruction Help page</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="algorithms.html"
+                        title="next chapter">Reconstruction Algorithms</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../index.html">Latest</a></li>
+  <li><a href="../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../2.0.0/user_guide/reconstructions/center_of_rotation.html">2.0.0</a></li>
+  <li><a href="center_of_rotation.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="algorithms.html" title="Reconstruction Algorithms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Reconstruction Help page"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Reconstruction Help page</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Center of Rotation and Tilt</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

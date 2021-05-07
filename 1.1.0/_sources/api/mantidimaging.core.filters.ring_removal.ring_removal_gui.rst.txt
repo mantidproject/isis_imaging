@@ -1,0 +1,7 @@
+mantidimaging.core.filters.ring\_removal.ring\_removal\_gui module
+==================================================================
+
+.. automodule:: mantidimaging.core.filters.ring_removal.ring_removal_gui
+   :members:
+   :undoc-members:
+   :show-inheritance:

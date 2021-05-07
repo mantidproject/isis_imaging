@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>IO package - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Developer Guide" href="../../developer_guide/index.html" />
+    <link rel="prev" title="Python Interface" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../developer_guide/index.html" title="Developer Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Python Interface"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Python Interface</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">IO package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="io-package">
+<h1>IO package<a class="headerlink" href="#io-package" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="code docutils literal notranslate"><span class="pre">io</span></code> module provides easy modules to load and save stacks of data.</p>
+<section id="loading-data">
+<h2>Loading data<a class="headerlink" href="#loading-data" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="code docutils literal notranslate"><span class="pre">core.io.loader</span></code> module provides a <code class="code docutils literal notranslate"><span class="pre">load</span></code> method, that takes a
+path, and <code class="code docutils literal notranslate"><span class="pre">img_format</span></code> (the default is <code class="code docutils literal notranslate"><span class="pre">tiff</span></code>, if different it needs
+to be specified) and will load <strong>all</strong> of the images in that folder.</p>
+</section>
+<section id="saving-data">
+<h2>Saving data<a class="headerlink" href="#saving-data" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="code docutils literal notranslate"><span class="pre">core.io.saver</span></code> module provides a <code class="code docutils literal notranslate"><span class="pre">save</span></code> method, that takes a
+Numpy <code class="code docutils literal notranslate"><span class="pre">ndarray</span></code> and a path, and will save out all the images in the path.
+The function also has additional parameters to specify output image format.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">IO package</a><ul>
+<li><a class="reference internal" href="#loading-data">Loading data</a></li>
+<li><a class="reference internal" href="#saving-data">Saving data</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Python Interface</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../developer_guide/index.html"
+                        title="next chapter">Developer Guide</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../index.html">Latest</a></li>
+  <li><a href="io.html">0.9.0</a></li>
+  <li><a href="../../../1.0.0/user_guide/python/io.html">1.0.0</a></li>
+  <li><a href="../../../1.1.0/user_guide/python/io.html">1.1.0</a></li>
+  <li><a href="../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../developer_guide/index.html" title="Developer Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Python Interface"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Python Interface</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">IO package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

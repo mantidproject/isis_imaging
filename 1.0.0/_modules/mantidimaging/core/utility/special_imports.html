@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.utility.special_imports - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.special_imports</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.utility.special_imports</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A place for special import logic to live.</span>
+
+<span class="sd">If something requires additional logic to import it for whatever reason (e.g.</span>
+<span class="sd">version dependencies), it should go in here.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+
+<div class="viewcode-block" id="import_skimage_io"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.special_imports.html#mantidimaging.core.utility.special_imports.import_skimage_io">[docs]</a><span class="k">def</span> <span class="nf">import_skimage_io</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    To import skimage io only when it is/can be used</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span> <span class="k">as</span> <span class="n">skio</span>
+        <span class="c1"># tifffile works better on local, but not available on scarf</span>
+        <span class="c1"># no plugin will use the default python imaging library (PIL)</span>
+        <span class="c1"># This behaviour might need to be changed when switching to python 3</span>
+        <span class="n">skio</span><span class="o">.</span><span class="n">use_plugin</span><span class="p">(</span><span class="s1">&#39;tifffile&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">&quot;Could not find the package skimage, its subpackage &quot;</span>
+            <span class="s2">&quot;io and the pluging freeimage which are required to support &quot;</span>
+            <span class="s2">&quot;several image formats. Error details: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">skio</span></div>
+
+
+<div class="viewcode-block" id="import_mock"><a class="viewcode-back" href="../../../../api/mantidimaging.core.utility.special_imports.html#mantidimaging.core.utility.special_imports.import_mock">[docs]</a><span class="k">def</span> <span class="nf">import_mock</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads a suitable version of mock depedning on the Python version being</span>
+<span class="sd">    used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">unittest</span>
+    <span class="kn">import</span> <span class="nn">unittest.mock</span> <span class="k">as</span> <span class="nn">mock</span>
+
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+        <span class="c1"># If on Python 3.5 and below then need to monkey patch this</span>
+        <span class="c1"># function in It is available as standard on Python 3.6 and above</span>
+        <span class="k">def</span> <span class="nf">assert_called_once</span><span class="p">(</span><span class="n">_mock_self</span><span class="p">):</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="n">_mock_self</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_count</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Expected &#39;</span><span class="si">{}</span><span class="s2">&#39; to have been called once. &quot;</span>
+                       <span class="s2">&quot;Called </span><span class="si">{}</span><span class="s2"> times.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">_mock_name</span> <span class="ow">or</span> <span class="s1">&#39;mock&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_count</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">unittest</span><span class="o">.</span><span class="n">mock</span><span class="o">.</span><span class="n">Mock</span><span class="o">.</span><span class="n">assert_called_once</span> <span class="o">=</span> <span class="n">assert_called_once</span>
+
+    <span class="k">return</span> <span class="n">mock</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="special_imports.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.special_imports</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

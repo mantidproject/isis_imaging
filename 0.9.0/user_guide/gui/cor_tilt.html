@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>COR and Tilt Finding - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="TomoPy Reconstruction" href="tomopy_recon.html" />
+    <link rel="prev" title="Filters" href="filters.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tomopy_recon.html" title="TomoPy Reconstruction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="filters.html" title="Filters"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Graphical User Interface (GUI)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">COR and Tilt Finding</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="cor-and-tilt-finding">
+<h1>COR and Tilt Finding<a class="headerlink" href="#cor-and-tilt-finding" title="Permalink to this headline">¶</a></h1>
+<p>This tool is used to determine the centre of rotation (COR) and detector tilt
+angle of a sample.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It cannot correct for a tilt in the sample relative to the sample
+stage.</p>
+</div>
+<section id="theory">
+<h2>Theory<a class="headerlink" href="#theory" title="Permalink to this headline">¶</a></h2>
+<p>A selection of slices along the Y axis (i.e. sinograms) are used to obtain a
+mapping of sinogram index to rotation centre.</p>
+<p>A linear fit of these values is performed to obtain the rotation centre at the
+first sinogram (from the Y axis intercept) and the tilt angle (calculated from
+the gradient).</p>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>With a stack of projection images loaded, select the <em>Find COR and Tilt</em> option
+from the <em>Reconstruct</em> menu to show the tool, as below:</p>
+<a class="reference internal image-reference" href="../../_images/gui_cor_tilt.png"><img alt="COR and tilt finder dialog" src="../../_images/gui_cor_tilt.png" style="width: 80%;" /></a>
+<p>Firstly a region of interest must be selected around the portion of the sample
+that will be used in the rotation centre calculations.</p>
+<p>The region must fully enclose the sample on the X axis and be limited to a
+single element of the sample in the Y axis. For instance, the bottom cylinder in
+the demo shown here.</p>
+<p>To ensure that the sample is well enclosed by the region the stack can be
+switched to <em>Sum</em> mode (by right clicking on the image and selecting <em>Sum
+Mode</em>). This mode allows you to see the extents of the sample from each
+projection angle, as shown in this screenshot:</p>
+<a class="reference internal image-reference" href="../../_images/gui_cor_tilt_stack_sum.png"><img alt="Summed stack view" src="../../_images/gui_cor_tilt_stack_sum.png" style="width: 80%;" /></a>
+<p>The region is selected using the ROI selector on the Stack Visualiser then
+updated by clicking the <em>Set ROI from stack</em> button on the COR and Tilt dialog.
+This will crop the preview displayed on the dialog to your selected ROI.</p>
+<p>The number of rotation centres to use in the linear fit is defined by the
+<em>Number of slices</em> option. Good results typically need at least 20 samples.</p>
+<a class="reference internal image-reference" href="../../_images/gui_cor_tilt_roi_selection.png"><img alt="ROI and slice selection" src="../../_images/gui_cor_tilt_roi_selection.png" style="width: 80%;" /></a>
+<p>When the parameters are set click <em>Calculate</em> to perform COR and tilt angle
+finding.</p>
+<p>Results are shown in the <em>Centre of Rotation</em> and <em>Tilt angle</em> fields, where the
+tilt angle is in radians):</p>
+<a class="reference internal image-reference" href="../../_images/gui_cor_tilt_calculate.png"><img alt="Complete COR and tilt calculation" src="../../_images/gui_cor_tilt_calculate.png" style="width: 80%;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The centre of rotation is given relative to the entire image, not the
+selected region of interest.</p>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">COR and Tilt Finding</a><ul>
+<li><a class="reference internal" href="#theory">Theory</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="filters.html"
+                        title="previous chapter">Filters</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tomopy_recon.html"
+                        title="next chapter">TomoPy Reconstruction</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../index.html">Latest</a></li>
+  <li><a href="cor_tilt.html">0.9.0</a></li>
+  <li><a href="../../../1.0.0/user_guide/gui/cor_tilt.html">1.0.0</a></li>
+  <li><a href="../../../1.1.0/user_guide/gui/cor_tilt.html">1.1.0</a></li>
+  <li><a href="../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tomopy_recon.html" title="TomoPy Reconstruction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="filters.html" title="Filters"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Graphical User Interface (GUI)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">COR and Tilt Finding</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

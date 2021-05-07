@@ -1,0 +1,330 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.utility.progress_reporting.progress - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.progress_reporting.progress</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.utility.progress_reporting.progress</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.memory_usage</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">get_memory_usage_linux_str</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ProgressHandler"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.ProgressHandler">[docs]</a><span class="k">class</span> <span class="nc">ProgressHandler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ProgressHandler.progress_update"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.ProgressHandler.progress_update">[docs]</a>    <span class="k">def</span> <span class="nf">progress_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Need to implement this method in the child class&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Progress"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress">[docs]</a><span class="k">class</span> <span class="nc">Progress</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class used to perform basic progress monitoring and reporting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Progress.ensure_instance"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.ensure_instance">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">ensure_instance</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function used to select either a non-None Progress instance as a</span>
+<span class="sd">        parameter, or simply create and configure a new one.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">Progress</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">.console_progress_bar</span> <span class="kn">import</span> <span class="n">ConsoleProgressBar</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">add_progress_handler</span><span class="p">(</span><span class="n">ConsoleProgressBar</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">p</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Task&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_name</span> <span class="o">=</span> <span class="n">task_name</span>
+
+        <span class="c1"># Estimated number of steps (used to calculated percentage complete)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_step</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_estimated_steps</span><span class="p">(</span><span class="n">num_steps</span><span class="p">)</span>
+
+        <span class="c1"># Current step being executed (0 denoting not started)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Flag indicating completion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">complete</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># List of tuples defining progress history</span>
+        <span class="c1"># (timestamp, step, message)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_history</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Lock used to synchronise modifications to the progress state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+        <span class="c1"># Handers that receive notifications when progress updates occur</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_handlers</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Levels of nesting when used as a context manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context_nesting_level</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Flag to indicate cancellation of the current task</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_msg</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Add initial step to history</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;init&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Log initial memory usage</span>
+        <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;Memory usage before execution: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">get_memory_usage_linux_str</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Progress(</span><span class="se">\n</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress_history</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context_nesting_level</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context_nesting_level</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="c1"># Only when we have left the context at all levels is the task complete</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">context_nesting_level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mark_complete</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Progress.is_started"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.is_started">[docs]</a>    <span class="k">def</span> <span class="nf">is_started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the task has been started.</span>
+
+<span class="sd">        A task starts when it reports it&#39;s first progress update.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="Progress.is_completed"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.is_completed">[docs]</a>    <span class="k">def</span> <span class="nf">is_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the task has been marked as completed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">complete</span></div>
+
+<div class="viewcode-block" id="Progress.completion"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.completion">[docs]</a>    <span class="k">def</span> <span class="nf">completion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the completion of the task in the range of 0.0 - 1.0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_step</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Progress.last_status_message"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.last_status_message">[docs]</a>    <span class="k">def</span> <span class="nf">last_status_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the message from the last progress update.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress_history</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_history</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">msg</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Progress.execution_time"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.execution_time">[docs]</a>    <span class="k">def</span> <span class="nf">execution_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the total time this task has been executing.</span>
+
+<span class="sd">        Total time is measured from the timestamp of the first progress message</span>
+<span class="sd">        to the timestamp of the last progress message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress_history</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_history</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_history</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">last</span> <span class="o">-</span> <span class="n">start</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span></div>
+
+<div class="viewcode-block" id="Progress.set_estimated_steps"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.set_estimated_steps">[docs]</a>    <span class="k">def</span> <span class="nf">set_estimated_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the number of steps this task is expected to take to complete.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_step</span> <span class="o">=</span> <span class="n">num_steps</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Progress.add_estimated_steps"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.add_estimated_steps">[docs]</a>    <span class="k">def</span> <span class="nf">add_estimated_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Increments the number of steps this task is expected to take to</span>
+<span class="sd">        complete.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_step</span> <span class="o">+=</span> <span class="n">num_steps</span></div>
+
+<div class="viewcode-block" id="Progress.add_progress_handler"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.add_progress_handler">[docs]</a>    <span class="k">def</span> <span class="nf">add_progress_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a hander to receiver progress updates.</span>
+<span class="sd">        :param handler: Instance of a progress handler</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">ProgressHandler</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Progress handlers must be of type ProgressHandler&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">progress</span> <span class="o">=</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Progress.update"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">force_continue</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the progress of the task.</span>
+
+<span class="sd">        :param steps: Number of steps that have been completed since last call</span>
+<span class="sd">                      to this function</span>
+<span class="sd">        :param msg: Message describing current step</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Acquire lock while manipulating progress state</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="c1"># Update current step</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span> <span class="o">+=</span> <span class="n">steps</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_step</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">end_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span> <span class="o">+</span> <span class="mi">1</span>
+
+            <span class="c1"># Update progress history</span>
+            <span class="n">step_details</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">clock</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step_details</span><span class="p">)</span>
+
+        <span class="c1"># Log progress</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Progress: </span><span class="si">%f</span><span class="s2">, Step: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">completion</span><span class="p">(),</span>
+                  <span class="n">step_details</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                  <span class="n">step_details</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">end_step</span><span class="p">)</span>
+
+        <span class="c1"># Process progress callbacks</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress_handlers</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_handlers</span><span class="p">:</span>
+                <span class="n">cb</span><span class="o">.</span><span class="n">progress_update</span><span class="p">()</span>
+
+        <span class="c1"># Force cancellation on progress update</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_cancel</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force_continue</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Task has been cancelled&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Progress.cancel"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.cancel">[docs]</a>    <span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;cancelled&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mark the task tree that uses this progress instance for cancellation.</span>
+
+<span class="sd">        Task should either periodically inspect should_cancel or have suitably</span>
+<span class="sd">        many calls to update() to be cancellable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_msg</span> <span class="o">=</span> <span class="n">msg</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">should_cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the task should be cancelled.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cancel_msg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Progress.mark_complete"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.utility.progress_reporting.progress.html#mantidimaging.core.utility.progress_reporting.progress.Progress.mark_complete">[docs]</a>    <span class="k">def</span> <span class="nf">mark_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;complete&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Marks the task as completed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force_continue</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">msg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_msg</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_cancel</span> <span class="k">else</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_cancel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">complete</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span>
+
+        <span class="c1"># Log elapsed time and final memory usage</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Elapsed time: </span><span class="si">%d</span><span class="s2"> sec.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">execution_time</span><span class="p">())</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Memory usage after execution: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                  <span class="n">get_memory_usage_linux_str</span><span class="p">())</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="progress.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.utility.progress_reporting.progress</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

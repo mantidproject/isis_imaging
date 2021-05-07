@@ -1,0 +1,7 @@
+mantidimaging.core.tools.importer module
+========================================
+
+.. automodule:: mantidimaging.core.tools.importer
+   :members:
+   :undoc-members:
+   :show-inheritance:

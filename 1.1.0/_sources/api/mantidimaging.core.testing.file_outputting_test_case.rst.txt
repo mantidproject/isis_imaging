@@ -1,0 +1,7 @@
+mantidimaging.core.testing.file\_outputting\_test\_case module
+==============================================================
+
+.. automodule:: mantidimaging.core.testing.file_outputting_test_case
+   :members:
+   :undoc-members:
+   :show-inheritance:

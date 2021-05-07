@@ -1,0 +1,15 @@
+mantidimaging.gui.windows.stack\_visualiser.test package
+========================================================
+
+.. automodule:: mantidimaging.gui.windows.stack_visualiser.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.stack_visualiser.test.presenter_test

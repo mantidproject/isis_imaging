@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.filters.test.model\_test module
+=========================================================
+
+.. automodule:: mantidimaging.gui.windows.filters.test.model_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

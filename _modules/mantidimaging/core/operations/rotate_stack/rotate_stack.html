@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.operations.rotate_stack.rotate_stack &#8212; MantidImaging 2.1.0 documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.rotate_stack.rotate_stack</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.operations.rotate_stack.rotate_stack</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">skimage.transform</span> <span class="kn">import</span> <span class="n">rotate</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging</span> <span class="kn">import</span> <span class="n">helper</span> <span class="k">as</span> <span class="n">h</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.operations.base_filter</span> <span class="kn">import</span> <span class="n">BaseFilter</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">shared</span> <span class="k">as</span> <span class="n">ps</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.utility.qt_helpers</span> <span class="kn">import</span> <span class="n">Type</span>
+
+
+<div class="viewcode-block" id="RotateFilter"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rotate_stack.rotate_stack.html#mantidimaging.core.operations.rotate_stack.rotate_stack.RotateFilter">[docs]</a><span class="k">class</span> <span class="nc">RotateFilter</span><span class="p">(</span><span class="n">BaseFilter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rotates the image data by an arbitrary degree counter-clockwise.</span>
+
+<span class="sd">    Intended to be used on: Projections</span>
+
+<span class="sd">    When: Rarely/never, ASTRA vector geometry will take care of the tilt correction</span>
+
+<span class="sd">    Caution: Manually rotating could introduce additional artifacts in the</span>
+<span class="sd">    reconstructed volume, and it is not strictly required as using</span>
+<span class="sd">    vector geometry will correct for the tilt without manual rotation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filter_name</span> <span class="o">=</span> <span class="s2">&quot;Rotate Stack&quot;</span>
+    <span class="n">link_histograms</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="RotateFilter.filter_func"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rotate_stack.rotate_stack.html#mantidimaging.core.operations.rotate_stack.rotate_stack.RotateFilter.filter_func">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_func</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Images</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dark</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Rotates images by an arbitrary degree.</span>
+
+<span class="sd">        :param data: stack of sample images</span>
+<span class="sd">        :param angle: The rotation to be performed, in degrees</span>
+<span class="sd">        :param cores: cores for parallel execution</span>
+<span class="sd">        :param chunksize: chunk for each worker</span>
+
+<span class="sd">        :return: The rotated images</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">angle</span><span class="p">:</span>
+            <span class="n">_execute</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="RotateFilter.register_gui"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rotate_stack.rotate_stack.html#mantidimaging.core.operations.rotate_stack.rotate_stack.RotateFilter.register_gui">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">register_gui</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">on_change</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">mantidimaging.gui.utility</span> <span class="kn">import</span> <span class="n">add_property_to_form</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">angle</span> <span class="o">=</span> <span class="n">add_property_to_form</span><span class="p">(</span><span class="s1">&#39;Angle of rotation</span><span class="se">\n</span><span class="s1">counter clockwise (degrees)&#39;</span><span class="p">,</span>
+                                        <span class="n">Type</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
+                                        <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">359</span><span class="p">,</span> <span class="mi">359</span><span class="p">),</span>
+                                        <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span>
+                                        <span class="n">on_change</span><span class="o">=</span><span class="n">on_change</span><span class="p">,</span>
+                                        <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;How much degrees to rotate counter-clockwise&quot;</span><span class="p">)</span>
+        <span class="n">angle</span><span class="o">.</span><span class="n">setDecimals</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="n">angle</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="RotateFilter.execute_wrapper"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rotate_stack.rotate_stack.html#mantidimaging.core.operations.rotate_stack.rotate_stack.RotateFilter.execute_wrapper">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">execute_wrapper</span><span class="p">(</span><span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">RotateFilter</span><span class="o">.</span><span class="n">filter_func</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="o">.</span><span class="n">value</span><span class="p">())</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_rotate_image_inplace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">rotate</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="p">:],</span> <span class="n">angle</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">cores</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="n">Progress</span><span class="p">):</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;Rotate Stack&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span><span class="n">_rotate_image_inplace</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">inplace1</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">)</span>
+        <span class="n">ps</span><span class="o">.</span><span class="n">shared_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
+        <span class="n">ps</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">progress</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Rotating by </span><span class="si">{</span><span class="n">angle</span><span class="si">}</span><span class="s2"> degrees&quot;</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="n">cores</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.rotate_stack.rotate_stack</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

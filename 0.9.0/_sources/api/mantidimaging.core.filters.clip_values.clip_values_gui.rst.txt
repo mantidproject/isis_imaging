@@ -1,0 +1,7 @@
+mantidimaging.core.filters.clip\_values.clip\_values\_gui module
+================================================================
+
+.. automodule:: mantidimaging.core.filters.clip_values.clip_values_gui
+   :members:
+   :undoc-members:
+   :show-inheritance:

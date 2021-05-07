@@ -1,0 +1,285 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.process_list.process_list - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.process_list.process_list</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.process_list.process_list</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="c1"># using pickle instead of dill, because dill is not available on SCARF</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+
+<span class="kn">from</span> <span class="nn">ast</span> <span class="kn">import</span> <span class="n">literal_eval</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">StringIO</span>
+
+<span class="n">DEFAULT_ARGUMENT_SEPARATOR</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span>
+<span class="n">DEFAULT_FUNCTION_SEPARATOR</span> <span class="o">=</span> <span class="s1">&#39;;&#39;</span>
+<span class="n">DEFAULT_TUPLE_SEPARATOR</span> <span class="o">=</span> <span class="s1">&#39;)&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">_entry_from_string</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">arg_separator</span><span class="o">=</span><span class="n">DEFAULT_ARGUMENT_SEPARATOR</span><span class="p">,</span>
+                       <span class="n">tuple_separator</span><span class="o">=</span><span class="n">DEFAULT_TUPLE_SEPARATOR</span><span class="p">):</span>
+    <span class="n">whitespace</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">arg_separator</span><span class="p">)</span>
+    <span class="n">package</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[:</span><span class="n">whitespace</span><span class="p">]</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="n">whitespace</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">whitespace</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">arg_separator</span><span class="p">)</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[:</span><span class="n">whitespace</span><span class="p">]</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="n">whitespace</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">tuple_end_brace</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tuple_separator</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="c1"># literal eval to convert into the actual tuple type</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">entry</span><span class="p">[:</span><span class="n">tuple_end_brace</span><span class="p">])</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="n">tuple_end_brace</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">package</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span>
+
+
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.load">[docs]</a><span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="from_string"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.from_string">[docs]</a><span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">arg_separator</span><span class="o">=</span><span class="n">DEFAULT_ARGUMENT_SEPARATOR</span><span class="p">,</span>
+                <span class="n">func_separator</span><span class="o">=</span><span class="n">DEFAULT_FUNCTION_SEPARATOR</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ProcessList</span><span class="p">),</span> \
+                <span class="s2">&quot;The class parameter is not of the correct type ProcessList!&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="n">ProcessList</span><span class="p">()</span>
+
+    <span class="c1"># split on func separator and remove any 0 length strings</span>
+    <span class="n">separated_string</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span>
+        <span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">DEFAULT_FUNCTION_SEPARATOR</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">separated_string</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_store_string</span><span class="p">(</span><span class="o">*</span><span class="n">_entry_from_string</span><span class="p">(</span>
+                <span class="n">entry</span><span class="p">,</span> <span class="n">arg_separator</span><span class="p">,</span> <span class="n">DEFAULT_TUPLE_SEPARATOR</span><span class="p">))</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">SyntaxError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Error encountered while processing from the input string. &quot;</span>
+            <span class="s2">&quot;The formatting may be invalid.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="bp">cls</span></div>
+
+
+<div class="viewcode-block" id="ProcessList"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.ProcessList">[docs]</a><span class="k">class</span> <span class="nc">ProcessList</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores a queue of functions to be executed in first-in first-out order.</span>
+
+<span class="sd">    Currently only works with MantidImaging internal functions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># call with default separators</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">DEFAULT_ARGUMENT_SEPARATOR</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">_list</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="ProcessList.is_over"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.ProcessList.is_over">[docs]</a>    <span class="k">def</span> <span class="nf">is_over</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: True if we have traversed all of the list, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_idx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessList.next"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.ProcessList.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: Return the next function stored in the Process List</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_over</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_list_idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_list_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="ProcessList.previous"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.ProcessList.previous">[docs]</a>    <span class="k">def</span> <span class="nf">previous</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: Return the previous function stored in the Process List</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_list_idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_list_idx</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="ProcessList.clear"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.ProcessList.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear all contents from the Process List</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="ProcessList.store"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.ProcessList.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store a function in the process list to be executed later.</span>
+
+<span class="sd">        The arguments must be literal values.</span>
+
+<span class="sd">        Note: More arguments can be appended when the funciton is called for</span>
+<span class="sd">        execution.</span>
+
+<span class="sd">        :param func: This works with a function reference, because metadata</span>
+<span class="sd">                     needs to be read from the function.</span>
+<span class="sd">        :param args: Arguments that will be forwarded to the function. They</span>
+<span class="sd">                     must be literal values.</span>
+<span class="sd">        :param kwargs: Keyword arguments that will be forwarded to the</span>
+<span class="sd">                       function. They must be literal values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_store_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_store_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">parameters</span><span class="p">),</span> \
+            <span class="s2">&quot;One or more of the keyword arguments provided were NOT found &quot;</span> \
+            <span class="s2">&quot;in the function&#39;s declaration!&quot;</span>
+
+        <span class="n">func_package</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;__name__&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">func_name</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_store_string</span><span class="p">(</span><span class="n">func_package</span><span class="p">,</span> <span class="n">func_name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_store_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">package</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ProcessList.first"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.ProcessList.first">[docs]</a>    <span class="k">def</span> <span class="nf">first</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the first member of the queue, but do not remove.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ProcessList.save"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.ProcessList.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ProcessList.to_string"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.ProcessList.to_string">[docs]</a>    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_separator</span><span class="o">=</span><span class="n">DEFAULT_ARGUMENT_SEPARATOR</span><span class="p">,</span>
+                  <span class="n">func_separator</span><span class="o">=</span><span class="n">DEFAULT_FUNCTION_SEPARATOR</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param arg_separator: Separator character to be used between arguments.</span>
+<span class="sd">        :param func_separator: Separator character to be used between</span>
+<span class="sd">                               functions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">entry</span><span class="p">)))</span>
+
+            <span class="n">output_string</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">DEFAULT_ARGUMENT_SEPARATOR</span> <span class="o">+</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+                             <span class="n">DEFAULT_ARGUMENT_SEPARATOR</span> <span class="o">+</span> <span class="n">e</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span>
+                             <span class="n">DEFAULT_ARGUMENT_SEPARATOR</span> <span class="o">+</span> <span class="n">e</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span>
+                             <span class="n">DEFAULT_FUNCTION_SEPARATOR</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output_string</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessList.from_string"><a class="viewcode-back" href="../../../../api/mantidimaging.core.process_list.process_list.html#mantidimaging.core.process_list.process_list.ProcessList.from_string">[docs]</a>    <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">arg_separator</span><span class="o">=</span><span class="n">DEFAULT_ARGUMENT_SEPARATOR</span><span class="p">,</span>
+                    <span class="n">func_separator</span><span class="o">=</span><span class="n">DEFAULT_FUNCTION_SEPARATOR</span><span class="p">):</span>
+        <span class="n">from_string</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">arg_separator</span><span class="p">,</span> <span class="n">func_separator</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="process_list.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.process_list.process_list</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

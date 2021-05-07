@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.operations.rescale.rescale module - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.operations.rescale.rescale_test module" href="mantidimaging.core.operations.rescale.rescale_test.html" />
+    <link rel="prev" title="mantidimaging.core.operations.rescale package" href="mantidimaging.core.operations.rescale.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.rescale.rescale_test.html" title="mantidimaging.core.operations.rescale.rescale_test module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.rescale.html" title="mantidimaging.core.operations.rescale package"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.operations.html" >mantidimaging.core.operations package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.core.operations.rescale.html" accesskey="U">mantidimaging.core.operations.rescale package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.rescale.rescale module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.operations.rescale.rescale">
+<span id="mantidimaging-core-operations-rescale-rescale-module"></span><h1>mantidimaging.core.operations.rescale.rescale module<a class="headerlink" href="#module-mantidimaging.core.operations.rescale.rescale" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.core.operations.rescale.rescale.RescaleFilter">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.core.operations.rescale.rescale.</code><code class="sig-name descname">RescaleFilter</code><a class="reference internal" href="../_modules/mantidimaging/core/operations/rescale/rescale.html#RescaleFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.rescale.rescale.RescaleFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.BaseFilter" title="mantidimaging.core.operations.base_filter.BaseFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">mantidimaging.core.operations.base_filter.BaseFilter</span></code></a></p>
+<p>Rescales the image data to a new [0, maximum output] range.</p>
+<p>Intended to be used on: Any</p>
+<p>When: Can be used to crop-out value regions of interest</p>
+<p>When: Automatically used when saving images to uint16</p>
+<dl class="py method">
+<dt id="mantidimaging.core.operations.rescale.rescale.RescaleFilter.execute_wrapper">
+<em class="property">static </em><code class="sig-name descname">execute_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">min_input_widget</span><span class="p">:</span> <span class="n">PyQt5.QtWidgets.QDoubleSpinBox</span></em>, <em class="sig-param"><span class="n">max_input_widget</span><span class="p">:</span> <span class="n">PyQt5.QtWidgets.QDoubleSpinBox</span></em>, <em class="sig-param"><span class="n">max_output_widget</span><span class="p">:</span> <span class="n">PyQt5.QtWidgets.QDoubleSpinBox</span></em>, <em class="sig-param"><span class="n">preset_widget</span><span class="p">:</span> <span class="n">PyQt5.QtWidgets.QComboBox</span></em><span class="sig-paren">)</span> &#x2192; functools.partial<a class="reference internal" href="../_modules/mantidimaging/core/operations/rescale/rescale.html#RescaleFilter.execute_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.rescale.rescale.RescaleFilter.execute_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should construct a partial call to _filter_func using values taken from the widgets passed to this function
+as kwargs.
+:param kwargs: widgets which contain values required for _filter_func.
+:return: a partial call to _filter_func using parameters taken from the input widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.operations.rescale.rescale.RescaleFilter.filter_func">
+<em class="property">static </em><code class="sig-name descname">filter_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">images</span><span class="p">:</span> <span class="n"><a class="reference internal" href="mantidimaging.core.data.images.html#mantidimaging.core.data.images.Images" title="mantidimaging.core.data.images.Images">mantidimaging.core.data.images.Images</a></span></em>, <em class="sig-param"><span class="n">min_input</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></span> <span class="o">=</span> <span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">max_input</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></span> <span class="o">=</span> <span class="default_value">10000.0</span></em>, <em class="sig-param"><span class="n">max_output</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></span> <span class="o">=</span> <span class="default_value">256.0</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data_type</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mantidimaging.core.data.images.html#mantidimaging.core.data.images.Images" title="mantidimaging.core.data.images.Images">mantidimaging.core.data.images.Images</a><a class="reference internal" href="../_modules/mantidimaging/core/operations/rescale/rescale.html#RescaleFilter.filter_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.rescale.rescale.RescaleFilter.filter_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the filter algorithm on a given set of image data with the given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – the image data to apply the filter to</p></li>
+<li><p><strong>kwargs</strong> – any additional arguments which the specific filter uses</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the image data after applying the filter</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mantidimaging.core.operations.rescale.rescale.RescaleFilter.filter_name">
+<code class="sig-name descname">filter_name</code><em class="property"> = 'Rescale'</em><a class="headerlink" href="#mantidimaging.core.operations.rescale.rescale.RescaleFilter.filter_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.operations.rescale.rescale.RescaleFilter.filter_single_image">
+<em class="property">static </em><code class="sig-name descname">filter_single_image</code><span class="sig-paren">(</span><em class="sig-param">image: numpy.ndarray</em>, <em class="sig-param">min_input: float</em>, <em class="sig-param">max_input: float</em>, <em class="sig-param">max_output: float</em>, <em class="sig-param">data_type=&lt;class 'numpy.float32'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/rescale/rescale.html#RescaleFilter.filter_single_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.rescale.rescale.RescaleFilter.filter_single_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.operations.rescale.rescale.RescaleFilter.register_gui">
+<em class="property">static </em><code class="sig-name descname">register_gui</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">form</span></em>, <em class="sig-param"><span class="n">on_change</span></em>, <em class="sig-param"><span class="n">view</span><span class="p">:</span> <span class="n">mantidimaging.gui.windows.operations.view.FiltersWindowView</span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/rescale/rescale.html#RescaleFilter.register_gui"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.rescale.rescale.RescaleFilter.register_gui" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds any required input widgets to the given form and returns references to them.</p>
+<p>The return values should be in a dict which can be unpacked as kwargs for a call to
+the operations <cite>execute_wrapper</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>view</strong> – </p></li>
+<li><p><strong>form</strong> – the layout to create input widgets in</p></li>
+<li><p><strong>on_change</strong> – the filter view action to be bound to all created inputs</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the widgets bound as kwargs which are needed to call execute_wrapper</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.operations.rescale.rescale.RescaleFilter.validate_execute_kwargs">
+<em class="property">static </em><code class="sig-name descname">validate_execute_kwargs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><a class="reference internal" href="../_modules/mantidimaging/core/operations/rescale/rescale.html#RescaleFilter.validate_execute_kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.rescale.rescale.RescaleFilter.validate_execute_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.operations.rescale.html"
+                        title="previous chapter">mantidimaging.core.operations.rescale package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.operations.rescale.rescale_test.html"
+                        title="next chapter">mantidimaging.core.operations.rescale.rescale_test module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="mantidimaging.core.operations.rescale.rescale.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.rescale.rescale_test.html" title="mantidimaging.core.operations.rescale.rescale_test module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.rescale.html" title="mantidimaging.core.operations.rescale package"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.operations.html" >mantidimaging.core.operations package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.core.operations.rescale.html" >mantidimaging.core.operations.rescale package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.rescale.rescale module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

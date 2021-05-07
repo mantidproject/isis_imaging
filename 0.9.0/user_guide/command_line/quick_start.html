@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Quick Start - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Aggregating images" href="aggregate.html" />
+    <link rel="prev" title="Command Line" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="aggregate.html" title="Aggregating images"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Command Line"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Command Line</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="quick-start">
+<h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<section id="printing-the-help">
+<h2>Printing the help<a class="headerlink" href="#printing-the-help" title="Permalink to this headline">¶</a></h2>
+<p>The help can be printed by passing the <code class="code docutils literal notranslate"><span class="pre">-h</span></code> flag.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-h</span></code></p>
+<p>This will print out the whole help, containing each available command line
+parameter that can be passed.</p>
+</section>
+<section id="loading-data">
+<h2>Loading Data<a class="headerlink" href="#loading-data" title="Permalink to this headline">¶</a></h2>
+<section id="specifying-sample-data">
+<h3>Specifying Sample data<a class="headerlink" href="#specifying-sample-data" title="Permalink to this headline">¶</a></h3>
+<p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/path/to/sample</span></code></p>
+</section>
+<section id="loading-sample-flat-and-dark-at-once">
+<h3>Loading Sample, Flat and Dark at once<a class="headerlink" href="#loading-sample-flat-and-dark-at-once" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Only Sample can be loaded, but you can’t load just Flat or just Dark images.
+Both Flat and Dark must be specified at the same time.</p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/path/to/sample</span> <span class="pre">-F</span> <span class="pre">/some/path/to/flat</span> <span class="pre">-D</span>
+<span class="pre">/some/path/to/dark</span></code></p>
+</section>
+<section id="running-a-filter">
+<h3>Running a filter<a class="headerlink" href="#running-a-filter" title="Permalink to this headline">¶</a></h3>
+<p>Available filters can be listed using the help command <code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-h</span></code>.
+This example will show how to run a median filter on the loaded images.</p>
+<p>From the <code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-h</span></code> we can see that the Median filter has the
+following commands:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">--median-size</span> <span class="pre">&lt;number&gt;</span></code> and <code class="code docutils literal notranslate"><span class="pre">--median-mode</span> <span class="pre">&lt;string&gt;</span></code></p>
+<p>The one we are interested in <code class="code docutils literal notranslate"><span class="pre">--median-size</span></code>.</p>
+<p>To run the median filter we want to load a stack with <cite>-i</cite> and then append the
+<code class="code docutils literal notranslate"><span class="pre">--median-size</span></code> flag. The full command line will look like this:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/path/</span> <span class="pre">--median-size</span> <span class="pre">3</span></code></p>
+<p>This will load in the data, execute median filter and do nothing else.</p>
+</section>
+<section id="saving-pre-processed-images">
+<h3>Saving pre-processed images<a class="headerlink" href="#saving-pre-processed-images" title="Permalink to this headline">¶</a></h3>
+<p>If we want to save out the pre-processed images we need to provide the one of
+the following flags:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">-s</span></code> or <code class="code docutils literal notranslate"><span class="pre">--save-preproc</span></code></p>
+<p>If they are not specified the data will be processed, and then <strong>the result will
+be discarded</strong>. However this also requires an output path specified. Please
+refer to <a class="reference internal" href="#specifying-output-folder">Specifying output folder</a>.</p>
+</section>
+<section id="specifying-output-folder">
+<h3>Specifying output folder<a class="headerlink" href="#specifying-output-folder" title="Permalink to this headline">¶</a></h3>
+<p>If we want anything saved out we need to specify the output path. This can be
+done via one of the following flags:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">-o</span> <span class="pre">folder_name</span></code> or <code class="code docutils literal notranslate"><span class="pre">--output-path</span> <span class="pre">folder_name</span></code></p>
+</section>
+<section id="customising-pre-processed-folder">
+<h3>Customising pre-processed folder<a class="headerlink" href="#customising-pre-processed-folder" title="Permalink to this headline">¶</a></h3>
+<p>By default the pre-processing will be saved out in a folder called
+<code class="code docutils literal notranslate"><span class="pre">pre_processed</span></code>. This can be customised using one of the following flags:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">-p</span> <span class="pre">folder_name</span></code> or <code class="code docutils literal notranslate"><span class="pre">--preproc-subdir</span> <span class="pre">folder_name</span></code></p>
+</section>
+<section id="specifying-indices-to-be-processed">
+<h3>Specifying indices to be processed<a class="headerlink" href="#specifying-indices-to-be-processed" title="Permalink to this headline">¶</a></h3>
+<p>The package supports specifying only certain indices to be processed, for faster
+testing and execution. This functionality can be accessed with:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">--indices</span> <span class="pre">&lt;start&gt;</span> <span class="pre">&lt;stop&gt;</span> <span class="pre">&lt;step&gt;</span></code></p>
+<p>The flag also supports a few additional usages:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">--indices</span> <span class="pre">&lt;stop&gt;</span></code> - This will assume the start is 0, and step is 1</p>
+<p><code class="code docutils literal notranslate"><span class="pre">--indices</span> <span class="pre">&lt;start&gt;</span> <span class="pre">&lt;stop</span></code> - This will assume the step is 1</p>
+<p>Example usage on the command line:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/data</span> <span class="pre">--indices</span> <span class="pre">100</span> <span class="pre">--median-size</span> <span class="pre">3</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/data</span> <span class="pre">--indices</span> <span class="pre">0</span> <span class="pre">100</span> <span class="pre">--median-size</span> <span class="pre">3</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/data</span> <span class="pre">--indices</span> <span class="pre">0</span> <span class="pre">100</span> <span class="pre">1</span> <span class="pre">--median-size</span> <span class="pre">3</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>These 3 specify the same thing, and show off the different ways to use
+<code class="code docutils literal notranslate"><span class="pre">--indices</span></code>.</p>
+</section>
+<section id="saving-out-sinograms">
+<h3>Saving out sinograms<a class="headerlink" href="#saving-out-sinograms" title="Permalink to this headline">¶</a></h3>
+<p>Finding the Center of Rotation and reconstructing a dataset requires the images
+to be converted to Sinograms first.</p>
+<p>This can be done in anything that involves saving images out, meaning that the
+images can be converted after being applied a filter:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/path/</span> <span class="pre">--median-size</span> <span class="pre">3</span> <span class="pre">--swap-axes</span> <span class="pre">-o</span> <span class="pre">/some/path</span>
+<span class="pre">-s</span></code></p>
+<p>For converting images that have already been saved out, use the following
+command:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/path/</span> <span class="pre">-o</span> <span class="pre">/output/path</span> <span class="pre">--convert</span> <span class="pre">--swap-axes</span></code></p>
+</section>
+<section id="automatic-finding-cor">
+<h3>Automatic Finding COR<a class="headerlink" href="#automatic-finding-cor" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Note: This expects images as sinograms. Please refer to <a class="reference internal" href="#saving-out-sinograms">Saving out
+sinograms</a>.</p></li>
+</ul>
+<p>To run one of the Tomopy’s automatic COR finding algorithms use:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">--imopr</span> <span class="pre">cor</span> <span class="pre">--indices</span> <span class="pre">10</span></code></p>
+<p>This will run the automatic COR algorithm on the first 10 slices.</p>
+</section>
+<section id="manual-finding-cor">
+<h3>Manual Finding COR<a class="headerlink" href="#manual-finding-cor" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Note: This expects images as sinograms. Please refer to <a class="reference internal" href="#saving-out-sinograms">Saving out
+sinograms</a>.</p></li>
+</ul>
+<p>If the algorithm is not accurate you can use the manual approach:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">--imopr</span> <span class="pre">&lt;cor_start&gt;</span> <span class="pre">&lt;cor_end&gt;</span> <span class="pre">&lt;cor_step&gt;</span> <span class="pre">corwrite</span> <span class="pre">-o</span> <span class="pre">/some/path</span> <span class="pre">--indices</span>
+<span class="pre">10</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">--imopr</span></code>’s <code class="code docutils literal notranslate"><span class="pre">corwrite</span></code> allows to manually specify CORs, reconstruct
+the slices with those CORs and save them out.</p>
+<p>The functionality is extended to provide a way for multiple slices in one go.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/sinogrmas</span> <span class="pre">--imopr</span> <span class="pre">200</span> <span class="pre">300</span> <span class="pre">1</span> <span class="pre">corwrite</span> <span class="pre">-o</span> <span class="pre">/some/path</span>
+<span class="pre">--indices</span> <span class="pre">10</span></code></p>
+<p>This will reconstruct the first 10 slices (from <code class="code docutils literal notranslate"><span class="pre">--indices</span> <span class="pre">10</span></code>) and will
+use the CORs in range 200 to 300, with a step of 1 (from <code class="code docutils literal notranslate"><span class="pre">--imopr</span> <span class="pre">200</span> <span class="pre">300</span>
+<span class="pre">1</span> <span class="pre">corwrite</span></code>).</p>
+<p>Then it will save them out to the path specified by <code class="code docutils literal notranslate"><span class="pre">-o</span></code>.</p>
+</section>
+<section id="running-reconstruction">
+<h3>Running reconstruction<a class="headerlink" href="#running-reconstruction" title="Permalink to this headline">¶</a></h3>
+<p>When the correct CORs have been found you can run the reconstruction.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">--reconstruction</span></code> flag must be specified, which also requires the
+<code class="code docutils literal notranslate"><span class="pre">--cor-slices</span> <span class="pre">--cors</span></code> to be specified.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">--cors</span></code></p>
+<p>Specifies the COR for each slice. If a single COR is passed, it will be assumed
+all slices have the same COR.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">--cor-slices</span></code></p>
+<p>Specifies which are the slices for which the CORs are specified with the
+<code class="code docutils literal notranslate"><span class="pre">--cors</span></code> flag. This must have the same number of arguments as
+<code class="code docutils literal notranslate"><span class="pre">--cors</span></code>.</p>
+<p>If only a single COR is passed into <code class="code docutils literal notranslate"><span class="pre">--cors</span></code> you <strong>must not</strong> specify this
+flag.</p>
+<p>Example command line:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">mantidimaging</span> <span class="pre">-i</span> <span class="pre">/some/sinograms/</span> <span class="pre">--cor-slices</span> <span class="pre">100</span> <span class="pre">200</span> <span class="pre">300</span> <span class="pre">--cors</span> <span class="pre">340</span> <span class="pre">341</span>
+<span class="pre">342</span> <span class="pre">--reconstruction</span> <span class="pre">-o</span> <span class="pre">/some/output/path</span></code></p>
+<p>This specifies that slice 100 has COR of 340, slice 200 has a COR of 341, and
+slice 300 has a COR of 342. The CORs between the slices will be interpolated
+based on the ones that are passed in.</p>
+</section>
+<section id="selecting-tool-and-algorithm">
+<h3>Selecting tool and algorithm<a class="headerlink" href="#selecting-tool-and-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>The tool used can be specified with:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">-t</span></code> or <code class="code docutils literal notranslate"><span class="pre">--tool</span></code></p>
+<p>The algorithm can be specified with:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">-a</span></code> or <code class="code docutils literal notranslate"><span class="pre">--algorithm</span></code></p>
+<p>For available tools and algorithms please refer to the <a class="reference internal" href="#printing-the-help">Printing the help</a>.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Quick Start</a><ul>
+<li><a class="reference internal" href="#printing-the-help">Printing the help</a></li>
+<li><a class="reference internal" href="#loading-data">Loading Data</a><ul>
+<li><a class="reference internal" href="#specifying-sample-data">Specifying Sample data</a></li>
+<li><a class="reference internal" href="#loading-sample-flat-and-dark-at-once">Loading Sample, Flat and Dark at once</a></li>
+<li><a class="reference internal" href="#running-a-filter">Running a filter</a></li>
+<li><a class="reference internal" href="#saving-pre-processed-images">Saving pre-processed images</a></li>
+<li><a class="reference internal" href="#specifying-output-folder">Specifying output folder</a></li>
+<li><a class="reference internal" href="#customising-pre-processed-folder">Customising pre-processed folder</a></li>
+<li><a class="reference internal" href="#specifying-indices-to-be-processed">Specifying indices to be processed</a></li>
+<li><a class="reference internal" href="#saving-out-sinograms">Saving out sinograms</a></li>
+<li><a class="reference internal" href="#automatic-finding-cor">Automatic Finding COR</a></li>
+<li><a class="reference internal" href="#manual-finding-cor">Manual Finding COR</a></li>
+<li><a class="reference internal" href="#running-reconstruction">Running reconstruction</a></li>
+<li><a class="reference internal" href="#selecting-tool-and-algorithm">Selecting tool and algorithm</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Command Line</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="aggregate.html"
+                        title="next chapter">Aggregating images</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../index.html">Latest</a></li>
+  <li><a href="quick_start.html">0.9.0</a></li>
+  <li><a href="../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="aggregate.html" title="Aggregating images"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Command Line"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Command Line</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

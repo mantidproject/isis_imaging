@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.gui.windows.cor_tilt.point_table_model module - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.gui.windows.cor_tilt.presenter module" href="mantidimaging.gui.windows.cor_tilt.presenter.html" />
+    <link rel="prev" title="mantidimaging.gui.windows.cor_tilt.model module" href="mantidimaging.gui.windows.cor_tilt.model.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.cor_tilt.presenter.html" title="mantidimaging.gui.windows.cor_tilt.presenter module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.cor_tilt.model.html" title="mantidimaging.gui.windows.cor_tilt.model module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.gui.html" >mantidimaging.gui package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.gui.windows.html" >mantidimaging.gui.windows package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.gui.windows.cor_tilt.html" accesskey="U">mantidimaging.gui.windows.cor_tilt package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.cor_tilt.point_table_model module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.gui.windows.cor_tilt.point_table_model">
+<span id="mantidimaging-gui-windows-cor-tilt-point-table-model-module"></span><h1>mantidimaging.gui.windows.cor_tilt.point_table_model module<a class="headerlink" href="#module-mantidimaging.gui.windows.cor_tilt.point_table_model" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.gui.windows.cor_tilt.point_table_model.</code><code class="sig-name descname">CorTiltPointQtModel</code><a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtCore.QAbstractTableModel</span></code>, <a class="reference internal" href="mantidimaging.core.cor_tilt.data_model.html#mantidimaging.core.cor_tilt.data_model.CorTiltDataModel" title="mantidimaging.core.cor_tilt.data_model.CorTiltDataModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mantidimaging.core.cor_tilt.data_model.CorTiltDataModel</span></code></a></p>
+<p>Qt data model for COR/Tilt finding.</p>
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.appendNewRow">
+<code class="sig-name descname">appendNewRow</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slice_idx</span></em>, <em class="sig-param"><span class="n">cor</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.appendNewRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.appendNewRow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.columnCount">
+<code class="sig-name descname">columnCount</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">parent</span><span class="p">:</span> <span class="n">QModelIndex</span> <span class="o">=</span> <span class="default_value">QModelIndex()</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.columnCount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.columnCount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.data">
+<code class="sig-name descname">data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">QModelIndex</span></em>, <em class="sig-param"><span class="n">role</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">Qt.ItemDataRole.DisplayRole</span></em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.flags">
+<code class="sig-name descname">flags</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">QModelIndex</span></em><span class="sig-paren">)</span> &#x2192; Qt.ItemFlags<a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.flags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.flags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.headerData">
+<code class="sig-name descname">headerData</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">int</em>, <em class="sig-param">Qt.Orientation</em>, <em class="sig-param">role: int = Qt.ItemDataRole.DisplayRole</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.headerData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.headerData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">CorTiltPointQtModel.insertRows(self, int, int, parent: QModelIndex = QModelIndex()) -&gt; bool</code><a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.insertRows"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.populate_slice_indices">
+<code class="sig-name descname">populate_slice_indices</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">begin</span></em>, <em class="sig-param"><span class="n">end</span></em>, <em class="sig-param"><span class="n">count</span></em>, <em class="sig-param"><span class="n">cor</span><span class="o">=</span><span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.populate_slice_indices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.populate_slice_indices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.removeAllRows">
+<code class="sig-name descname">removeAllRows</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.removeAllRows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.removeAllRows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">CorTiltPointQtModel.removeRows(self, int, int, parent: QModelIndex = QModelIndex()) -&gt; bool</code><a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.removeRows"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.rowCount">
+<code class="sig-name descname">rowCount</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">parent</span><span class="p">:</span> <span class="n">QModelIndex</span> <span class="o">=</span> <span class="default_value">QModelIndex()</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.rowCount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.rowCount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.setData">
+<code class="sig-name descname">setData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">QModelIndex</span></em>, <em class="sig-param"><span class="n">Any</span></em>, <em class="sig-param"><span class="n">role</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">Qt.ItemDataRole.EditRole</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.setData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.setData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.set_point">
+<code class="sig-name descname">set_point</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idx</span></em>, <em class="sig-param"><span class="n">slice_idx</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cor</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.set_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.set_point" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.sort_points">
+<code class="sig-name descname">sort_points</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/windows/cor_tilt/point_table_model.html#CorTiltPointQtModel.sort_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.windows.cor_tilt.point_table_model.CorTiltPointQtModel.sort_points" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.gui.windows.cor_tilt.model.html"
+                        title="previous chapter">mantidimaging.gui.windows.cor_tilt.model module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.gui.windows.cor_tilt.presenter.html"
+                        title="next chapter">mantidimaging.gui.windows.cor_tilt.presenter module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="mantidimaging.gui.windows.cor_tilt.point_table_model.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.cor_tilt.presenter.html" title="mantidimaging.gui.windows.cor_tilt.presenter module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.windows.cor_tilt.model.html" title="mantidimaging.gui.windows.cor_tilt.model module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.gui.html" >mantidimaging.gui package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.gui.windows.html" >mantidimaging.gui.windows package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="mantidimaging.gui.windows.cor_tilt.html" >mantidimaging.gui.windows.cor_tilt package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.windows.cor_tilt.point_table_model module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

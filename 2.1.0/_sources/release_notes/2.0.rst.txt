@@ -1,0 +1,20 @@
+Mantid Imaging 2.0
+==================
+
+MantidImaging 2.0 is the first production ready release, suitable for a full neutron imaging and tomography workflow.
+
+New features
+------------
+
+* Auto loading of flat and dark frames
+* Loading of projection angles
+* PyQtGraph based stack viewers, for higher performance interactive data views
+* Compare window showing before vs after for operations
+* Safe apply of operations
+* ASTRA reconstruction algorithms
+
+
+Fixes
+-----
+
+Large number of fixes, clean ups and smaller improvements.

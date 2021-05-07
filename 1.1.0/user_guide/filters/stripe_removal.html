@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Stripe Removal - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Python Interface" href="../python/index.html" />
+    <link rel="prev" title="Rotate Stack" href="rotate_stack.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../python/index.html" title="Python Interface"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="rotate_stack.html" title="Rotate Stack"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Filters</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Stripe Removal</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="stripe-removal">
+<h1>Stripe Removal<a class="headerlink" href="#stripe-removal" title="Permalink to this headline">¶</a></h1>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This filter requires TomoPy to be available.</p>
+</div>
+<dl class="simple">
+<dt>Performs stripe removal using one of three methods provided by TomoPy:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="http://tomopy.readthedocs.io/en/latest/api/tomopy.prep.stripe.html#tomopy.prep.stripe.remove_stripe_fw">Fourier-Wavelet</a></p></li>
+<li><p><a class="reference external" href="http://tomopy.readthedocs.io/en/latest/api/tomopy.prep.stripe.html#tomopy.prep.stripe.remove_stripe_ti">Titarenko</a></p></li>
+<li><p><a class="reference external" href="http://tomopy.readthedocs.io/en/latest/api/tomopy.prep.stripe.html#tomopy.prep.stripe.remove_stripe_sf">Smoothing filter</a></p></li>
+</ul>
+</dd>
+</dl>
+<section id="python-api">
+<h2>Python API<a class="headerlink" href="#python-api" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="mantidimaging.core.filters.stripe_removal.execute">
+<code class="sig-prename descclassname">mantidimaging.core.filters.stripe_removal.</code><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">wf</span></em>, <em class="sig-param"><span class="n">ti</span></em>, <em class="sig-param"><span class="n">sf</span></em>, <em class="sig-param"><span class="n">cores</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">chunksize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mantidimaging/core/filters/stripe_removal/stripe_removal.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.filters.stripe_removal.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute stripe removal filters.</p>
+<p>Multiple filters can be executed, if they are specified on the command
+line.</p>
+<p>The order for that execution will always be: wavelett-fourier, titarenko,
+smoothing-filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Sample data which is to be processed. Expected in radiograms</p></li>
+<li><p><strong>wf</strong> – <p>Specify parameters for the wavelett-fourier filter.
+Acceptable keywords are:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>level (default None, type int, optional parameter)</dt><dd><p>Number of discrete wavelet transform levels.</p>
+</dd>
+<dt>wname (default ‘db5’, type str, optional parameter)</dt><dd><p>Type of the wavelet filter. ‘haar’, ‘db5’, ‘sym5’.</p>
+</dd>
+<dt>sigma (default 2, type float, optional parameter)</dt><dd><p>Damping parameter in Fourier space.</p>
+</dd>
+<dt>pad (default True, type bool, optional parameter)</dt><dd><p>If True, extend the size of the sinogram by
+padding with zeros.</p>
+</dd>
+</dl>
+</div></blockquote>
+</p></li>
+<li><p><strong>ti</strong> – <p>Specify parameters for the titarenko filter.
+Acceptable keywords are:</p>
+<blockquote>
+<div><p>nblock (default:0, int, optional) Number of blocks.</p>
+<p>alpha (default: 1.5, int, optional) Damping factor.</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>sf</strong> – <p>Specify parameters for the smoothing-filter.
+Acceptable keywords are:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>size (default: 5, int, optional)</dt><dd><p>Size of the smoothing filter.</p>
+</dd>
+</dl>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Processed data</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Stripe Removal</a><ul>
+<li><a class="reference internal" href="#python-api">Python API</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="rotate_stack.html"
+                        title="previous chapter">Rotate Stack</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../python/index.html"
+                        title="next chapter">Python Interface</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../index.html">Latest</a></li>
+  <li><a href="../../../0.9.0/user_guide/filters/stripe_removal.html">0.9.0</a></li>
+  <li><a href="../../../1.0.0/user_guide/filters/stripe_removal.html">1.0.0</a></li>
+  <li><a href="stripe_removal.html">1.1.0</a></li>
+  <li><a href="../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../python/index.html" title="Python Interface"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="rotate_stack.html" title="Rotate Stack"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Filters</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Stripe Removal</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

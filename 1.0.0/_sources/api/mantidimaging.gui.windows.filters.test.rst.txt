@@ -1,0 +1,15 @@
+mantidimaging.gui.windows.filters.test package
+==============================================
+
+.. automodule:: mantidimaging.gui.windows.filters.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.filters.test.model_test

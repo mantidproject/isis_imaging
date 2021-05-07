@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.main.presenter module
+===============================================
+
+.. automodule:: mantidimaging.gui.windows.main.presenter
+   :members:
+   :undoc-members:
+   :show-inheritance:

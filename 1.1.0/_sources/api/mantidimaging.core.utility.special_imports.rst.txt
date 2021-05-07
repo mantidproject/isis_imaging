@@ -1,0 +1,7 @@
+mantidimaging.core.utility.special\_imports module
+==================================================
+
+.. automodule:: mantidimaging.core.utility.special_imports
+   :members:
+   :undoc-members:
+   :show-inheritance:

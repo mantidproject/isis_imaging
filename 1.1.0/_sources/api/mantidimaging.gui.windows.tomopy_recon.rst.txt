@@ -1,0 +1,26 @@
+mantidimaging.gui.windows.tomopy\_recon package
+===============================================
+
+.. automodule:: mantidimaging.gui.windows.tomopy_recon
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.tomopy_recon.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.tomopy_recon.model
+   mantidimaging.gui.windows.tomopy_recon.navigation_toolbar
+   mantidimaging.gui.windows.tomopy_recon.presenter
+   mantidimaging.gui.windows.tomopy_recon.view

@@ -1,0 +1,24 @@
+mantidimaging.core.filters.circular\_mask package
+=================================================
+
+.. automodule:: mantidimaging.core.filters.circular_mask
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.circular_mask.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.circular_mask.circular_mask
+   mantidimaging.core.filters.circular_mask.circular_mask_gui

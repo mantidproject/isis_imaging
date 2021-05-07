@@ -1,0 +1,7 @@
+mantidimaging.core.filters.background\_correction\_and\_normalisation.background\_correction\_and\_normalisation\_gui module
+============================================================================================================================
+
+.. automodule:: mantidimaging.core.filters.background_correction_and_normalisation.background_correction_and_normalisation_gui
+   :members:
+   :undoc-members:
+   :show-inheritance:

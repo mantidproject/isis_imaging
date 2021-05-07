@@ -1,0 +1,7 @@
+mantidimaging.core.imopr.sinogram module
+========================================
+
+.. automodule:: mantidimaging.core.imopr.sinogram
+   :members:
+   :undoc-members:
+   :show-inheritance:

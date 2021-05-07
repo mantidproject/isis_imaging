@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.parallel - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.parallel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">parallel.shared_mem: Runs a function in parallel.</span>
+<span class="sd">                     Expects and uses a single 3D shared memory array between</span>
+<span class="sd">                     the processes.</span>
+<span class="sd">parallel.two_shared_mem: Runs a function in parallel.</span>
+<span class="sd">                         Expects and uses two 3D shared memory arrays between</span>
+<span class="sd">                         the processes.</span>
+<span class="sd">parallel.exclusive_mem: Runs a function in parallel.</span>
+<span class="sd">                         Uses a 3D memory array, but each process will copy the</span>
+<span class="sd">                         piece of data it&#39;s processing, before processing it,</span>
+<span class="sd">                         if the data is in any way read or modified, triggering</span>
+<span class="sd">                         the copy-on-write.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: F401</span>
+        <span class="n">exclusive_mem</span><span class="p">,</span>
+        <span class="n">shared_mem</span><span class="p">,</span>
+        <span class="n">two_shared_mem</span><span class="p">,</span>
+        <span class="n">utility</span><span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Replace the memory allocation function for subprocesses. In Python 2.7 this</span>
+<span class="sd">would allocate the memory in RAM and then share it between the processes. This</span>
+<span class="sd">was changed in Python 3.x to allocate a file that is used for shared memory.</span>
+<span class="sd">The following code reverts that change back to the Python 2.7 behaviour.</span>
+
+<span class="sd">The `mmap.mmap(-1, self.size)` is taken from the Python 2.7 source.</span>
+<span class="sd">The source up to Python 3.6 function is this:</span>
+
+<span class="sd">def __init__(self, size, fd=-1):</span>
+<span class="sd">    self.size = size</span>
+<span class="sd">    self.fd = fd</span>
+<span class="sd">    if fd == -1:</span>
+<span class="sd">        self.fd, name = tempfile.mkstemp(</span>
+<span class="sd">             prefix=&#39;pym-%d-&#39;%os.getpid(), dir=util.get_temp_dir())</span>
+<span class="sd">        os.unlink(name)</span>
+<span class="sd">        util.Finalize(self, os.close, (self.fd,))</span>
+<span class="sd">        with open(self.fd, &#39;wb&#39;, closefd=False) as f:</span>
+<span class="sd">            bs = 1024 * 1024</span>
+<span class="sd">            if size &gt;= bs:</span>
+<span class="sd">                zeros = b&#39;\0&#39; * bs</span>
+<span class="sd">                for _ in range(size // bs):</span>
+<span class="sd">                    f.write(zeros)</span>
+<span class="sd">                del zeros</span>
+<span class="sd">            f.write(b&#39;\0&#39; * (size % bs))</span>
+<span class="sd">            assert f.tell() == size</span>
+<span class="sd">    self.buffer = mmap.mmap(self.fd, self.size)</span>
+
+<span class="sd">On the line with open(...) python allocates the shared memory as a file.</span>
+
+<span class="sd">This is the code from the bug issue at http://bugs.python.org/issue30919.</span>
+
+<span class="sd">The performance testing that has been done with the fix (copied the code from</span>
+<span class="sd">Python 3.7) seems to give the same performance as the Python 2.7.</span>
+
+<span class="sd">It will be officially in Python when 3.7 is released.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s1">&#39;win32&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">mmap</span>
+    <span class="kn">import</span> <span class="nn">multiprocessing.heap</span>
+    <span class="kn">import</span> <span class="nn">tempfile</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">import</span> <span class="nn">multiprocessing.util</span> <span class="k">as</span> <span class="nn">util</span>
+
+    <span class="n">multiprocessing</span><span class="o">.</span><span class="n">heap</span><span class="o">.</span><span class="n">Arena</span><span class="o">.</span><span class="n">_dir_candidates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/dev/shm&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_choose_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="c1"># Choose a non-storage backed directory if possible,</span>
+        <span class="c1"># to improve performance</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_candidates</span><span class="p">:</span>
+            <span class="n">st</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">statvfs</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">f_bavail</span> <span class="o">*</span> <span class="n">st</span><span class="o">.</span><span class="n">f_frsize</span> <span class="o">&gt;=</span> <span class="n">size</span><span class="p">:</span>  <span class="c1"># enough free space?</span>
+                <span class="k">return</span> <span class="n">d</span>
+        <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">get_temp_dir</span><span class="p">()</span>
+
+    <span class="n">multiprocessing</span><span class="o">.</span><span class="n">heap</span><span class="o">.</span><span class="n">Arena</span><span class="o">.</span><span class="n">_choose_dir</span> <span class="o">=</span> <span class="n">_choose_dir</span>
+
+<div class="viewcode-block" id="ftruncate_allocation"><a class="viewcode-back" href="../../../api/mantidimaging.core.parallel.html#mantidimaging.core.parallel.ftruncate_allocation">[docs]</a>    <span class="k">def</span> <span class="nf">ftruncate_allocation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">fd</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="n">fd</span>
+        <span class="k">if</span> <span class="n">fd</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkstemp</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;pym-</span><span class="si">%d</span><span class="s1">-&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span>
+                <span class="nb">dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_choose_dir</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">util</span><span class="o">.</span><span class="n">Finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">ftruncate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">mmap</span><span class="o">.</span><span class="n">mmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span></div>
+
+    <span class="n">multiprocessing</span><span class="o">.</span><span class="n">heap</span><span class="o">.</span><span class="n">Arena</span><span class="o">.</span><span class="fm">__init__</span> <span class="o">=</span> <span class="n">ftruncate_allocation</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../index.html">Latest</a></li>
+  <li><a href="parallel.html">0.9.0</a></li>
+  <li><a href="../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

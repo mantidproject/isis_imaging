@@ -1,0 +1,7 @@
+mantidimaging.core.configs.test.recon\_config\_test module
+==========================================================
+
+.. automodule:: mantidimaging.core.configs.test.recon_config_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

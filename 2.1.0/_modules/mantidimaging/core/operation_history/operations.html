@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.operation_history.operations - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operation_history.operations</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.operation_history.operations</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.operations.loader</span> <span class="kn">import</span> <span class="n">load_filter_packages</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">const</span>
+
+<span class="n">MODULE_NOT_FOUND</span> <span class="o">=</span> <span class="s2">&quot;Could not find module with name &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span>
+
+
+<div class="viewcode-block" id="ImageOperation"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operation_history.operations.html#mantidimaging.core.operation_history.operations.ImageOperation">[docs]</a><span class="k">class</span> <span class="nc">ImageOperation</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A deserialized representation of an item in a stack&#39;s operation_history</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">filter_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span> <span class="o">=</span> <span class="n">filter_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_kwargs</span> <span class="o">=</span> <span class="n">filter_kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_name</span> <span class="o">=</span> <span class="n">display_name</span>
+
+<div class="viewcode-block" id="ImageOperation.to_partial"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operation_history.operations.html#mantidimaging.core.operation_history.operations.ImageOperation.to_partial">[docs]</a>    <span class="k">def</span> <span class="nf">to_partial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_funcs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">partial</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="n">filter_funcs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">MODULE_NOT_FOUND</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">)</span>
+            <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageOperation.from_serialized"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operation_history.operations.html#mantidimaging.core.operation_history.operations.ImageOperation.from_serialized">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_serialized</span><span class="p">(</span><span class="n">metadata_entry</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageOperation&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ImageOperation</span><span class="p">(</span><span class="n">filter_name</span><span class="o">=</span><span class="n">metadata_entry</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">OPERATION_NAME</span><span class="p">],</span>
+                              <span class="n">filter_kwargs</span><span class="o">=</span><span class="n">metadata_entry</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">OPERATION_KEYWORD_ARGS</span><span class="p">],</span>
+                              <span class="n">display_name</span><span class="o">=</span><span class="n">metadata_entry</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">OPERATION_DISPLAY_NAME</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ImageOperation.serialize"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operation_history.operations.html#mantidimaging.core.operation_history.operations.ImageOperation.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">OPERATION_NAME</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">,</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">OPERATION_KEYWORD_ARGS</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_kwargs</span><span class="p">,</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">OPERATION_DISPLAY_NAME</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_name</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display_name</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_name</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="si">}</span><span class="s2">, &quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;kwargs: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_kwargs</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="deserialize_metadata"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operation_history.operations.html#mantidimaging.core.operation_history.operations.deserialize_metadata">[docs]</a><span class="k">def</span> <span class="nf">deserialize_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ImageOperation</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">ImageOperation</span><span class="o">.</span><span class="n">from_serialized</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">OPERATION_HISTORY</span><span class="p">]]</span> \
+        <span class="k">if</span> <span class="n">const</span><span class="o">.</span><span class="n">OPERATION_HISTORY</span> <span class="ow">in</span> <span class="n">metadata</span> <span class="k">else</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="ops_to_partials"><a class="viewcode-back" href="../../../../api/mantidimaging.core.operation_history.operations.html#mantidimaging.core.operation_history.operations.ops_to_partials">[docs]</a><span class="k">def</span> <span class="nf">ops_to_partials</span><span class="p">(</span><span class="n">filter_ops</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ImageOperation</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">partial</span><span class="p">]:</span>
+    <span class="n">filter_funcs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">f</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">filter_func</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">load_filter_packages</span><span class="p">(</span><span class="n">ignored_packages</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mantidimaging.core.operations.wip&#39;</span><span class="p">])</span>
+    <span class="p">}</span>
+    <span class="n">fixed_funcs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">OPERATION_NAME_AXES_SWAP</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">img</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="c1"># const.OPERATION_NAME_TOMOPY_RECON: lambda img, **kwargs: TomopyReconWindowModel.do_recon(img, **kwargs),</span>
+    <span class="p">}</span>
+    <span class="n">filter_funcs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">fixed_funcs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">to_partial</span><span class="p">(</span><span class="n">filter_funcs</span><span class="p">)</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">filter_ops</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="operations.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operation_history.operations</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+mantidimaging.gui.mvp\_base.test package
+========================================
+
+.. automodule:: mantidimaging.gui.mvp_base.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.mvp_base.test.presenter_test

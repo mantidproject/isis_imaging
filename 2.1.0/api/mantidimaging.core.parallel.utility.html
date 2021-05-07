@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.parallel.utility module - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.reconstruct package" href="mantidimaging.core.reconstruct.html" />
+    <link rel="prev" title="mantidimaging.core.parallel.shared module" href="mantidimaging.core.parallel.shared.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.reconstruct.html" title="mantidimaging.core.reconstruct package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.shared.html" title="mantidimaging.core.parallel.shared module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.parallel.html" accesskey="U">mantidimaging.core.parallel package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.utility module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.parallel.utility">
+<span id="mantidimaging-core-parallel-utility-module"></span><h1>mantidimaging.core.parallel.utility module<a class="headerlink" href="#module-mantidimaging.core.parallel.utility" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.utility.calculate_chunksize">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.utility.</code><code class="sig-name descname">calculate_chunksize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cores</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/parallel/utility.html#calculate_chunksize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.utility.calculate_chunksize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.utility.create_array">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.utility.</code><code class="sig-name descname">create_array</code><span class="sig-paren">(</span><em class="sig-param">shape: Tuple[Any, ...], dtype: Type[numpy.float32] = &lt;class 'numpy.float32'&gt;</em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="../_modules/mantidimaging/core/parallel/utility.html#create_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.utility.create_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an array, either in a memory file (if name provided), or purely in memory (if name is None)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shape</strong> – Shape of the array</p></li>
+<li><p><strong>dtype</strong> – Dtype of the array</p></li>
+<li><p><strong>name</strong> – Name of the shared memory array. If None, a non-shared array will be created</p></li>
+<li><p><strong>random_name</strong> – Whether to randomise the name. Will discard anything in the <cite>name</cite> parameter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The created Numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.utility.enough_memory">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.utility.</code><code class="sig-name descname">enough_memory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shape</span></em>, <em class="sig-param"><span class="n">dtype</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/parallel/utility.html#enough_memory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.utility.enough_memory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.utility.execute_impl">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.utility.</code><code class="sig-name descname">execute_impl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_num</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">partial_func</span><span class="p">:</span> <span class="n">functools.partial</span></em>, <em class="sig-param"><span class="n">cores</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">chunksize</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">progress</span><span class="p">:</span> <span class="n">mantidimaging.core.utility.progress_reporting.progress.Progress</span></em>, <em class="sig-param"><span class="n">msg</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/parallel/utility.html#execute_impl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.utility.execute_impl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.utility.get_cores">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.utility.</code><code class="sig-name descname">get_cores</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/parallel/utility.html#get_cores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.utility.get_cores" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.utility.multiprocessing_necessary">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.utility.</code><code class="sig-name descname">multiprocessing_necessary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shape</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span><span class="p">, </span>List<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">cores</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><a class="reference internal" href="../_modules/mantidimaging/core/parallel/utility.html#multiprocessing_necessary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.utility.multiprocessing_necessary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.parallel.shared.html"
+                        title="previous chapter">mantidimaging.core.parallel.shared module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.reconstruct.html"
+                        title="next chapter">mantidimaging.core.reconstruct package</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="mantidimaging.core.parallel.utility.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.reconstruct.html" title="mantidimaging.core.reconstruct package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.shared.html" title="mantidimaging.core.parallel.shared module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.parallel.html" >mantidimaging.core.parallel package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.utility module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Testing - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Troubleshooting" href="../troubleshooting.html" />
+    <link rel="prev" title="Creating a Release" href="release.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../troubleshooting.html" title="Troubleshooting"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="release.html" title="Creating a Release"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Testing</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="testing">
+<h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
+<p>Mantid imaging uses unit tests, static analysis and GUI approval testing</p>
+<p>The full test suite can be run using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">check</span>
+</pre></div>
+</div>
+<p>Tests are run automatically on pull requests on GitHub using actions, but should also be run during development.</p>
+<section id="unit-testing">
+<h2>Unit testing<a class="headerlink" href="#unit-testing" title="Permalink to this headline">¶</a></h2>
+<p>Unit tests can be run using <a class="reference external" href="https://docs.pytest.org/">pytest</a>, e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pytest</span>
+</pre></div>
+</div>
+<p>For options such as running a subset of tests, see <a class="reference external" href="https://docs.pytest.org/en/stable/usage.html">PyTest Docs</a></p>
+</section>
+<section id="static-analysis">
+<h2>Static analysis<a class="headerlink" href="#static-analysis" title="Permalink to this headline">¶</a></h2>
+<p>Mantid Imaging uses <a class="reference external" href="http://mypy-lang.org/">mypy</a>, <a class="reference external" href="https://flake8.pycqa.org/">flake8</a> and <a class="reference external" href="https://github.com/google/yapf">yapf</a> for static analysis and formatting. They are run by <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">check</span></code>, or can be run individually, e.g. <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">mypy</span></code>.</p>
+</section>
+<section id="gui-testing">
+<h2>GUI Testing<a class="headerlink" href="#gui-testing" title="Permalink to this headline">¶</a></h2>
+<p>Mantid Imaging uses <a class="reference external" href="https://applitools.com/products-eyes/">Applitools Eyes</a> for GUI approval testing. Screenshots of windows are uploaded and compared to known good baseline images. This is run in the github action on pull requests.</p>
+<p>Appplitools requires an API key to use, which can be found on via a Applitools web interface. On a developer machine this can be passed as an environment variable. E.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">APPLITOOLS_API_KEY</span><span class="o">=</span><span class="n">XXXXXXXXXX</span> <span class="n">xvfb</span><span class="o">-</span><span class="n">run</span> <span class="o">--</span><span class="n">auto</span><span class="o">-</span><span class="n">servernum</span> <span class="n">pytest</span> <span class="o">-</span><span class="n">p</span> <span class="n">no</span><span class="p">:</span><span class="n">xdist</span> <span class="o">-</span><span class="n">p</span> <span class="n">no</span><span class="p">:</span><span class="n">randomly</span> <span class="o">-</span><span class="n">p</span> <span class="n">no</span><span class="p">:</span><span class="n">repeat</span> <span class="o">-</span><span class="n">p</span> <span class="n">no</span><span class="p">:</span><span class="n">cov</span> <span class="n">mantidimaging</span><span class="o">/</span><span class="n">eyes_tests</span>
+</pre></div>
+</div>
+<p>Differences between uploaded and baseline images can be examined and approved or rejected from the Applitools web interface.</p>
+<p>To run without a key or to prevent uploads, set <code class="docutils literal notranslate"><span class="pre">APPLITOOLS_API_KEY</span></code> to <code class="docutils literal notranslate"><span class="pre">local</span></code> and choose a directory to save the screenshots. Note that this does not check for changes, and will always pass. e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">gui_test</span>
+<span class="n">APPLITOOLS_API_KEY</span><span class="o">=</span><span class="n">local</span> <span class="n">APPLITOOLS_IMAGE_DIR</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">gui_test</span> <span class="n">xvfb</span><span class="o">-</span><span class="n">run</span> <span class="o">--</span><span class="n">auto</span><span class="o">-</span><span class="n">servernum</span> <span class="n">pytest</span> <span class="o">-</span><span class="n">p</span> <span class="n">no</span><span class="p">:</span><span class="n">xdist</span> <span class="o">-</span><span class="n">p</span> <span class="n">no</span><span class="p">:</span><span class="n">randomly</span> <span class="o">-</span><span class="n">p</span> <span class="n">no</span><span class="p">:</span><span class="n">repeat</span> <span class="o">-</span><span class="n">p</span> <span class="n">no</span><span class="p">:</span><span class="n">cov</span> <span class="n">mantidimaging</span><span class="o">/</span><span class="n">eyes_tests</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Testing</a><ul>
+<li><a class="reference internal" href="#unit-testing">Unit testing</a></li>
+<li><a class="reference internal" href="#static-analysis">Static analysis</a></li>
+<li><a class="reference internal" href="#gui-testing">GUI Testing</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="release.html"
+                        title="previous chapter">Creating a Release</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../troubleshooting.html"
+                        title="next chapter">Troubleshooting</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="testing.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../troubleshooting.html" title="Troubleshooting"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="release.html" title="Creating a Release"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Testing</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

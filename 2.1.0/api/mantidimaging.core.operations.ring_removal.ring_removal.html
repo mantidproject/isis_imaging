@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.operations.ring_removal.ring_removal module - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.operations.roi_normalisation.roi_normalisation module" href="mantidimaging.core.operations.roi_normalisation.roi_normalisation.html" />
+    <link rel="prev" title="mantidimaging.core.operations.rebin.rebin module" href="mantidimaging.core.operations.rebin.rebin.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.roi_normalisation.roi_normalisation.html" title="mantidimaging.core.operations.roi_normalisation.roi_normalisation module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.rebin.rebin.html" title="mantidimaging.core.operations.rebin.rebin module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../user_guide/index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../user_guide/operations/index.html" accesskey="U">Operations</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.ring_removal.ring_removal module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.operations.ring_removal.ring_removal">
+<span id="mantidimaging-core-operations-ring-removal-ring-removal-module"></span><h1>mantidimaging.core.operations.ring_removal.ring_removal module<a class="headerlink" href="#module-mantidimaging.core.operations.ring_removal.ring_removal" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.core.operations.ring_removal.ring_removal.</code><code class="sig-name descname">RingRemovalFilter</code><a class="reference internal" href="../_modules/mantidimaging/core/operations/ring_removal/ring_removal.html#RingRemovalFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="mantidimaging.core.operations.base_filter.html#mantidimaging.core.operations.base_filter.BaseFilter" title="mantidimaging.core.operations.base_filter.BaseFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">mantidimaging.core.operations.base_filter.BaseFilter</span></code></a></p>
+<p>Remove ring artifacts from images in the reconstructed domain.</p>
+<p>Intended to be used on: Reconstructed slices</p>
+<p>When: To remove ring-filters that have not been removed by the pre-processing</p>
+<dl class="py method">
+<dt id="mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter.execute_wrapper">
+<em class="property">static </em><code class="sig-name descname">execute_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_field</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_field</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">thresh</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">thresh_max</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">thresh_min</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">theta</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rwidth</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/ring_removal/ring_removal.html#RingRemovalFilter.execute_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter.execute_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should construct a partial call to _filter_func using values taken from the widgets passed to this function
+as kwargs.
+:param kwargs: widgets which contain values required for _filter_func.
+:return: a partial call to _filter_func using parameters taken from the input widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter.filter_func">
+<em class="property">static </em><code class="sig-name descname">filter_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">images</span><span class="p">:</span> <span class="n"><a class="reference internal" href="mantidimaging.core.data.images.html#mantidimaging.core.data.images.Images" title="mantidimaging.core.data.images.Images">mantidimaging.core.data.images.Images</a></span></em>, <em class="sig-param"><span class="n">run_ring_removal</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">center_x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">center_y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">thresh</span><span class="o">=</span><span class="default_value">300.0</span></em>, <em class="sig-param"><span class="n">thresh_max</span><span class="o">=</span><span class="default_value">300.0</span></em>, <em class="sig-param"><span class="n">thresh_min</span><span class="o">=</span><span class="default_value">- 100.0</span></em>, <em class="sig-param"><span class="n">theta_min</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">rwidth</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">cores</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">chunksize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/ring_removal/ring_removal.html#RingRemovalFilter.filter_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter.filter_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removal of ring artifacts in reconstructed volume.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images</strong> – Sample data which is to be processed. Expected in radiograms</p></li>
+<li><p><strong>run_ring_removal</strong> – Uses Wavelet-Fourier based ring removal</p></li>
+<li><p><strong>center_x</strong> – (float, optional) abscissa location of center of rotation</p></li>
+<li><p><strong>center_y</strong> – (float, optional) ordinate location of center of rotation</p></li>
+<li><p><strong>thresh</strong> – (float, optional)
+maximum value of an offset due to a ring artifact</p></li>
+<li><p><strong>thresh_max</strong> – (float, optional)
+max value for portion of image to filter</p></li>
+<li><p><strong>thresh_min</strong> – (float, optional)
+min value for portion of image to filer</p></li>
+<li><p><strong>theta_min</strong> – (int, optional)
+minimum angle in degrees to be considered ring artifact</p></li>
+<li><p><strong>rwidth</strong> – (int, optional)
+Maximum width of the rings to be filtered in pixels</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Filtered data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter.filter_name">
+<code class="sig-name descname">filter_name</code><em class="property"> = 'Ring Removal'</em><a class="headerlink" href="#mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter.filter_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter.link_histograms">
+<code class="sig-name descname">link_histograms</code><em class="property"> = True</em><a class="headerlink" href="#mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter.link_histograms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter.register_gui">
+<em class="property">static </em><code class="sig-name descname">register_gui</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">form</span></em>, <em class="sig-param"><span class="n">on_change</span></em>, <em class="sig-param"><span class="n">view</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/operations/ring_removal/ring_removal.html#RingRemovalFilter.register_gui"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.operations.ring_removal.ring_removal.RingRemovalFilter.register_gui" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds any required input widgets to the given form and returns references to them.</p>
+<p>The return values should be in a dict which can be unpacked as kwargs for a call to
+the operations <cite>execute_wrapper</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>view</strong> – </p></li>
+<li><p><strong>form</strong> – the layout to create input widgets in</p></li>
+<li><p><strong>on_change</strong> – the filter view action to be bound to all created inputs</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the widgets bound as kwargs which are needed to call execute_wrapper</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.operations.rebin.rebin.html"
+                        title="previous chapter">mantidimaging.core.operations.rebin.rebin module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.operations.roi_normalisation.roi_normalisation.html"
+                        title="next chapter">mantidimaging.core.operations.roi_normalisation.roi_normalisation module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="mantidimaging.core.operations.ring_removal.ring_removal.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.roi_normalisation.roi_normalisation.html" title="mantidimaging.core.operations.roi_normalisation.roi_normalisation module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.operations.rebin.rebin.html" title="mantidimaging.core.operations.rebin.rebin module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../user_guide/index.html" >User Guide</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../user_guide/operations/index.html" >Operations</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.ring_removal.ring_removal module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

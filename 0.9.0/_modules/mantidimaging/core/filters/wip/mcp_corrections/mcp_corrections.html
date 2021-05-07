@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging</span> <span class="kn">import</span> <span class="n">helper</span> <span class="k">as</span> <span class="n">h</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+
+<span class="k">def</span> <span class="nf">_cli_register</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--mcp-corrections&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Do MCP Corrections.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span>
+
+
+<div class="viewcode-block" id="fool_my_own_sanity_check"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections.html#mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections.fool_my_own_sanity_check">[docs]</a><span class="k">def</span> <span class="nf">fool_my_own_sanity_check</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">expected_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections.html#mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;This only implement gap filling code. &quot;</span>
+                             <span class="s2">&quot;NO CODE FOR SHIFTING THE CHIPS IS CURRENTLY &quot;</span>
+                             <span class="s2">&quot;IMPLEMENTED!&quot;</span><span class="p">)</span>
+
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                        <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;MCP Corrections&#39;</span><span class="p">)</span>
+
+    <span class="n">fool_my_own_sanity_check</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># regions to mask, in order [left, top, right, bottom],</span>
+    <span class="c1"># the order for the coordinates is also left, top, right, bottom</span>
+    <span class="c1"># filter_width = 0 could use this for arbitrary filter value</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="mi">254</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="mi">258</span>
+    <span class="n">left_chip_region</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="n">x2</span><span class="p">]</span>
+    <span class="n">right_chip_region</span> <span class="o">=</span> <span class="p">[</span><span class="mi">257</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="mi">511</span><span class="p">,</span> <span class="n">x2</span><span class="p">]</span>
+    <span class="n">top_chip_region</span> <span class="o">=</span> <span class="p">[</span><span class="n">x1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="mi">255</span><span class="p">]</span>
+    <span class="n">bottom_chip_region</span> <span class="o">=</span> <span class="p">[</span><span class="n">x1</span><span class="p">,</span> <span class="mi">257</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="mi">511</span><span class="p">]</span>
+
+    <span class="n">vertical_chip_regions</span> <span class="o">=</span> <span class="p">[</span><span class="n">top_chip_region</span><span class="p">,</span> <span class="n">bottom_chip_region</span><span class="p">]</span>
+    <span class="n">horizontal_chip_regions</span> <span class="o">=</span> <span class="p">[</span><span class="n">left_chip_region</span><span class="p">,</span> <span class="n">right_chip_region</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;MCP corrections&quot;</span><span class="p">)</span>
+        <span class="c1"># 1st way -&gt; set all of the coordinates to 0 in a for loop per region</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">vertical_chip_regions</span><span class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">top</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">bottom</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="n">do_vertical_magic</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">do_vertical_magic</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">horizontal_chip_regions</span><span class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">top</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">bottom</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="n">do_horizontal_magic</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">do_horizontal_magic</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+
+    <span class="c1"># 2nd way -&gt; create a mask of 512, 512 filled with 1, set the coordinates</span>
+    <span class="c1"># to 1e-9 and then multiply all images by that mask!</span>
+    <span class="n">fool_my_own_sanity_check</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="do_horizontal_magic"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections.html#mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections.do_horizontal_magic">[docs]</a><span class="k">def</span> <span class="nf">do_horizontal_magic</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">):</span>
+    <span class="c1"># get column on left of values we&#39;ll interpolate</span>
+    <span class="n">left_val</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">top</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span><span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">]</span>
+    <span class="c1"># get column on right of values we&#39;ll interpolate</span>
+    <span class="n">right_val</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">bottom</span><span class="p">:</span><span class="n">bottom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">]</span>
+    <span class="n">fill_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">left_val</span> <span class="o">+</span> <span class="n">right_val</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">image</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill_value</span></div>
+
+
+<div class="viewcode-block" id="do_vertical_magic"><a class="viewcode-back" href="../../../../../../api/mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections.html#mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections.do_vertical_magic">[docs]</a><span class="k">def</span> <span class="nf">do_vertical_magic</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">):</span>
+    <span class="c1"># get column on left of values we&#39;ll interpolate</span>
+    <span class="n">left_val</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="p">,</span> <span class="n">left</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span><span class="n">left</span><span class="p">]</span>
+    <span class="c1"># get column on right of values we&#39;ll interpolate</span>
+    <span class="n">right_val</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span><span class="n">right</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># generate the interpolation</span>
+    <span class="n">fill_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">left_val</span> <span class="o">+</span> <span class="n">right_val</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="c1"># this makes each column of the matrix to equal the vector</span>
+    <span class="n">image</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill_value</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../../index.html">Latest</a></li>
+  <li><a href="mcp_corrections.html">0.9.0</a></li>
+  <li><a href="../../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.wip.mcp_corrections.mcp_corrections</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

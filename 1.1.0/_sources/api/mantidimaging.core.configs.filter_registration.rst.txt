@@ -1,0 +1,7 @@
+mantidimaging.core.configs.filter\_registration module
+======================================================
+
+.. automodule:: mantidimaging.core.configs.filter_registration
+   :members:
+   :undoc-members:
+   :show-inheritance:

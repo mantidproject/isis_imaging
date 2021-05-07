@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.configs.test.recon_config_test - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.configs.test.recon_config_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.configs.test.recon_config_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
+
+<span class="kn">import</span> <span class="nn">mantidimaging.core.testing.unit_test_helper</span> <span class="k">as</span> <span class="nn">th</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.configs.recon_config</span> <span class="kn">import</span> <span class="n">ReconstructionConfig</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.configs.filter_registration</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">register_filters_on_cli</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.configs.functional_config</span> <span class="kn">import</span> <span class="n">FunctionalConfig</span>
+
+
+<div class="viewcode-block" id="FunctionalConfigTest"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest">[docs]</a><span class="k">class</span> <span class="nc">FunctionalConfigTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="FunctionalConfigTest.setUpClass"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.setUpClass">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">func_config</span> <span class="o">=</span> <span class="n">FunctionalConfig</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_setup_parser</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">parser</span><span class="p">)</span>
+
+        <span class="n">register_filters_on_cli</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">parser</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_no_input_path_error"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_no_input_path_error">[docs]</a>    <span class="k">def</span> <span class="nf">test_no_input_path_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Ignore output to stdout/stderr</span>
+        <span class="k">with</span> <span class="n">th</span><span class="o">.</span><span class="n">IgnoreOutputStreams</span><span class="p">():</span>
+            <span class="c1"># the error is thrown from handle_special_arguments</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># don&#39;t add input path, which is supposed to be mandatory</span>
+                <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">]</span>
+                <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+                <span class="n">ReconstructionConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span> <span class="n">fake_args</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;If we reached this point we have failed the test, </span><span class="se">\</span>
+<span class="s2">                              because we were supposed to crash without </span><span class="se">\</span>
+<span class="s2">                              --input--path specified&quot;</span>
+            <span class="k">except</span> <span class="ne">SystemExit</span><span class="p">:</span>
+                <span class="c1"># it was supposed to fail, it&#39;s fine</span>
+                <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_missing_cors_error"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_missing_cors_error">[docs]</a>    <span class="k">def</span> <span class="nf">test_missing_cors_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># don&#39;t add CORS, which is mandatory if running reconstruction</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--reconstruction&#39;</span><span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="c1"># this was causing troubles, because the state is not refreshed with a</span>
+        <span class="c1"># global setUpClass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">cors</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">ReconstructionConfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span>
+                          <span class="n">fake_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_cors_success"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_cors_success">[docs]</a>    <span class="k">def</span> <span class="nf">test_cors_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="n">ReconstructionConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span> <span class="n">fake_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_save_preproc_no_output_path_error"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_save_preproc_no_output_path_error">[docs]</a>    <span class="k">def</span> <span class="nf">test_save_preproc_no_output_path_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="s1">&#39;--save-preproc&#39;</span>
+        <span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">ReconstructionConfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span>
+                          <span class="n">fake_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_convert_no_output_path_error"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_convert_no_output_path_error">[docs]</a>    <span class="k">def</span> <span class="nf">test_convert_no_output_path_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="s1">&#39;--convert&#39;</span><span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">ReconstructionConfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span>
+                          <span class="n">fake_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_aggregate_no_output_path_error"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_aggregate_no_output_path_error">[docs]</a>    <span class="k">def</span> <span class="nf">test_aggregate_no_output_path_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="s1">&#39;--aggregate&#39;</span><span class="p">,</span> <span class="s1">&#39;10 20&#39;</span>
+        <span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">ReconstructionConfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span>
+                          <span class="n">fake_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_successful_parse"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_successful_parse">[docs]</a>    <span class="k">def</span> <span class="nf">test_successful_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># remove the output path raise</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;/tmp/&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="s1">&#39;--output-path&#39;</span><span class="p">,</span> <span class="s1">&#39;/tmp/&#39;</span>
+        <span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="c1"># this shouldn&#39;t raise anything, if it does the test will crash</span>
+        <span class="n">ReconstructionConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span> <span class="n">fake_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_region_of_interest_not_int_fail"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_region_of_interest_not_int_fail">[docs]</a>    <span class="k">def</span> <span class="nf">test_region_of_interest_not_int_fail</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="s1">&#39;--region-of-interest&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;boop&#39;</span><span class="p">,</span> <span class="s1">&#39;what&#39;</span><span class="p">,</span> <span class="s1">&#39;why&#39;</span>
+        <span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">ReconstructionConfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span>
+                          <span class="n">fake_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_region_of_interest_success"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_region_of_interest_success">[docs]</a>    <span class="k">def</span> <span class="nf">test_region_of_interest_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="s1">&#39;--region-of-interest&#39;</span><span class="p">,</span> <span class="s1">&#39;10&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;20&#39;</span><span class="p">,</span> <span class="s1">&#39;10&#39;</span><span class="p">,</span> <span class="s1">&#39;20&#39;</span>
+        <span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="n">ReconstructionConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span> <span class="n">fake_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_air_region_not_int_fail"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_air_region_not_int_fail">[docs]</a>    <span class="k">def</span> <span class="nf">test_air_region_not_int_fail</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="s1">&#39;--air-region&#39;</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;boop&#39;</span><span class="p">,</span> <span class="s1">&#39;what&#39;</span><span class="p">,</span> <span class="s1">&#39;why&#39;</span>
+        <span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">ReconstructionConfig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span>
+                          <span class="n">fake_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_air_region_success"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_air_region_success">[docs]</a>    <span class="k">def</span> <span class="nf">test_air_region_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="s1">&#39;--air-region&#39;</span><span class="p">,</span> <span class="s1">&#39;10&#39;</span><span class="p">,</span> <span class="s1">&#39;20&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;10&#39;</span><span class="p">,</span> <span class="s1">&#39;20&#39;</span>
+        <span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="n">ReconstructionConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span> <span class="n">fake_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_indices_single"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_indices_single">[docs]</a>    <span class="k">def</span> <span class="nf">test_indices_single</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="s1">&#39;--indices&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span>
+        <span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="n">rc</span> <span class="o">=</span> <span class="n">ReconstructionConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span> <span class="n">fake_args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rc</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_indices_range"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_indices_range">[docs]</a>    <span class="k">def</span> <span class="nf">test_indices_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="s1">&#39;--indices&#39;</span><span class="p">,</span> <span class="s1">&#39;10&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span>
+        <span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="n">rc</span> <span class="o">=</span> <span class="n">ReconstructionConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span> <span class="n">fake_args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rc</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="FunctionalConfigTest.test_indices_step"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.configs.test.recon_config_test.html#mantidimaging.core.configs.test.recon_config_test.FunctionalConfigTest.test_indices_step">[docs]</a>    <span class="k">def</span> <span class="nf">test_indices_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fake_args_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;--input-path&#39;</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="s1">&#39;--cors&#39;</span><span class="p">,</span> <span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="s1">&#39;--indices&#39;</span><span class="p">,</span> <span class="s1">&#39;15&#39;</span><span class="p">,</span> <span class="s1">&#39;33&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span>
+        <span class="p">]</span>
+        <span class="n">fake_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">fake_args_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">fake_args</span><span class="p">)</span>
+        <span class="n">rc</span> <span class="o">=</span> <span class="n">ReconstructionConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func_config</span><span class="p">,</span> <span class="n">fake_args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rc</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="recon_config_test.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.configs.test.recon_config_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

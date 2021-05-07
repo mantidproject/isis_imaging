@@ -1,0 +1,16 @@
+mantidimaging.core.reconstruct.test package
+===========================================
+
+.. automodule:: mantidimaging.core.reconstruct.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.reconstruct.test.tomopy_reconstruction_test
+   mantidimaging.core.reconstruct.test.utility_test

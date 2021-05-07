@@ -1,0 +1,20 @@
+mantidimaging.core.utility.test package
+=======================================
+
+.. automodule:: mantidimaging.core.utility.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.utility.test.execution_splitter_test
+   mantidimaging.core.utility.test.execution_timer_test
+   mantidimaging.core.utility.test.registrator_test
+   mantidimaging.core.utility.test.shape_splitter_test
+   mantidimaging.core.utility.test.size_calculator_test
+   mantidimaging.core.utility.test.value_scaling_test

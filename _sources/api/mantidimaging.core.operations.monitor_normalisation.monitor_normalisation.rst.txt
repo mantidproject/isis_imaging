@@ -1,0 +1,7 @@
+mantidimaging.core.operations.monitor\_normalisation.monitor\_normalisation module
+==================================================================================
+
+.. automodule:: mantidimaging.core.operations.monitor_normalisation.monitor_normalisation
+   :members:
+   :undoc-members:
+   :show-inheritance:

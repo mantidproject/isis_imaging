@@ -1,0 +1,26 @@
+mantidimaging.core.cor\_tilt package
+====================================
+
+.. automodule:: mantidimaging.core.cor_tilt
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.cor_tilt.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.cor_tilt.angles
+   mantidimaging.core.cor_tilt.auto
+   mantidimaging.core.cor_tilt.data_model
+   mantidimaging.core.cor_tilt.workflow

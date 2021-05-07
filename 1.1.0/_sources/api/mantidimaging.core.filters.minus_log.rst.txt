@@ -1,0 +1,24 @@
+mantidimaging.core.filters.minus\_log package
+=============================================
+
+.. automodule:: mantidimaging.core.filters.minus_log
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.minus_log.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.minus_log.minus_log
+   mantidimaging.core.filters.minus_log.minus_log_gui

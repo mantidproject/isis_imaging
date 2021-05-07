@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.dialogs.cor_inspection.presenter - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.dialogs.cor_inspection.presenter</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.dialogs.cor_inspection.presenter</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">Qt</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.mvp_base</span> <span class="kn">import</span> <span class="n">BasePresenter</span>
+
+<span class="kn">from</span> <span class="nn">.model</span> <span class="kn">import</span> <span class="n">CORInspectionDialogModel</span>
+<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">ImageType</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Notification"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.dialogs.cor_inspection.presenter.html#mantidimaging.gui.dialogs.cor_inspection.presenter.Notification">[docs]</a><span class="k">class</span> <span class="nc">Notification</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">IMAGE_CLICKED_LESS</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">IMAGE_CLICKED_CURRENT</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">IMAGE_CLICKED_MORE</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">FULL_UPDATE</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">UPDATE_PARAMETERS_FROM_UI</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">LOADED</span> <span class="o">=</span> <span class="mi">6</span></div>
+
+
+<div class="viewcode-block" id="CORInspectionDialogPresenter"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.dialogs.cor_inspection.presenter.html#mantidimaging.gui.dialogs.cor_inspection.presenter.CORInspectionDialogPresenter">[docs]</a><span class="k">class</span> <span class="nc">CORInspectionDialogPresenter</span><span class="p">(</span><span class="n">BasePresenter</span><span class="p">):</span>
+    <span class="n">progress_updated</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CORInspectionDialogPresenter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">CORInspectionDialogModel</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CORInspectionDialogPresenter.notify"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.dialogs.cor_inspection.presenter.html#mantidimaging.gui.dialogs.cor_inspection.presenter.CORInspectionDialogPresenter.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">IMAGE_CLICKED_LESS</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_select_image</span><span class="p">(</span><span class="n">ImageType</span><span class="o">.</span><span class="n">LESS</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">IMAGE_CLICKED_CURRENT</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_select_image</span><span class="p">(</span><span class="n">ImageType</span><span class="o">.</span><span class="n">CURRENT</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">IMAGE_CLICKED_MORE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_select_image</span><span class="p">(</span><span class="n">ImageType</span><span class="o">.</span><span class="n">MORE</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">FULL_UPDATE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_full_ui_update</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">UPDATE_PARAMETERS_FROM_UI</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_update_ui_parameters</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="n">Notification</span><span class="o">.</span><span class="n">LOADED</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_load</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Notification handler failed&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CORInspectionDialogPresenter.on_load"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.dialogs.cor_inspection.presenter.html#mantidimaging.gui.dialogs.cor_inspection.presenter.CORInspectionDialogPresenter.on_load">[docs]</a>    <span class="k">def</span> <span class="nf">on_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">set_maximum_cor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">cor_extents</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">Notification</span><span class="o">.</span><span class="n">FULL_UPDATE</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CORInspectionDialogPresenter.on_select_image"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.dialogs.cor_inspection.presenter.html#mantidimaging.gui.dialogs.cor_inspection.presenter.CORInspectionDialogPresenter.on_select_image">[docs]</a>    <span class="k">def</span> <span class="nf">on_select_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Image selected: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
+
+        <span class="c1"># Adjust COR step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">adjust_cor</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+        <span class="c1"># Update UI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">Notification</span><span class="o">.</span><span class="n">FULL_UPDATE</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CORInspectionDialogPresenter.do_full_ui_update"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.dialogs.cor_inspection.presenter.html#mantidimaging.gui.dialogs.cor_inspection.presenter.CORInspectionDialogPresenter.do_full_ui_update">[docs]</a>    <span class="k">def</span> <span class="nf">do_full_ui_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">step_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">cor_step</span>
+
+        <span class="c1"># Images</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ImageType</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;COR: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">cor</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">recon_preview</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">title</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">image_canvas_draw</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CORInspectionDialogPresenter.do_update_ui_parameters"><a class="viewcode-back" href="../../../../../api/mantidimaging.gui.dialogs.cor_inspection.presenter.html#mantidimaging.gui.dialogs.cor_inspection.presenter.CORInspectionDialogPresenter.do_update_ui_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">do_update_ui_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">cor_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">step_size</span>
+
+        <span class="c1"># Update UI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">Notification</span><span class="o">.</span><span class="n">FULL_UPDATE</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">optimal_rotation_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">centre_cor</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="presenter.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.dialogs.cor_inspection.presenter</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

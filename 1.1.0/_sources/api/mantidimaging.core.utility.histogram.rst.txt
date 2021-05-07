@@ -1,0 +1,7 @@
+mantidimaging.core.utility.histogram module
+===========================================
+
+.. automodule:: mantidimaging.core.utility.histogram
+   :members:
+   :undoc-members:
+   :show-inheritance:

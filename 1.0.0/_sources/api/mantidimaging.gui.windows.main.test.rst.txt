@@ -1,0 +1,16 @@
+mantidimaging.gui.windows.main.test package
+===========================================
+
+.. automodule:: mantidimaging.gui.windows.main.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.main.test.model_test
+   mantidimaging.gui.windows.main.test.presenter_test

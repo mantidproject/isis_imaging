@@ -1,0 +1,7 @@
+mantidimaging.gui.mvp\_base.presenter module
+============================================
+
+.. automodule:: mantidimaging.gui.mvp_base.presenter
+   :members:
+   :undoc-members:
+   :show-inheritance:

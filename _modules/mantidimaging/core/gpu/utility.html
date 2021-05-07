@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.gpu.utility &#8212; MantidImaging 2.1.0 documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.gpu.utility</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.gpu.utility</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="n">CUPY_NOT_IMPORTED</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
+    <span class="n">mempool</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">get_default_memory_pool</span><span class="p">()</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="c1"># cupy not installed</span>
+    <span class="n">CUPY_NOT_IMPORTED</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># cupy installed, but unable to load CUDA</span>
+    <span class="n">CUPY_NOT_IMPORTED</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="n">MAX_CUPY_MEMORY_FRACTION</span> <span class="o">=</span> <span class="mf">0.8</span>
+<span class="n">MAX_GPU_SLICES</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">KERNEL_FILENAME</span> <span class="o">=</span> <span class="s2">&quot;cuda_image_filters.cu&quot;</span>
+
+<span class="n">EQUIVALENT_PAD_MODE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;reflect&quot;</span><span class="p">:</span> <span class="s2">&quot;symmetric&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;constant&quot;</span><span class="p">:</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;nearest&quot;</span><span class="p">:</span> <span class="s2">&quot;edge&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mirror&quot;</span><span class="p">:</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;wrap&quot;</span><span class="p">:</span> <span class="s2">&quot;wrap&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">_cupy_on_system</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :return: True if cupy is installed on the system, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="n">CUPY_NOT_IMPORTED</span>
+
+
+<span class="k">def</span> <span class="nf">_cupy_installed_correctly</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :return: True if cupy is able to run on the system, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Check that cupy was installed properly. If it is properly installed, then basic array multiplication will</span>
+        <span class="c1"># work without getting an exception.</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+        <span class="c1"># Initialise the memory pool if the above works</span>
+        <span class="k">with</span> <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
+            <span class="n">mempool</span><span class="o">.</span><span class="n">set_limit</span><span class="p">(</span><span class="n">fraction</span><span class="o">=</span><span class="n">MAX_CUPY_MEMORY_FRACTION</span><span class="p">)</span>
+
+        <span class="c1"># Delete arrays. Cupy should then clear the space.</span>
+        <span class="k">del</span> <span class="n">a</span>
+        <span class="k">del</span> <span class="n">b</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">except</span> <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">CompileException</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="gpu_available"><a class="viewcode-back" href="../../../../api/mantidimaging.core.gpu.utility.html#mantidimaging.core.gpu.utility.gpu_available">[docs]</a><span class="k">def</span> <span class="nf">gpu_available</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :return: True if cupy is installed AND working, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_cupy_on_system</span><span class="p">()</span> <span class="ow">and</span> <span class="n">_cupy_installed_correctly</span><span class="p">()</span></div>
+
+
+<span class="k">def</span> <span class="nf">_load_cuda_kernel</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads the CUDA kernel so that cupy can act as a mediator. Replaces instances of &#39;float&#39; with &#39;double&#39; if the dtype</span>
+<span class="sd">    is float64.</span>
+<span class="sd">    :param dtype: The data type of the array that is going to be processed.</span>
+<span class="sd">    :return: The CUDA kernel in string format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cuda_kernel</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">KERNEL_FILENAME</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">cuda_kernel</span> <span class="o">+=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;float64&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cuda_kernel</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="s2">&quot;double&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cuda_kernel</span>
+
+
+<span class="k">def</span> <span class="nf">_free_memory_pool</span><span class="p">(</span><span class="n">arrays</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Delete any given GPU arrays and instruct the memory pool to free unused blocks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">arrays</span><span class="p">:</span>
+        <span class="n">arrays</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">mempool</span><span class="o">.</span><span class="n">free_all_blocks</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_create_pinned_memory</span><span class="p">(</span><span class="n">cpu_array</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use pinned memory in order to store a numpy array on the GPU.</span>
+<span class="sd">    :param cpu_array: The numpy array to be transferred to the GPU.</span>
+<span class="sd">    :return: src</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mem</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">alloc_pinned_memory</span><span class="p">(</span><span class="n">cpu_array</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">cpu_array</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">cpu_array</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">cpu_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">src</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpu_array</span>
+    <span class="k">return</span> <span class="n">src</span>
+
+
+<span class="k">def</span> <span class="nf">_send_single_array_to_gpu</span><span class="p">(</span><span class="n">cpu_array</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sends a single array to the GPU using pinned memory and a stream.</span>
+<span class="sd">    :param cpu_array: The numpy array to be transferred to the GPU.</span>
+<span class="sd">    :param stream: The stream used to mediate the transfer.</span>
+<span class="sd">    :return: A GPU array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pinned_memory</span> <span class="o">=</span> <span class="n">_create_pinned_memory</span><span class="p">(</span><span class="n">cpu_array</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+    <span class="n">gpu_array</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">pinned_memory</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cpu_array</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">gpu_array</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">pinned_memory</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gpu_array</span>
+
+
+<span class="k">def</span> <span class="nf">_send_arrays_to_gpu_with_pinned_memory</span><span class="p">(</span><span class="n">cpu_arrays</span><span class="p">,</span> <span class="n">streams</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transfer the arrays to the GPU using pinned memory. Raises an error if the GPU runs out of memory.</span>
+<span class="sd">    :param cpu_arrays: A list of numpy arrays to be transferred to the GPU.</span>
+<span class="sd">    :param streams: A list of streams used to mediate the transfers. Needs to have the same length as the cpu_arrays</span>
+<span class="sd">                    list.</span>
+<span class="sd">    :return: A list of GPU arrays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gpu_arrays</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cpu_arrays</span><span class="p">)):</span>
+            <span class="n">gpu_arrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_send_single_array_to_gpu</span><span class="p">(</span><span class="n">cpu_arrays</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">streams</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="c1"># Synchronise to ensure that the upload has completed</span>
+            <span class="n">streams</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">gpu_arrays</span>
+
+    <span class="k">except</span> <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">OutOfMemoryError</span><span class="p">:</span>
+        <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to send arrays to GPU. Median filter not performed.&quot;</span><span class="p">)</span>
+        <span class="n">_free_memory_pool</span><span class="p">(</span><span class="n">gpu_arrays</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+
+<span class="k">def</span> <span class="nf">_create_block_and_grid_args</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create the block and grid arguments that are passed to the cupy. These determine how the array</span>
+<span class="sd">    is broken up.</span>
+<span class="sd">    :param data: The array that will be processed using the GPU.</span>
+<span class="sd">    :return: block_size and grid_size that are passed to the CUDA kernel.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">block_size</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">N</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span>
+    <span class="n">grid_size</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="n">shape</span> <span class="o">//</span> <span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">shape</span> <span class="o">%</span> <span class="n">N</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">shape</span> <span class="o">//</span> <span class="n">N</span><span class="p">)</span> <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">grid_size</span>
+
+
+<span class="k">def</span> <span class="nf">_create_padded_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">scipy_mode</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates the padded array on the CPU for the median filter.</span>
+<span class="sd">    :param data: The data array to be padded.</span>
+<span class="sd">    :param filter_size: The size of the filter that will be applied to the data array.</span>
+<span class="sd">    :param scipy_mode: The desired mode for the scipy median filter.</span>
+<span class="sd">    :return: An padded version of the data array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Use the &#39;mode&#39; argument that is ordinarily given to &#39;scipy&#39; and determine its numpy.pad equivalent.</span>
+    <span class="n">pad_size</span> <span class="o">=</span> <span class="n">_get_padding_value</span><span class="p">(</span><span class="n">filter_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pad_width</span><span class="o">=</span><span class="p">((</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">pad_size</span><span class="p">),</span> <span class="p">(</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">pad_size</span><span class="p">)),</span> <span class="n">mode</span><span class="o">=</span><span class="n">EQUIVALENT_PAD_MODE</span><span class="p">[</span><span class="n">scipy_mode</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">_replace_gpu_array_contents</span><span class="p">(</span><span class="n">gpu_array</span><span class="p">,</span> <span class="n">cpu_array</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Overwrites the contents of an existing GPU array with a given CPU array.</span>
+<span class="sd">    :param gpu_array: The GPU array to be overwritten.</span>
+<span class="sd">    :param cpu_array: The CPU array that should be used to overwrite the GPU array.</span>
+<span class="sd">    :param stream: The stream to mediate the transfer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gpu_array</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cpu_array</span><span class="p">,</span> <span class="n">stream</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_padding_value</span><span class="p">(</span><span class="n">filter_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine the padding value by using the filter size.</span>
+<span class="sd">    :param filter_size: The filter size.</span>
+<span class="sd">    :return: The size of padding needed for the padded array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">filter_size</span> <span class="o">//</span> <span class="mi">2</span>
+
+
+<div class="viewcode-block" id="CudaExecuter"><a class="viewcode-back" href="../../../../api/mantidimaging.core.gpu.utility.html#mantidimaging.core.gpu.utility.CudaExecuter">[docs]</a><span class="k">class</span> <span class="nc">CudaExecuter</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+
+        <span class="c1"># Load the CUDA kernel through cupy</span>
+        <span class="n">loaded_from_source</span> <span class="o">=</span> <span class="n">_load_cuda_kernel</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">median_filter_module</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">RawModule</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">loaded_from_source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">single_image_median_filter</span> <span class="o">=</span> <span class="n">median_filter_module</span><span class="o">.</span><span class="n">get_function</span><span class="p">(</span><span class="s2">&quot;two_dimensional_median_filter&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Warm up the CUDA functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warm_up</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_warm_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the median filter on a small test array in order to allow it to compile then deleted the GPU arrays.</span>
+<span class="sd">        :param dtype: The data type of the input array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filter_size</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">test_array_size</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">padded_array_size</span> <span class="o">=</span> <span class="n">test_array_size</span> <span class="o">+</span> <span class="n">_get_padding_value</span><span class="p">(</span><span class="n">filter_size</span><span class="p">)</span>
+
+        <span class="n">test_data</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">test_array_size</span><span class="p">,</span> <span class="n">test_array_size</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">test_padding</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">padded_array_size</span><span class="p">,</span> <span class="n">padded_array_size</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">block_size</span><span class="p">,</span> <span class="n">grid_size</span> <span class="o">=</span> <span class="n">_create_block_and_grid_args</span><span class="p">(</span><span class="n">test_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cuda_single_image_median_filter</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">test_padding</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">grid_size</span><span class="p">,</span> <span class="n">block_size</span><span class="p">)</span>
+
+        <span class="c1"># Clear the test arrays</span>
+        <span class="n">_free_memory_pool</span><span class="p">([</span><span class="n">test_data</span><span class="p">,</span> <span class="n">test_padding</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_cuda_single_image_median_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">padded_data</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">grid_size</span><span class="p">,</span> <span class="n">block_size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the median filter on a single 2D image using CUDA.</span>
+<span class="sd">        :param input_data: A 2D GPU data array.</span>
+<span class="sd">        :param padded_data: The corresponding padded GPU array.</span>
+<span class="sd">        :param filter_size: The size of the filter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">single_image_median_filter</span><span class="p">(</span>
+            <span class="n">grid_size</span><span class="p">,</span>
+            <span class="n">block_size</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="n">input_data</span><span class="p">,</span>
+                <span class="n">padded_data</span><span class="p">,</span>
+                <span class="n">input_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">input_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">filter_size</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="CudaExecuter.median_filter"><a class="viewcode-back" href="../../../../api/mantidimaging.core.gpu.utility.html#mantidimaging.core.gpu.utility.CudaExecuter.median_filter">[docs]</a>    <span class="k">def</span> <span class="nf">median_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the median filter on a stack of 2D images asynchronously.</span>
+
+<span class="sd">        The data array with the median filter applied to it provided the GPU didn&#39;t run out of space,</span>
+<span class="sd">        otherwise it returns the unaltered input array.</span>
+
+<span class="sd">        :param data: The CPU data array containing a stack of 2D images.</span>
+<span class="sd">        :param filter_size: The filter size.</span>
+<span class="sd">        :param mode: The mode for the filter. Determines how the edge value are managed.</span>
+<span class="sd">        :param progress: An object for displaying the filter progress.</span>
+<span class="sd">        :return: Data with median filter applied on success, else unaltered input array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Try to free memory</span>
+        <span class="n">_free_memory_pool</span><span class="p">()</span>
+
+        <span class="n">n_images</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Set the maximum number of images that will be on the GPU at a time</span>
+        <span class="k">if</span> <span class="n">n_images</span> <span class="o">&gt;</span> <span class="n">MAX_GPU_SLICES</span><span class="p">:</span>
+            <span class="n">slice_limit</span> <span class="o">=</span> <span class="n">MAX_GPU_SLICES</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If the number of images is smaller than the slice limit, use that instead</span>
+            <span class="n">slice_limit</span> <span class="o">=</span> <span class="n">n_images</span>
+
+        <span class="n">cpu_padded_images</span> <span class="o">=</span> <span class="p">[</span><span class="n">_create_padded_array</span><span class="p">(</span><span class="n">data_slice</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">for</span> <span class="n">data_slice</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+
+        <span class="n">streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Stream</span><span class="p">(</span><span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">slice_limit</span><span class="p">)]</span>
+
+        <span class="c1"># Send the data arrays and padded arrays to the GPU in slices</span>
+        <span class="n">gpu_data_slices</span> <span class="o">=</span> <span class="n">_send_arrays_to_gpu_with_pinned_memory</span><span class="p">(</span><span class="n">data</span><span class="p">[:</span><span class="n">slice_limit</span><span class="p">],</span> <span class="n">streams</span><span class="p">)</span>
+        <span class="n">gpu_padded_data</span> <span class="o">=</span> <span class="n">_send_arrays_to_gpu_with_pinned_memory</span><span class="p">(</span><span class="n">cpu_padded_images</span><span class="p">[:</span><span class="n">slice_limit</span><span class="p">],</span> <span class="n">streams</span><span class="p">)</span>
+
+        <span class="c1"># Return if the data transfer was not successful</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">gpu_data_slices</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">gpu_padded_data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data</span>
+
+        <span class="n">block_size</span><span class="p">,</span> <span class="n">grid_size</span> <span class="o">=</span> <span class="n">_create_block_and_grid_args</span><span class="p">(</span><span class="n">gpu_data_slices</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_images</span><span class="p">):</span>
+
+            <span class="c1"># Use the current stream</span>
+            <span class="n">streams</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">slice_limit</span><span class="p">]</span><span class="o">.</span><span class="n">use</span><span class="p">()</span>
+
+            <span class="c1"># Overwrite the contents of the GPU arrays</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">slice_limit</span><span class="p">:</span>
+                <span class="n">_replace_gpu_array_contents</span><span class="p">(</span><span class="n">gpu_data_slices</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">slice_limit</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">streams</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">slice_limit</span><span class="p">])</span>
+                <span class="n">_replace_gpu_array_contents</span><span class="p">(</span>
+                    <span class="n">gpu_padded_data</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">slice_limit</span><span class="p">],</span>
+                    <span class="n">cpu_padded_images</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">streams</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">slice_limit</span><span class="p">],</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Synchronise the current stream to ensure that the overwriting is complete</span>
+            <span class="n">streams</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">slice_limit</span><span class="p">]</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+
+            <span class="c1"># Apply the median filter on the individual image</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cuda_single_image_median_filter</span><span class="p">(</span><span class="n">gpu_data_slices</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">slice_limit</span><span class="p">],</span> <span class="n">gpu_padded_data</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">slice_limit</span><span class="p">],</span>
+                                                  <span class="n">filter_size</span><span class="p">,</span> <span class="n">grid_size</span><span class="p">,</span> <span class="n">block_size</span><span class="p">)</span>
+
+            <span class="c1"># Synchronise to ensure that the GPU median filter has completed</span>
+            <span class="n">streams</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">slice_limit</span><span class="p">]</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+
+            <span class="c1"># Transfer the GPU result to a CPU array</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">gpu_data_slices</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">slice_limit</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">streams</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">slice_limit</span><span class="p">])</span>
+
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="n">progress</span><span class="o">.</span><span class="n">mark_complete</span><span class="p">()</span>
+
+        <span class="c1"># Free memory once the operation is complete</span>
+        <span class="n">_free_memory_pool</span><span class="p">(</span><span class="n">gpu_data_slices</span> <span class="o">+</span> <span class="n">gpu_padded_data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../index.html">Latest</a></li>
+  <li><a href="../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.gpu.utility</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

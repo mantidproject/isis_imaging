@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Python &lt;=3.6 Performance Issues - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dynamic Registering" href="registering_with_cli_and_gui.html" />
+    <link rel="prev" title="Jupyter Notebooks Tutorial" href="notebooks.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="registering_with_cli_and_gui.html" title="Dynamic Registering"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="notebooks.html" title="Jupyter Notebooks Tutorial"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Python &lt;=3.6 Performance Issues</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="python-3-6-performance-issues">
+<h1>Python &lt;=3.6 Performance Issues<a class="headerlink" href="#python-3-6-performance-issues" title="Permalink to this headline">¶</a></h1>
+<p>Up to Python 3.6 a change has been made to how the shared memory is allocated.
+It was moved to using a shared file, instead of mapping to RAM. The reason for
+that is to support different ways to start subprocesses. More information can be
+found at this issue thread <a class="reference external" href="http://bugs.python.org/issue30919">http://bugs.python.org/issue30919</a>.</p>
+<p>This, is a breaking change to these scripts, because IO is not nearly fast
+enough as we want it to be. There is a fix and the performance testing that has
+been done with it (copied the code from Python 3.7) seems to give the same
+performance as the Python 2.7. It will not be available with the default
+distribution until Python 3.7.</p>
+<p>The behaviour is monkey-patched at runtime, to have the Python 3.7 code, in the
+<code class="code docutils literal notranslate"><span class="pre">parallel</span></code> package’s <code class="code docutils literal notranslate"><span class="pre">__init__.py</span></code> file. There is more explanation
+of what is being done in the file and why.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="notebooks.html"
+                        title="previous chapter">Jupyter Notebooks Tutorial</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="registering_with_cli_and_gui.html"
+                        title="next chapter">Dynamic Registering</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="python_3x_performance_issues.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/developer_guide/python_3x_performance_issues.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/developer_guide/python_3x_performance_issues.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="registering_with_cli_and_gui.html" title="Dynamic Registering"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="notebooks.html" title="Jupyter Notebooks Tutorial"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Python &lt;=3.6 Performance Issues</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

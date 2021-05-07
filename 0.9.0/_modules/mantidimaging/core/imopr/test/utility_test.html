@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.imopr.test.utility_test - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.imopr.test.utility_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.imopr.test.utility_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.imopr.utility</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">new_cor_array</span><span class="p">,</span> <span class="n">save_cors_to_file</span><span class="p">,</span> <span class="n">load_cors_from_file</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ImoprTest"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.imopr.test.utility_test.html#mantidimaging.core.imopr.test.utility_test.ImoprTest">[docs]</a><span class="k">class</span> <span class="nc">ImoprTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImoprTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImoprTest.test_save_cor_file"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.imopr.test.utility_test.html#mantidimaging.core.imopr.test.utility_test.ImoprTest.test_save_cor_file">[docs]</a>    <span class="k">def</span> <span class="nf">test_save_cor_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;# slice_index cor</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;0 0.000000</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;2 5.500000</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;4 11.000000</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;6 16.500000</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;8 22.000000</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">cors</span> <span class="o">=</span> <span class="n">new_cor_array</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+            <span class="n">cors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">i</span> <span class="o">*</span> <span class="mf">5.5</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;cors.txt&#39;</span><span class="p">)</span>
+
+            <span class="n">save_cors_to_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">cors</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">tf</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImoprTest.test_load_cor_file"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.imopr.test.utility_test.html#mantidimaging.core.imopr.test.utility_test.ImoprTest.test_load_cor_file">[docs]</a>    <span class="k">def</span> <span class="nf">test_load_cor_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">text_data</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;0 0.000000</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;2 5.500000</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;4 11.000000</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;6 16.500000</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;8 22.000000</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">expected</span> <span class="o">=</span> <span class="n">new_cor_array</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+            <span class="n">expected</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">i</span> <span class="o">*</span> <span class="mf">5.5</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;cors.txt&#39;</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tf</span><span class="p">:</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text_data</span><span class="p">)</span>
+
+            <span class="n">cors</span> <span class="o">=</span> <span class="n">load_cors_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+            <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">cors</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImoprTest.test_load_cor_file_single_cor"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.imopr.test.utility_test.html#mantidimaging.core.imopr.test.utility_test.ImoprTest.test_load_cor_file_single_cor">[docs]</a>    <span class="k">def</span> <span class="nf">test_load_cor_file_single_cor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">text_data</span> <span class="o">=</span> <span class="s1">&#39;5 1.230000</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+        <span class="n">expected</span> <span class="o">=</span> <span class="n">new_cor_array</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">expected</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">1.23</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;cors.txt&#39;</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tf</span><span class="p">:</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text_data</span><span class="p">)</span>
+
+            <span class="n">cors</span> <span class="o">=</span> <span class="n">load_cors_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">cors</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+            <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">cors</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="utility_test.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.imopr.test.utility_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

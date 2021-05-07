@@ -1,0 +1,15 @@
+mantidimaging.core.operations.outliers package
+==============================================
+
+.. automodule:: mantidimaging.core.operations.outliers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.operations.outliers.outliers

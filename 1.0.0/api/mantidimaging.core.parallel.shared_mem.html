@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.parallel.shared_mem module - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.parallel.two_shared_mem module" href="mantidimaging.core.parallel.two_shared_mem.html" />
+    <link rel="prev" title="mantidimaging.core.parallel.exclusive_mem module" href="mantidimaging.core.parallel.exclusive_mem.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.two_shared_mem.html" title="mantidimaging.core.parallel.two_shared_mem module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.exclusive_mem.html" title="mantidimaging.core.parallel.exclusive_mem module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.parallel.html" accesskey="U">mantidimaging.core.parallel package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.shared_mem module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.parallel.shared_mem">
+<span id="mantidimaging-core-parallel-shared-mem-module"></span><h1>mantidimaging.core.parallel.shared_mem module<a class="headerlink" href="#module-mantidimaging.core.parallel.shared_mem" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.shared_mem.create_partial">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.shared_mem.</code><code class="sig-name descname">create_partial</code><span class="sig-paren">(</span><em class="sig-param">func</em>, <em class="sig-param">fwd_func=&lt;function return_fwd_func&gt;</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/parallel/shared_mem.html#create_partial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.shared_mem.create_partial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a partial using functools.partial, to forward the kwargs to the
+parallel execution.</p>
+<p>If you seem to be getting NANs, check if the correct fwd_function is set!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> – Function that will be executed</p></li>
+<li><p><strong>fwd_func</strong> – <p>The function will be forwarded through function.
+It must be one of:
+- shared_mem.fwd_func: if the function returns a value
+- shared_mem.inplace: if the function will overwrite the data in</p>
+<blockquote>
+<div><p>place</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>kwargs</strong> – kwargs to forward to the function func that will be executed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.shared_mem.execute">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.shared_mem.</code><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partial_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cores</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">chunksize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'Progress'</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/parallel/shared_mem.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.shared_mem.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes a function in parallel with shared memory between the processes.</p>
+<p>The array MUST HAVE BEEN created using
+parallel.utility.create_shared_array(shape, dtype).</p>
+<p>If the input array IS NOT a shared array, the data will NOT BE CHANGED!
+The reason for that is that the processes don’t work on the data, but on a
+copy.</p>
+<p>When they process it and return the result, THE RESULT IS NOT ASSIGNED BACK
+TO REPLACE THE ORIGINAL as is done in parallel.exclusive_mem, it is merely
+discarded.</p>
+<ul class="simple">
+<li><p>imap_unordered gives the images back in random order!</p></li>
+<li><p>map and map_async cannot replace the data in place and end up</p></li>
+</ul>
+<p>doubling the memory. They do not improve speed performance either
+- imap seems to be the best choice</p>
+<p>Using _ in the for _ enumerate is slightly faster, because the tuple
+from enumerate isn’t unpacked, and thus some time is saved.</p>
+<p>From performance tests, the chunksize doesn’t seem to make much of a
+difference, but having larger chunks usually led to slower performance:</p>
+<p>Shape: (50,512,512)
+1 chunk 3.06s
+2 chunks 3.05s
+3 chunks 3.07s
+4 chunks 3.06s
+5 chunks 3.16s
+6 chunks 3.06s
+7 chunks 3.058s
+8 chunks 3.25s
+9 chunks 3.45s</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – the data array that will be processed in parallel</p></li>
+<li><p><strong>partial_func</strong> – a function constructed using partial to pass the
+correct arguments</p></li>
+<li><p><strong>cores</strong> – number of cores that the processing will use</p></li>
+<li><p><strong>chunksize</strong> – chunk of work per process(worker)</p></li>
+<li><p><strong>name</strong> – name of the task used in progress reporting</p></li>
+<li><p><strong>progress</strong> – Progress instance to use for progress reporting (optional)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>reference to the input shared array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.shared_mem.inplace">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.shared_mem.</code><code class="sig-name descname">inplace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="n">i</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/parallel/shared_mem.html#inplace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.shared_mem.inplace" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Use if the parameter function will do the following:</dt><dd><ul class="simple">
+<li><p>Perform an operation on the input data</p></li>
+<li><p>DOES NOT have a return statement</p></li>
+<li><p>The data is NOT RESIZED</p></li>
+<li><p>The data will be changed INPLACE inside the function being forwarded
+(the parameter function)</p></li>
+</ul>
+</dd>
+</dl>
+<p>You HAVE to be careful when using this, for example the func:
+def _apply_normalise_inplace(</p>
+<blockquote>
+<div><blockquote>
+<div><p>data, dark=None, norm_divide=None, clip_min=None, clip_max=None):</p>
+</div></blockquote>
+<dl class="simple">
+<dt>data = np.clip(np.true_divide(</dt><dd><p>data - dark, norm_divide), clip_min, clip_max)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>DOES NOT CHANGE THE DATA! Because the data = … variable inside is just a
+LOCAL VARIABLE that is discarded.</p>
+<p>The proper way to write this function is:
+def _apply_normalise_inplace(</p>
+<blockquote>
+<div><blockquote>
+<div><p>data, dark=None, norm_divide=None, clip_min=None, clip_max=None):</p>
+</div></blockquote>
+<dl class="simple">
+<dt>data[:] = np.clip(np.true_divide(</dt><dd><p>data - dark, norm_divide), clip_min, clip_max)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Notice the data[:], what this does is REFER to the ACTUAL parameter, and
+then changes it’s contents, as [:] gives a reference back to the inner
+contents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> – Function that will be executed</p></li>
+<li><p><strong>i</strong> – index from the shared_data on which to operate</p></li>
+<li><p><strong>kwargs</strong> – kwargs to forward to the function func that will be executed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>nothing is returned, as the data is replaced in place</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.parallel.shared_mem.return_fwd_func">
+<code class="sig-prename descclassname">mantidimaging.core.parallel.shared_mem.</code><code class="sig-name descname">return_fwd_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="n">i</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/parallel/shared_mem.html#return_fwd_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.parallel.shared_mem.return_fwd_func" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Use if the parameter function will do the following:</dt><dd><ul class="simple">
+<li><p>Perform an operation on the input data</p></li>
+<li><p>DOES have a return statement</p></li>
+<li><p>The data is NOT RESIZED</p></li>
+<li><p>The output will be stored in the same container as the input
+container</p></li>
+</ul>
+</dd>
+</dl>
+<p>If a function seems to give back unexpected Nones or nans, then it might
+not be returning anything, and is doing all the calculations and
+overwriting in place. In that case use fwd_func_inplace as a fwd_function
+parameter for create_partial, creating something like:</p>
+<dl class="simple">
+<dt>f = parallel.create_partial(</dt><dd><p>func_to_be_executed, parallel.inplace, <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> – Function that will be executed</p></li>
+<li><p><strong>i</strong> – index from the shared_data on which to operate</p></li>
+<li><p><strong>kwargs</strong> – kwargs to forward to the function func that will be executed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>nothing is returned, as the data is replaced by assigning the
+return value from the func</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.parallel.exclusive_mem.html"
+                        title="previous chapter">mantidimaging.core.parallel.exclusive_mem module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.parallel.two_shared_mem.html"
+                        title="next chapter">mantidimaging.core.parallel.two_shared_mem module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="mantidimaging.core.parallel.shared_mem.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.two_shared_mem.html" title="mantidimaging.core.parallel.two_shared_mem module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.parallel.exclusive_mem.html" title="mantidimaging.core.parallel.exclusive_mem module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.parallel.html" >mantidimaging.core.parallel package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.parallel.shared_mem module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

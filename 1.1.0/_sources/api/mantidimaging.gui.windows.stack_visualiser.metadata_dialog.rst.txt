@@ -1,0 +1,7 @@
+mantidimaging.gui.windows.stack\_visualiser.metadata\_dialog module
+===================================================================
+
+.. automodule:: mantidimaging.gui.windows.stack_visualiser.metadata_dialog
+   :members:
+   :undoc-members:
+   :show-inheritance:

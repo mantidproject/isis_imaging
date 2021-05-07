@@ -1,0 +1,29 @@
+mantidimaging.core package
+==========================
+
+.. automodule:: mantidimaging.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.aggregate
+   mantidimaging.core.configs
+   mantidimaging.core.configurations
+   mantidimaging.core.convert
+   mantidimaging.core.cor_tilt
+   mantidimaging.core.data
+   mantidimaging.core.filters
+   mantidimaging.core.imopr
+   mantidimaging.core.io
+   mantidimaging.core.parallel
+   mantidimaging.core.process_list
+   mantidimaging.core.reconstruct
+   mantidimaging.core.testing
+   mantidimaging.core.tools
+   mantidimaging.core.utility

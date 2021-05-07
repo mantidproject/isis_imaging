@@ -1,0 +1,7 @@
+mantidimaging.core.process\_list.executor module
+================================================
+
+.. automodule:: mantidimaging.core.process_list.executor
+   :members:
+   :undoc-members:
+   :show-inheritance:

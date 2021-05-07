@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.operations.rescale.rescale_test &#8212; MantidImaging 2.1.0 documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.rescale.rescale_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.operations.rescale.rescale_test</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">testing</span> <span class="k">as</span> <span class="n">npt</span><span class="p">,</span> <span class="n">int16</span><span class="p">,</span> <span class="n">uint16</span><span class="p">,</span> <span class="n">float32</span><span class="p">,</span> <span class="n">finfo</span><span class="p">,</span> <span class="n">copy</span>
+
+<span class="kn">import</span> <span class="nn">mantidimaging.test_helpers.unit_test_helper</span> <span class="k">as</span> <span class="nn">th</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.operations.rescale</span> <span class="kn">import</span> <span class="n">RescaleFilter</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.test_helpers.qt_mocks</span> <span class="kn">import</span> <span class="n">MockQSpinBox</span><span class="p">,</span> <span class="n">MockQComboBox</span>
+
+
+<div class="viewcode-block" id="test_rescale"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rescale.rescale_test.html#mantidimaging.core.operations.rescale.rescale_test.test_rescale">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">255.0</span><span class="p">,</span> <span class="mf">65535.0</span><span class="p">,</span> <span class="mf">2147483647.0</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_rescale</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">generate_images</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+    <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>
+    <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="n">expected_min_input</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">RescaleFilter</span><span class="o">.</span><span class="n">filter_func</span><span class="p">(</span><span class="n">images</span><span class="p">,</span>
+                                       <span class="n">min_input</span><span class="o">=</span><span class="n">expected_min_input</span><span class="p">,</span>
+                                       <span class="n">max_input</span><span class="o">=</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+                                       <span class="n">max_output</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="c1"># below min_input has been clipped to 0</span>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="n">value</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">10</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_execute_wrapper_no_preset"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rescale.rescale_test.html#mantidimaging.core.operations.rescale.rescale_test.test_execute_wrapper_no_preset">[docs]</a><span class="k">def</span> <span class="nf">test_execute_wrapper_no_preset</span><span class="p">():</span>
+    <span class="n">min_input_value</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">max_input_value</span> <span class="o">=</span> <span class="mi">34</span>
+
+    <span class="n">min_input</span> <span class="o">=</span> <span class="n">MockQSpinBox</span><span class="p">(</span><span class="n">min_input_value</span><span class="p">)</span>
+    <span class="n">max_input</span> <span class="o">=</span> <span class="n">MockQSpinBox</span><span class="p">(</span><span class="n">max_input_value</span><span class="p">)</span>
+    <span class="n">max_output</span> <span class="o">=</span> <span class="n">MockQSpinBox</span><span class="p">(</span><span class="mf">420.0</span><span class="p">)</span>
+    <span class="n">preset</span> <span class="o">=</span> <span class="n">MockQComboBox</span><span class="p">(</span><span class="s1">&#39;None&#39;</span><span class="p">)</span>
+    <span class="n">partial</span> <span class="o">=</span> <span class="n">RescaleFilter</span><span class="o">.</span><span class="n">execute_wrapper</span><span class="p">(</span><span class="n">min_input</span><span class="p">,</span> <span class="n">max_input</span><span class="p">,</span> <span class="n">max_output</span><span class="p">,</span> <span class="n">preset</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">partial</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;min_input&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">min_input_value</span>
+    <span class="k">assert</span> <span class="n">partial</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;max_input&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">max_input_value</span>
+    <span class="k">assert</span> <span class="n">partial</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;max_output&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mf">420.0</span></div>
+
+
+<div class="viewcode-block" id="test_execute_wrapper_with_preset"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rescale.rescale_test.html#mantidimaging.core.operations.rescale.rescale_test.test_execute_wrapper_with_preset">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s1">&#39;type, expected_max&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;int8&#39;</span><span class="p">,</span> <span class="mf">255.0</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;int16&#39;</span><span class="p">,</span> <span class="mi">65535</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="mf">2147483647.0</span><span class="p">),</span>
+<span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_execute_wrapper_with_preset</span><span class="p">(</span><span class="nb">type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expected_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="n">min_input_value</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">max_input_value</span> <span class="o">=</span> <span class="mi">34</span>
+
+    <span class="n">min_input</span> <span class="o">=</span> <span class="n">MockQSpinBox</span><span class="p">(</span><span class="n">min_input_value</span><span class="p">)</span>
+    <span class="n">max_input</span> <span class="o">=</span> <span class="n">MockQSpinBox</span><span class="p">(</span><span class="n">max_input_value</span><span class="p">)</span>
+    <span class="n">max_output</span> <span class="o">=</span> <span class="n">MockQSpinBox</span><span class="p">(</span><span class="mf">420.0</span><span class="p">)</span>  <span class="c1"># this value is overridden by preset</span>
+    <span class="n">preset</span> <span class="o">=</span> <span class="n">MockQComboBox</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">partial</span> <span class="o">=</span> <span class="n">RescaleFilter</span><span class="o">.</span><span class="n">execute_wrapper</span><span class="p">(</span><span class="n">min_input</span><span class="p">,</span> <span class="n">max_input</span><span class="p">,</span> <span class="n">max_output</span><span class="p">,</span> <span class="n">preset</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">assert</span> <span class="n">partial</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;min_input&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">min_input_value</span>
+    <span class="k">assert</span> <span class="n">partial</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;max_input&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">max_input_value</span>
+    <span class="k">assert</span> <span class="n">partial</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;max_output&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">expected_max</span></div>
+
+
+<div class="viewcode-block" id="test_type_changes_to_given_type"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rescale.rescale_test.html#mantidimaging.core.operations.rescale.rescale_test.test_type_changes_to_given_type">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s1">&#39;type, max_value&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="n">uint16</span><span class="p">,</span> <span class="mi">65535</span><span class="p">),</span> <span class="p">(</span><span class="n">float32</span><span class="p">,</span> <span class="n">finfo</span><span class="p">(</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">)])</span>
+<span class="k">def</span> <span class="nf">test_type_changes_to_given_type</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">max_value</span><span class="p">):</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">generate_images</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+    <span class="n">expected_min_input</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">RescaleFilter</span><span class="o">.</span><span class="n">filter_func</span><span class="p">(</span><span class="n">images</span><span class="p">,</span>
+                                       <span class="n">min_input</span><span class="o">=</span><span class="n">expected_min_input</span><span class="p">,</span>
+                                       <span class="n">max_input</span><span class="o">=</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+                                       <span class="n">max_output</span><span class="o">=</span><span class="n">max_value</span><span class="p">,</span>
+                                       <span class="n">data_type</span><span class="o">=</span><span class="nb">type</span><span class="p">)</span>
+
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_scale_single_image"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rescale.rescale_test.html#mantidimaging.core.operations.rescale.rescale_test.test_scale_single_image">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">uint16</span><span class="p">,</span> <span class="n">float32</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_scale_single_image</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">generate_images</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+    <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.0002</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+    <span class="n">scaled_image</span> <span class="o">=</span> <span class="n">RescaleFilter</span><span class="o">.</span><span class="n">filter_single_image</span><span class="p">(</span><span class="n">copy</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                                     <span class="n">min_input</span><span class="o">=</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+                                                     <span class="n">max_input</span><span class="o">=</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+                                                     <span class="n">max_output</span><span class="o">=</span><span class="mi">65535</span><span class="p">,</span>
+                                                     <span class="n">data_type</span><span class="o">=</span><span class="nb">type</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">scaled_image</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">scaled_image</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">==</span> <span class="mi">65535</span>
+    <span class="k">assert</span> <span class="n">scaled_image</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">int16</span><span class="p">,</span> \
+        <span class="s2">&quot;Ensure not using signed int16 - this will make all values over 32768 overflow to negative&quot;</span></div>
+
+
+<div class="viewcode-block" id="test_scale_single_image_bad_offset"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rescale.rescale_test.html#mantidimaging.core.operations.rescale.rescale_test.test_scale_single_image_bad_offset">[docs]</a><span class="k">def</span> <span class="nf">test_scale_single_image_bad_offset</span><span class="p">():</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">generate_images</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">RescaleFilter</span><span class="o">.</span><span class="n">filter_single_image</span><span class="p">(</span><span class="n">copy</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                          <span class="n">min_input</span><span class="o">=-</span><span class="mi">5000</span><span class="p">,</span>
+                                          <span class="n">max_input</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>
+                                          <span class="n">max_output</span><span class="o">=</span><span class="mi">65535</span><span class="p">,</span>
+                                          <span class="n">data_type</span><span class="o">=</span><span class="n">uint16</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Unexpected exception was triggered: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="test_rescale_ignores_nans"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.operations.rescale.rescale_test.html#mantidimaging.core.operations.rescale.rescale_test.test_rescale_ignores_nans">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">255.0</span><span class="p">,</span> <span class="mf">65535.0</span><span class="p">,</span> <span class="mf">2147483647.0</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_rescale_ignores_nans</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">generate_images</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+    <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.0</span>
+    <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="n">expected_min_input</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">RescaleFilter</span><span class="o">.</span><span class="n">filter_func</span><span class="p">(</span><span class="n">images</span><span class="p">,</span>
+                                       <span class="n">min_input</span><span class="o">=</span><span class="n">expected_min_input</span><span class="p">,</span>
+                                       <span class="n">max_input</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">),</span>
+                                       <span class="n">max_output</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="c1"># below min_input has been clipped to 0</span>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">],</span> <span class="n">value</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">10</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()])</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pytest</span>
+
+    <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="vm">__file__</span><span class="p">])</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.operations.rescale.rescale_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

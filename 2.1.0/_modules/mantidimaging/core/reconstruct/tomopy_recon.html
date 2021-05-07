@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.reconstruct.tomopy_recon - MantidImaging 2.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../reconstruct.html" accesskey="U">mantidimaging.core.reconstruct</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.reconstruct.tomopy_recon</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.reconstruct.tomopy_recon</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.reconstruct.base_recon</span> <span class="kn">import</span> <span class="n">BaseRecon</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.data_containers</span> <span class="kn">import</span> <span class="n">ProjectionAngles</span><span class="p">,</span> <span class="n">ReconstructionParameters</span><span class="p">,</span> <span class="n">ScalarCoR</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.optional_imports</span> <span class="kn">import</span> <span class="n">safe_import</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">tomopy</span> <span class="o">=</span> <span class="n">safe_import</span><span class="p">(</span><span class="s1">&#39;tomopy&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TomopyRecon"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.tomopy_recon.html#mantidimaging.core.reconstruct.tomopy_recon.TomopyRecon">[docs]</a><span class="k">class</span> <span class="nc">TomopyRecon</span><span class="p">(</span><span class="n">BaseRecon</span><span class="p">):</span>
+<div class="viewcode-block" id="TomopyRecon.find_cor"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.tomopy_recon.html#mantidimaging.core.reconstruct.tomopy_recon.TomopyRecon.find_cor">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find_cor</span><span class="p">(</span><span class="n">images</span><span class="p">:</span> <span class="n">Images</span><span class="p">,</span> <span class="n">slice_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_cor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">recon_params</span><span class="p">:</span> <span class="n">ReconstructionParameters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tomopy</span><span class="o">.</span><span class="n">find_center</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">sinograms</span><span class="p">,</span>
+                                  <span class="n">images</span><span class="o">.</span><span class="n">projection_angles</span><span class="p">(</span><span class="n">recon_params</span><span class="o">.</span><span class="n">max_projection_angle</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                  <span class="n">ind</span><span class="o">=</span><span class="n">slice_idx</span><span class="p">,</span>
+                                  <span class="n">init</span><span class="o">=</span><span class="n">start_cor</span><span class="p">,</span>
+                                  <span class="n">sinogram_order</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TomopyRecon.single_sino"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.tomopy_recon.html#mantidimaging.core.reconstruct.tomopy_recon.TomopyRecon.single_sino">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">single_sino</span><span class="p">(</span><span class="n">sino</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">cor</span><span class="p">:</span> <span class="n">ScalarCoR</span><span class="p">,</span> <span class="n">proj_angles</span><span class="p">:</span> <span class="n">ProjectionAngles</span><span class="p">,</span>
+                    <span class="n">recon_params</span><span class="p">:</span> <span class="n">ReconstructionParameters</span><span class="p">):</span>
+        <span class="n">sino</span> <span class="o">=</span> <span class="n">BaseRecon</span><span class="o">.</span><span class="n">sino_recon_prep</span><span class="p">(</span><span class="n">sino</span><span class="p">)</span>
+        <span class="n">volume</span> <span class="o">=</span> <span class="n">tomopy</span><span class="o">.</span><span class="n">recon</span><span class="p">(</span><span class="n">tomo</span><span class="o">=</span><span class="p">[</span><span class="n">sino</span><span class="p">],</span>
+                              <span class="n">sinogram_order</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                              <span class="n">theta</span><span class="o">=</span><span class="n">proj_angles</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                              <span class="n">center</span><span class="o">=</span><span class="n">cor</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                              <span class="n">algorithm</span><span class="o">=</span><span class="n">recon_params</span><span class="o">.</span><span class="n">algorithm</span><span class="p">,</span>
+                              <span class="n">filter_name</span><span class="o">=</span><span class="n">recon_params</span><span class="o">.</span><span class="n">filter_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">volume</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TomopyRecon.full"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.tomopy_recon.html#mantidimaging.core.reconstruct.tomopy_recon.TomopyRecon.full">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">full</span><span class="p">(</span><span class="n">images</span><span class="p">:</span> <span class="n">Images</span><span class="p">,</span> <span class="n">cors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ScalarCoR</span><span class="p">],</span> <span class="n">recon_params</span><span class="p">:</span> <span class="n">ReconstructionParameters</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a volume reconstruction using sample data provided as sinograms.</span>
+
+<span class="sd">        :param images: Array of sinogram images</span>
+<span class="sd">        :param cors: Array of centre of rotation values</span>
+<span class="sd">        :param proj_angles: Array of projection angles</span>
+<span class="sd">        :param recon_params: Reconstruction Parameters</span>
+<span class="sd">        :param progress: Optional progress reporter</span>
+<span class="sd">        :return: 3D image data for reconstructed volume</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;TomoPy reconstruction&#39;</span><span class="p">)</span>
+
+        <span class="kn">import</span> <span class="nn">multiprocessing</span>
+        <span class="n">ncores</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ncore&#39;</span><span class="p">:</span> <span class="n">ncores</span><span class="p">,</span>
+            <span class="s1">&#39;tomo&#39;</span><span class="p">:</span> <span class="n">images</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="s1">&#39;sinogram_order&#39;</span><span class="p">:</span> <span class="n">images</span><span class="o">.</span><span class="n">_is_sinograms</span><span class="p">,</span>
+            <span class="s1">&#39;theta&#39;</span><span class="p">:</span> <span class="n">images</span><span class="o">.</span><span class="n">projection_angles</span><span class="p">(</span><span class="n">recon_params</span><span class="o">.</span><span class="n">max_projection_angle</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s1">&#39;center&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">cor</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">cor</span> <span class="ow">in</span> <span class="n">cors</span><span class="p">],</span>
+            <span class="s1">&#39;algorithm&#39;</span><span class="p">:</span> <span class="n">recon_params</span><span class="o">.</span><span class="n">algorithm</span><span class="p">,</span>
+            <span class="s1">&#39;filter_name&#39;</span><span class="p">:</span> <span class="n">recon_params</span><span class="o">.</span><span class="n">filter_name</span>
+        <span class="p">}</span>
+
+        <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="n">volume</span> <span class="o">=</span> <span class="n">tomopy</span><span class="o">.</span><span class="n">recon</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Reconstructed 3D volume with shape: </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">volume</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">Images</span><span class="p">(</span><span class="n">volume</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TomopyRecon.allowed_filters"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.tomopy_recon.html#mantidimaging.core.reconstruct.tomopy_recon.TomopyRecon.allowed_filters">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">allowed_filters</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;ramlak&quot;</span><span class="p">,</span> <span class="s1">&#39;shepp&#39;</span><span class="p">,</span> <span class="s1">&#39;cosine&#39;</span><span class="p">,</span> <span class="s1">&#39;hann&#39;</span><span class="p">,</span> <span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="s1">&#39;parzen&#39;</span><span class="p">,</span> <span class="s1">&#39;butterworth&#39;</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="allowed_recon_kwargs"><a class="viewcode-back" href="../../../../api/mantidimaging.core.reconstruct.tomopy_recon.html#mantidimaging.core.reconstruct.tomopy_recon.allowed_recon_kwargs">[docs]</a><span class="k">def</span> <span class="nf">allowed_recon_kwargs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="c1"># only gridrec is used from tomopy</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;gridrec&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;num_gridx&#39;</span><span class="p">,</span> <span class="s1">&#39;num_gridy&#39;</span><span class="p">,</span> <span class="s1">&#39;filter_name&#39;</span><span class="p">,</span> <span class="s1">&#39;filter_par&#39;</span><span class="p">]}</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="tomopy_recon.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../reconstruct.html" >mantidimaging.core.reconstruct</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.reconstruct.tomopy_recon</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

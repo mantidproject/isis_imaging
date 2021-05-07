@@ -1,0 +1,15 @@
+mantidimaging.core.filters.crop\_coords.test package
+====================================================
+
+.. automodule:: mantidimaging.core.filters.crop_coords.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.crop_coords.test.crop_coords_test

@@ -1,0 +1,7 @@
+mantidimaging.core.filters.background\_correction\_and\_normalisation.test package
+==================================================================================
+
+.. automodule:: mantidimaging.core.filters.background_correction_and_normalisation.test
+   :members:
+   :undoc-members:
+   :show-inheritance:

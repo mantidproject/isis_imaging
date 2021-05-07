@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.rotation.data_model &#8212; MantidImaging 2.1.0 documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.rotation.data_model</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.rotation.data_model</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2021 ISIS Rutherford Appleton Laboratory UKRI</span>
+<span class="c1"># SPDX - License - Identifier: GPL-3.0-or-later</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Iterator</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.operation_history</span> <span class="kn">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">..utility.data_containers</span> <span class="kn">import</span> <span class="n">ScalarCoR</span><span class="p">,</span> <span class="n">Degrees</span><span class="p">,</span> <span class="n">Slope</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">Point</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Point&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;slice_index&#39;</span><span class="p">,</span> <span class="s1">&#39;cor&#39;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="CorTiltDataModel"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel">[docs]</a><span class="k">class</span> <span class="nc">CorTiltDataModel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Model for finding COR/Tilt from (slice index, centre of rotation) data points</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_cached_gradient</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">_cached_cor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">_points</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Point</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_gradient</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_cor</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="CorTiltDataModel.populate_slice_indices"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.populate_slice_indices">[docs]</a>    <span class="k">def</span> <span class="nf">populate_slice_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">cor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_results</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points</span> <span class="o">=</span> <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="n">cor</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)]</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Populated slice indices: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slices</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModel.linear_regression"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.linear_regression">[docs]</a>    <span class="k">def</span> <span class="nf">linear_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Running linear regression with </span><span class="si">{}</span><span class="s1"> points&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_points</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_gradient</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_cor</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">linregress</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cors</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModel.add_point"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.add_point">[docs]</a>    <span class="k">def</span> <span class="nf">add_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slice_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_results</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">slice_idx</span><span class="p">,</span> <span class="n">cor</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">Point</span><span class="p">(</span><span class="n">slice_idx</span><span class="p">,</span> <span class="n">cor</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModel.set_point"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.set_point">[docs]</a>    <span class="k">def</span> <span class="nf">set_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">slice_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reset_results</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">reset_results</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_results</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">idx</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">slice_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">slice_idx</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">cor</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">cor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">slice_index</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">cor</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_data_idx_from_slice_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slice_idx</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">slice_index</span> <span class="o">==</span> <span class="n">slice_idx</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">i</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="CorTiltDataModel.set_cor_at_slice"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.set_cor_at_slice">[docs]</a>    <span class="k">def</span> <span class="nf">set_cor_at_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slice_idx</span><span class="p">,</span> <span class="n">cor</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">data_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_idx_from_slice_idx</span><span class="p">(</span><span class="n">slice_idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_point</span><span class="p">(</span><span class="n">data_idx</span><span class="p">,</span> <span class="n">cor</span><span class="o">=</span><span class="n">cor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModel.remove_point"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.remove_point">[docs]</a>    <span class="k">def</span> <span class="nf">remove_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_results</span><span class="p">()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModel.clear_points"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.clear_points">[docs]</a>    <span class="k">def</span> <span class="nf">clear_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_results</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModel.clear_results"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.clear_results">[docs]</a>    <span class="k">def</span> <span class="nf">clear_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_gradient</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_cor</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModel.point"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.point">[docs]</a>    <span class="k">def</span> <span class="nf">point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_points</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModel.sort_points"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.sort_points">[docs]</a>    <span class="k">def</span> <span class="nf">sort_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">slice_index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModel.get_cor_from_regression"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.get_cor_from_regression">[docs]</a>    <span class="k">def</span> <span class="nf">get_cor_from_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slice_idx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="n">cor</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">slice_idx</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cor</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">return</span> <span class="n">cor</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModel.get_all_cors_from_regression"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.get_all_cors_from_regression">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_cors_from_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_height</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ScalarCoR</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param image_height: How many cors will be generated,</span>
+<span class="sd">                             this should be equal to the image height</span>
+<span class="sd">                             (i.e. number of sinograms that will be reconstructed)</span>
+<span class="sd">        :return: List of cors for every slice of the image height</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">image_height</span><span class="p">):</span>
+            <span class="n">cors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ScalarCoR</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cor_from_regression</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">cors</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">slice_index</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">cor</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Slope</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_gradient</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Slope</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cached_gradient</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Slope</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarCoR</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_cor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ScalarCoR</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cached_cor</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ScalarCoR</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">angle_in_degrees</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Degrees</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Degrees</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">value</span><span class="p">)))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_gradient</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_cor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stack_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="c1"># TODO remove float casts</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">COR_TILT_ROTATION_CENTRE</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cor</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">COR_TILT_FITTED_GRADIENT</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">COR_TILT_TILT_ANGLE_DEG</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angle_in_degrees</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">COR_TILT_SLICE_INDICES</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices</span><span class="p">,</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">COR_TILT_ROTATION_CENTRES</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cors</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="CorTiltDataModel.set_precalculated"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.set_precalculated">[docs]</a>    <span class="k">def</span> <span class="nf">set_precalculated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cor</span><span class="p">:</span> <span class="n">ScalarCoR</span><span class="p">,</span> <span class="n">tilt</span><span class="p">:</span> <span class="n">Degrees</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_cor</span> <span class="o">=</span> <span class="n">cor</span><span class="o">.</span><span class="n">value</span>
+        <span class="c1"># reverse the tilt calculation to get the slope of the regression back</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_gradient</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">tilt</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">)):</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">slice_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cor_from_regression</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">slice_index</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModel.iter_points"><a class="viewcode-back" href="../../../../api/mantidimaging.core.rotation.data_model.html#mantidimaging.core.rotation.data_model.CorTiltDataModel.iter_points">[docs]</a>    <span class="k">def</span> <span class="nf">iter_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Point</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_points</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../index.html">Latest</a></li>
+  <li><a href="../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 2.1.0 documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.rotation.data_model</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

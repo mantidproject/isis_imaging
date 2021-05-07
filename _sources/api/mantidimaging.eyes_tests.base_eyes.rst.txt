@@ -1,0 +1,7 @@
+mantidimaging.eyes\_tests.base\_eyes module
+===========================================
+
+.. automodule:: mantidimaging.eyes_tests.base_eyes
+   :members:
+   :undoc-members:
+   :show-inheritance:

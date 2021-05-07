@@ -1,0 +1,15 @@
+mantidimaging.core.convert.test package
+=======================================
+
+.. automodule:: mantidimaging.core.convert.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.convert.test.convert_test

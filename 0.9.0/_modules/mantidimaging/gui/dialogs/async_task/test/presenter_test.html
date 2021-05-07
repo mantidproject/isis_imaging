@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.gui.dialogs.async_task.test.presenter_test - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.dialogs.async_task.test.presenter_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.gui.dialogs.async_task.test.presenter_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.special_imports</span> <span class="kn">import</span> <span class="n">import_mock</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.dialogs.async_task</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">AsyncTaskDialogPresenter</span><span class="p">,</span> <span class="n">AsyncTaskDialogView</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.gui.dialogs.async_task.presenter</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">Notification</span><span class="p">)</span>
+
+<span class="n">mock</span> <span class="o">=</span> <span class="n">import_mock</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="AsyncTaskDialogPresenterTest"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.dialogs.async_task.test.presenter_test.html#mantidimaging.gui.dialogs.async_task.test.presenter_test.AsyncTaskDialogPresenterTest">[docs]</a><span class="k">class</span> <span class="nc">AsyncTaskDialogPresenterTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AsyncTaskDialogPresenterTest.test_basic_happy_case"><a class="viewcode-back" href="../../../../../../api/mantidimaging.gui.dialogs.async_task.test.presenter_test.html#mantidimaging.gui.dialogs.async_task.test.presenter_test.AsyncTaskDialogPresenterTest.test_basic_happy_case">[docs]</a>    <span class="k">def</span> <span class="nf">test_basic_happy_case</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+        <span class="n">v</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">create_autospec</span><span class="p">(</span><span class="n">AsyncTaskDialogView</span><span class="p">)</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">AsyncTaskDialogPresenter</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">set_task</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">([</span><span class="mi">5</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">task_is_running</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">Notification</span><span class="o">.</span><span class="n">START</span><span class="p">)</span>
+        <span class="n">v</span><span class="o">.</span><span class="n">show</span><span class="o">.</span><span class="n">assert_called_once</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">task_is_running</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">task_is_running</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../../index.html">Latest</a></li>
+  <li><a href="presenter_test.html">0.9.0</a></li>
+  <li><a href="../../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.dialogs.async_task.test.presenter_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

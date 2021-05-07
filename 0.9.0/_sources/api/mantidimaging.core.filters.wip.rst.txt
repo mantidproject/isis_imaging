@@ -1,0 +1,15 @@
+mantidimaging.core.filters.wip package
+======================================
+
+.. automodule:: mantidimaging.core.filters.wip
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.wip.mcp_corrections

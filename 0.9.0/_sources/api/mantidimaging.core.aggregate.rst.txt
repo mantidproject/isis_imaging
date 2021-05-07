@@ -1,0 +1,23 @@
+mantidimaging.core.aggregate package
+====================================
+
+.. automodule:: mantidimaging.core.aggregate
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.aggregate.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.aggregate.aggregate

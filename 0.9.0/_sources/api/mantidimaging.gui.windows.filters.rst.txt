@@ -1,0 +1,26 @@
+mantidimaging.gui.windows.filters package
+=========================================
+
+.. automodule:: mantidimaging.gui.windows.filters
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.filters.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.gui.windows.filters.model
+   mantidimaging.gui.windows.filters.navigation_toolbar
+   mantidimaging.gui.windows.filters.presenter
+   mantidimaging.gui.windows.filters.view

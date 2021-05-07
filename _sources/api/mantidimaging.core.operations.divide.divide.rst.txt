@@ -1,0 +1,7 @@
+mantidimaging.core.operations.divide.divide module
+==================================================
+
+.. automodule:: mantidimaging.core.operations.divide.divide
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+mantidimaging.core.cor\_tilt.test.workflow\_test module
+=======================================================
+
+.. automodule:: mantidimaging.core.cor_tilt.test.workflow_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.cor_tilt.test.data_model_test - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.cor_tilt.test.data_model_test</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.cor_tilt.test.data_model_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.cor_tilt</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">CorTiltDataModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">FIELD_NAMES</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CorTiltDataModelTest"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest">[docs]</a><span class="k">class</span> <span class="nc">CorTiltDataModelTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_field_defs_sanity"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_field_defs_sanity">[docs]</a>    <span class="k">def</span> <span class="nf">test_field_defs_sanity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Field</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">FIELD_NAMES</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_init"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_init">[docs]</a>    <span class="k">def</span> <span class="nf">test_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">empty</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">num_points</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">slices</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cors</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">has_results</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_add_points"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_add_points">[docs]</a>    <span class="k">def</span> <span class="nf">test_add_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">empty</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">num_points</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">slices</span><span class="p">,</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cors</span><span class="p">,</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_add_points_no_index"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_add_points_no_index">[docs]</a>    <span class="k">def</span> <span class="nf">test_add_points_no_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">empty</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">num_points</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">slices</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cors</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_clear_points"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_clear_points">[docs]</a>    <span class="k">def</span> <span class="nf">test_clear_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">clear_points</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">empty</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">num_points</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">slices</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cors</span><span class="p">,</span> <span class="p">[])</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_populate_slice_indices_no_cor"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_populate_slice_indices_no_cor">[docs]</a>    <span class="k">def</span> <span class="nf">test_populate_slice_indices_no_cor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">populate_slice_indices</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">num_points</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">300</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="mi">19</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">400</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="n">i</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_populate_slice_indices_with_cor"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_populate_slice_indices_with_cor">[docs]</a>    <span class="k">def</span> <span class="nf">test_populate_slice_indices_with_cor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">populate_slice_indices</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">56.7</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">num_points</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">300</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="mi">19</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">400</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="n">i</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">56.7</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_linear_regression_no_data"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_linear_regression_no_data">[docs]</a>    <span class="k">def</span> <span class="nf">test_linear_regression_no_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">linear_regression</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">has_results</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_linear_regression"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_linear_regression">[docs]</a>    <span class="k">def</span> <span class="nf">test_linear_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">linear_regression</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">has_results</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_linear_regression_data"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_linear_regression_data">[docs]</a>    <span class="k">def</span> <span class="nf">test_linear_regression_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">_points</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="mi">1409</span><span class="p">,</span> <span class="mi">1401</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1386</span><span class="p">,</span> <span class="mi">1400</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1363</span><span class="p">,</span> <span class="mi">1400</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1340</span><span class="p">,</span> <span class="mi">1401</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1317</span><span class="p">,</span> <span class="mi">1400</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1294</span><span class="p">,</span> <span class="mi">1399</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1271</span><span class="p">,</span> <span class="mi">1398</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1248</span><span class="p">,</span> <span class="mi">1400</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1225</span><span class="p">,</span> <span class="mi">1398</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1202</span><span class="p">,</span> <span class="mi">1400</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1179</span><span class="p">,</span> <span class="mi">1399</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1156</span><span class="p">,</span> <span class="mi">1399</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1133</span><span class="p">,</span> <span class="mi">1400</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1110</span><span class="p">,</span> <span class="mi">1402</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1087</span><span class="p">,</span> <span class="mi">1398</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1064</span><span class="p">,</span> <span class="mi">1398</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1041</span><span class="p">,</span> <span class="mi">1397</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1018</span><span class="p">,</span> <span class="mi">1399</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">995</span><span class="p">,</span> <span class="mi">1398</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">972</span><span class="p">,</span> <span class="mi">1401</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">949</span><span class="p">,</span> <span class="mi">1397</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">926</span><span class="p">,</span> <span class="mi">1398</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">903</span><span class="p">,</span> <span class="mi">1398</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">880</span><span class="p">,</span> <span class="mi">1398</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">857</span><span class="p">,</span> <span class="mi">1396</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">834</span><span class="p">,</span> <span class="mi">1397</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">linear_regression</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="mf">0.005292</span><span class="p">,</span> <span class="n">places</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="mf">1392.99</span><span class="p">,</span> <span class="n">places</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_stack_properties"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_stack_properties">[docs]</a>    <span class="k">def</span> <span class="nf">test_stack_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">linear_regression</span><span class="p">()</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">stack_properties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;fitted_gradient&#39;</span><span class="p">],</span> <span class="n">m</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;rotation_centre&#39;</span><span class="p">],</span> <span class="n">m</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;slice_indices&#39;</span><span class="p">],</span> <span class="n">m</span><span class="o">.</span><span class="n">slices</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;rotation_centres&#39;</span><span class="p">],</span> <span class="n">m</span><span class="o">.</span><span class="n">cors</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;tilt_angle_rad&#39;</span><span class="p">],</span> <span class="nb">float</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_clear_results"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_clear_results">[docs]</a>    <span class="k">def</span> <span class="nf">test_clear_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">linear_regression</span><span class="p">()</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">clear_results</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">has_results</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_data_ordering"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_data_ordering">[docs]</a>    <span class="k">def</span> <span class="nf">test_data_ordering</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">sort_points</span><span class="p">()</span>
+
+        <span class="c1"># Expect data to be sorted as it is inserted</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">slices</span><span class="p">,</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cors</span><span class="p">,</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">])</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">linear_regression</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">has_results</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_get_cor_for_slice"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_get_cor_for_slice">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_cor_for_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">get_cor_for_slice</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">get_cor_for_slice</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">get_cor_for_slice</span><span class="p">(</span><span class="mi">45</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_get_cor_for_slice_from_regression"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_get_cor_for_slice_from_regression">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_cor_for_slice_from_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">linear_regression</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">get_cor_for_slice_from_regression</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mf">4.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">get_cor_for_slice_from_regression</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">get_cor_for_slice_from_regression</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="mf">9.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_get_data_idx_for_slice_idx"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_get_data_idx_for_slice_idx">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_data_idx_for_slice_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">_get_data_idx_from_slice_idx</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">_get_data_idx_from_slice_idx</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CorTiltDataModelTest.test_set_cor_at_slice"><a class="viewcode-back" href="../../../../../api/mantidimaging.core.cor_tilt.test.data_model_test.html#mantidimaging.core.cor_tilt.test.data_model_test.CorTiltDataModelTest.test_set_cor_at_slice">[docs]</a>    <span class="k">def</span> <span class="nf">test_set_cor_at_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">CorTiltDataModel</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">set_cor_at_slice</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cors</span><span class="p">,</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">])</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="data_model_test.html">1.0.0</a></li>
+  <li><a href="../../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.cor_tilt.test.data_model_test</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

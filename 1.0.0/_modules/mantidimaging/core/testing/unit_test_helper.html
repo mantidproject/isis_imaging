@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.testing.unit_test_helper - MantidImaging 1.0.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.testing.unit_test_helper</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.testing.unit_test_helper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">StringIO</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">utility</span> <span class="k">as</span> <span class="n">pu</span>
+
+<span class="n">backup_mp_avail</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">g_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="gen_img_numpy_rand"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.gen_img_numpy_rand">[docs]</a><span class="k">def</span> <span class="nf">gen_img_numpy_rand</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">g_shape</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="o">*</span><span class="n">shape</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="gen_img_shared_array_and_copy"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.gen_img_shared_array_and_copy">[docs]</a><span class="k">def</span> <span class="nf">gen_img_shared_array_and_copy</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">g_shape</span><span class="p">):</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">gen_img_shared_array</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">copy</span> <span class="o">=</span> <span class="n">shared_deepcopy</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">arr</span><span class="p">,</span> <span class="n">copy</span></div>
+
+
+<div class="viewcode-block" id="gen_img_shared_array"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.gen_img_shared_array">[docs]</a><span class="k">def</span> <span class="nf">gen_img_shared_array</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">g_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_shared_array</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="c1"># move the data in the shared array</span>
+    <span class="n">d</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">n</span><span class="p">[:]</span>
+
+    <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="generate_images_class_random_shared_array"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.generate_images_class_random_shared_array">[docs]</a><span class="k">def</span> <span class="nf">generate_images_class_random_shared_array</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">g_shape</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">mantidimaging.core.data</span> <span class="kn">import</span> <span class="n">Images</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_shared_array</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="c1"># move the data in the shared array</span>
+    <span class="n">d</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">n</span><span class="p">[:]</span>
+
+    <span class="n">images</span> <span class="o">=</span> <span class="n">Images</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">images</span></div>
+
+
+<div class="viewcode-block" id="gen_empty_shared_array"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.gen_empty_shared_array">[docs]</a><span class="k">def</span> <span class="nf">gen_empty_shared_array</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">g_shape</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_shared_array</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="gen_img_shared_array_with_val"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.gen_img_shared_array_with_val">[docs]</a><span class="k">def</span> <span class="nf">gen_img_shared_array_with_val</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">g_shape</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_shared_array</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+    <span class="c1"># move the data in the shared array</span>
+    <span class="n">d</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">n</span><span class="p">[:]</span>
+
+    <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="assert_not_equals"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.assert_not_equals">[docs]</a><span class="k">def</span> <span class="nf">assert_not_equals</span><span class="p">(</span><span class="n">numpy_ndarray1</span><span class="p">,</span> <span class="n">numpy_ndarray2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Assert equality for numpy ndarrays using the numpy testing library.</span>
+
+<span class="sd">    :param numpy_ndarray1: The left side of the comparison</span>
+
+<span class="sd">    :param numpy_ndarray2: The right side of the comparison</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">AssertionError</span><span class="p">,</span>
+                      <span class="n">npt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">,</span>
+                      <span class="n">numpy_ndarray1</span><span class="p">,</span> <span class="n">numpy_ndarray2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="deepcopy"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.deepcopy">[docs]</a><span class="k">def</span> <span class="nf">deepcopy</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+    <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">source</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="shared_deepcopy"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.shared_deepcopy">[docs]</a><span class="k">def</span> <span class="nf">shared_deepcopy</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_shared_array</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+    <span class="n">d</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">source</span><span class="p">)[:]</span>
+    <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="debug"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.debug">[docs]</a><span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="n">switch</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">switch</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">pydevd</span>
+        <span class="n">pydevd</span><span class="o">.</span><span class="n">settrace</span><span class="p">(</span>
+            <span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">59003</span><span class="p">,</span> <span class="n">stdoutToServer</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderrToServer</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="vsdebug"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.vsdebug">[docs]</a><span class="k">def</span> <span class="nf">vsdebug</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">ptvsd</span>
+    <span class="n">ptvsd</span><span class="o">.</span><span class="n">enable_attach</span><span class="p">(</span><span class="s2">&quot;my_secret&quot;</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="mi">59003</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Waiting for remote debugger at localhost:59003&quot;</span><span class="p">)</span>
+    <span class="c1"># Enable the below line of code only if you want the application to wait</span>
+    <span class="c1"># untill the debugger has attached to it</span>
+    <span class="n">ptvsd</span><span class="o">.</span><span class="n">wait_for_attach</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="switch_mp_off"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.switch_mp_off">[docs]</a><span class="k">def</span> <span class="nf">switch_mp_off</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function does very bad things that should never be replicated.</span>
+<span class="sd">    But it&#39;s a unit test so it&#39;s fine.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># backup function so we can restore it</span>
+    <span class="k">global</span> <span class="n">backup_mp_avail</span>
+    <span class="n">backup_mp_avail</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">multiprocessing_available</span>
+
+    <span class="k">def</span> <span class="nf">simple_return_false</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># do bad things, swap out the function to one that returns false</span>
+    <span class="n">pu</span><span class="o">.</span><span class="n">multiprocessing_available</span> <span class="o">=</span> <span class="n">simple_return_false</span></div>
+
+
+<div class="viewcode-block" id="switch_mp_on"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.switch_mp_on">[docs]</a><span class="k">def</span> <span class="nf">switch_mp_on</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function does very bad things that should never be replicated.</span>
+<span class="sd">    But it&#39;s a unit test so it&#39;s fine.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># restore the original backed up function from switch_mp_off</span>
+    <span class="n">pu</span><span class="o">.</span><span class="n">multiprocessing_available</span> <span class="o">=</span> <span class="n">backup_mp_avail</span></div>
+
+
+<div class="viewcode-block" id="assert_files_exist"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.assert_files_exist">[docs]</a><span class="k">def</span> <span class="nf">assert_files_exist</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_name</span><span class="p">,</span> <span class="n">file_extension</span><span class="p">,</span>
+                       <span class="n">file_extension_separator</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">single_file</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">num_images</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Asserts that a file exists.</span>
+
+<span class="sd">    :param cls: Must be a unittest.TestCase class, in order to use the</span>
+<span class="sd">                assertTrue</span>
+<span class="sd">    :param base_name: The base name of the filename.</span>
+<span class="sd">    :param file_extension: The expected extension</span>
+<span class="sd">    :param file_extension_separator: The extension separator. It should</span>
+<span class="sd">                                     normally always be &#39;.&#39;</span>
+<span class="sd">    :param single_file: Are we looking for a &#39;stack&#39; of images</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">unittest</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span>
+    <span class="p">),</span> <span class="s2">&quot;Work only if class is unittest.TestCase, it uses self.assertTrue!&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">single_file</span><span class="p">:</span>
+        <span class="c1"># generate a list of filenames with 000000 numbers appended</span>
+        <span class="n">filenames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span><span class="p">):</span>
+            <span class="n">filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">base_name</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span>
+                             <span class="n">file_extension_separator</span> <span class="o">+</span> <span class="n">file_extension</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">base_name</span> <span class="o">+</span> <span class="n">file_extension_separator</span> <span class="o">+</span> <span class="n">file_extension</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="mock_property"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.mock_property">[docs]</a><span class="k">def</span> <span class="nf">mock_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">object_property</span><span class="p">,</span> <span class="n">property_return_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mock a property of the object. This is a helper function to work around the</span>
+<span class="sd">    limitations of mocking a property with different return values.</span>
+
+<span class="sd">    :param obj: The object whose property will be mocked.</span>
+
+<span class="sd">    :param object_property: The property that will be mocked as a string.</span>
+
+<span class="sd">    :param property_return_value: The expected return value</span>
+
+<span class="sd">    :returns: The PropertyMock object that you can do assertions with</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">mantidimaging.core.utility.special_imports</span> <span class="k">as</span> <span class="nn">imps</span>
+    <span class="n">mock</span> <span class="o">=</span> <span class="n">imps</span><span class="o">.</span><span class="n">import_mock</span><span class="p">()</span>
+    <span class="n">temp_property_mock</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">PropertyMock</span><span class="p">(</span><span class="n">return_value</span><span class="o">=</span><span class="n">property_return_value</span><span class="p">)</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="n">object_property</span><span class="p">,</span> <span class="n">temp_property_mock</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">temp_property_mock</span></div>
+
+
+<div class="viewcode-block" id="IgnoreOutputStreams"><a class="viewcode-back" href="../../../../api/mantidimaging.core.testing.unit_test_helper.html#mantidimaging.core.testing.unit_test_helper.IgnoreOutputStreams">[docs]</a><span class="k">class</span> <span class="nc">IgnoreOutputStreams</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Record the default streams</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span>
+
+        <span class="c1"># Replace them with string IO &quot;dummy&quot; buffers</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="c1"># Restore the default streams</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="unit_test_helper.html">1.0.0</a></li>
+  <li><a href="../../../../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MantidImaging 1.0.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.testing.unit_test_helper</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

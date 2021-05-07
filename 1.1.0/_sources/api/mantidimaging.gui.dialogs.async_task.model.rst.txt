@@ -1,0 +1,7 @@
+mantidimaging.gui.dialogs.async\_task.model module
+==================================================
+
+.. automodule:: mantidimaging.gui.dialogs.async_task.model
+   :members:
+   :undoc-members:
+   :show-inheritance:

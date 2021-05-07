@@ -1,0 +1,18 @@
+mantidimaging.core.parallel package
+===================================
+
+.. automodule:: mantidimaging.core.parallel
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.parallel.shared
+   mantidimaging.core.parallel.shared_mem
+   mantidimaging.core.parallel.two_shared_mem
+   mantidimaging.core.parallel.utility

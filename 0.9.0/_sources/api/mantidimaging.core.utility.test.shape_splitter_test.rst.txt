@@ -1,0 +1,7 @@
+mantidimaging.core.utility.test.shape\_splitter\_test module
+============================================================
+
+.. automodule:: mantidimaging.core.utility.test.shape_splitter_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

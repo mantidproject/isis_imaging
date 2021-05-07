@@ -1,0 +1,7 @@
+mantidimaging.core.filters.rebin.test.rebin\_test module
+========================================================
+
+.. automodule:: mantidimaging.core.filters.rebin.test.rebin_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

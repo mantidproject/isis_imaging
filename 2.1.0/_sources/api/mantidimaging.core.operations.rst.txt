@@ -1,0 +1,43 @@
+mantidimaging.core.operations package
+=====================================
+
+.. automodule:: mantidimaging.core.operations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.operations.circular_mask
+   mantidimaging.core.operations.clip_values
+   mantidimaging.core.operations.crop_coords
+   mantidimaging.core.operations.divide
+   mantidimaging.core.operations.flat_fielding
+   mantidimaging.core.operations.gaussian
+   mantidimaging.core.operations.median_filter
+   mantidimaging.core.operations.monitor_normalisation
+   mantidimaging.core.operations.outliers
+   mantidimaging.core.operations.rebin
+   mantidimaging.core.operations.remove_all_stripe
+   mantidimaging.core.operations.remove_dead_stripe
+   mantidimaging.core.operations.remove_large_stripe
+   mantidimaging.core.operations.remove_stripe
+   mantidimaging.core.operations.remove_stripe_filtering
+   mantidimaging.core.operations.remove_stripe_sorting_fitting
+   mantidimaging.core.operations.rescale
+   mantidimaging.core.operations.ring_removal
+   mantidimaging.core.operations.roi_normalisation
+   mantidimaging.core.operations.rotate_stack
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.operations.base_filter
+   mantidimaging.core.operations.loader

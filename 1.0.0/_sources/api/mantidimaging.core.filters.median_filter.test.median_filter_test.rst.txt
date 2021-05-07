@@ -1,0 +1,7 @@
+mantidimaging.core.filters.median\_filter.test.median\_filter\_test module
+==========================================================================
+
+.. automodule:: mantidimaging.core.filters.median_filter.test.median_filter_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

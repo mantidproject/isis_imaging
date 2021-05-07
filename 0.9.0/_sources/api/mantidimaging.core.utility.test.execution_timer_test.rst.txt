@@ -1,0 +1,7 @@
+mantidimaging.core.utility.test.execution\_timer\_test module
+=============================================================
+
+.. automodule:: mantidimaging.core.utility.test.execution_timer_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,15 @@
+mantidimaging.core.filters.outliers.test package
+================================================
+
+.. automodule:: mantidimaging.core.filters.outliers.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.outliers.test.outliers_test

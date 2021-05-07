@@ -1,0 +1,7 @@
+mantidimaging.core.utility.test.registrator\_test module
+========================================================
+
+.. automodule:: mantidimaging.core.utility.test.registrator_test
+   :members:
+   :undoc-members:
+   :show-inheritance:

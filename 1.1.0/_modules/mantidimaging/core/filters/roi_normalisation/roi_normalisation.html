@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>mantidimaging.core.filters.roi_normalisation.roi_normalisation - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.roi_normalisation.roi_normalisation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mantidimaging.core.filters.roi_normalisation.roi_normalisation</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mantidimaging</span> <span class="kn">import</span> <span class="n">helper</span> <span class="k">as</span> <span class="n">h</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">two_shared_mem</span> <span class="k">as</span> <span class="n">ptsm</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.parallel</span> <span class="kn">import</span> <span class="n">utility</span> <span class="k">as</span> <span class="n">pu</span>
+<span class="kn">from</span> <span class="nn">mantidimaging.core.utility.progress_reporting</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+
+<span class="k">def</span> <span class="nf">_cli_register</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-A&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--air-region&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Air region /region for normalisation. The selection is a &quot;</span>
+        <span class="s2">&quot;rectangle and expected order is - Left Top Right Bottom.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;For best results the region selected should not be blocked by &quot;</span>
+        <span class="s2">&quot;any object in the Tomography.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Example: --air-region 150 234 23 22&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span>
+
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../../user_guide/filters/roi_normalisation.html#mantidimaging.core.filters.roi_normalisation.roi_normalisation.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">air_region</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalise by beam intensity.</span>
+
+<span class="sd">    This does NOT do any checks if the Air Region is out of bounds!</span>
+<span class="sd">    If the Air Region is out of bounds, the crop will fail at runtime.</span>
+<span class="sd">    If the Air Region is in bounds, but has overlapping coordinates</span>
+<span class="sd">    the crop give back a 0 shape of the coordinates that were wrong.</span>
+
+<span class="sd">    :param data: Sample data which is to be processed. Expected in radiograms</span>
+
+<span class="sd">    :param air_region: The order is - Left Top Right Bottom. The air region</span>
+<span class="sd">                       from which sums will be calculated and all images will</span>
+<span class="sd">                       be normalised.</span>
+
+<span class="sd">    :param cores: The number of cores that will be used to process the data.</span>
+
+<span class="sd">    :param chunksize: The number of chunks that each worker will receive.</span>
+
+<span class="sd">    :returns: Filtered data (stack of images)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># just get data reference</span>
+    <span class="k">if</span> <span class="n">air_region</span><span class="p">:</span>
+        <span class="c1"># sanity check for the regions</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span>
+                   <span class="n">air_region</span><span class="p">),</span> <span class="s2">&quot;The air region coordinates are not integers!&quot;</span>
+        <span class="k">if</span> <span class="n">pu</span><span class="o">.</span><span class="n">multiprocessing_available</span><span class="p">():</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">_execute_par</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">air_region</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">_execute_seq</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">air_region</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+
+    <span class="n">h</span><span class="o">.</span><span class="n">check_data_stack</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<span class="k">def</span> <span class="nf">_calc_sum</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+              <span class="n">air_sums</span><span class="p">,</span>
+              <span class="n">air_left</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">air_top</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">air_right</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">air_bottom</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># here we can use ndarray.sum or ndarray.mean</span>
+    <span class="c1"># ndarray.mean makes the values with a nice int16 range</span>
+    <span class="c1"># (0-65535, BUT NOT int16 TYPE! They remain floats!)</span>
+    <span class="c1"># while ndarray.sum makes them in a low range of 0-1.5.</span>
+    <span class="c1"># There is no difference in the results</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">air_top</span><span class="p">:</span><span class="n">air_bottom</span><span class="p">,</span> <span class="n">air_left</span><span class="p">:</span><span class="n">air_right</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_divide_by_air_sum</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">air_sums</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">air_sums</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_execute_par</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">air_region</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                        <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;ROI Normalisation&#39;</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="n">left</span> <span class="o">=</span> <span class="n">air_region</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="n">air_region</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="n">air_region</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">bottom</span> <span class="o">=</span> <span class="n">air_region</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Normalization by air region&quot;</span><span class="p">)</span>
+
+        <span class="c1"># initialise same number of air sums</span>
+        <span class="n">img_num</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">air_sums</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">create_shared_array</span><span class="p">((</span><span class="n">img_num</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># turn into a 1D array, from the 3D that is returned</span>
+        <span class="n">air_sums</span> <span class="o">=</span> <span class="n">air_sums</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">img_num</span><span class="p">)</span>
+
+        <span class="n">calc_sums_partial</span> <span class="o">=</span> <span class="n">ptsm</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span>
+            <span class="n">_calc_sum</span><span class="p">,</span>
+            <span class="n">fwd_function</span><span class="o">=</span><span class="n">ptsm</span><span class="o">.</span><span class="n">return_to_second</span><span class="p">,</span>
+            <span class="n">air_left</span><span class="o">=</span><span class="n">left</span><span class="p">,</span>
+            <span class="n">air_top</span><span class="o">=</span><span class="n">top</span><span class="p">,</span>
+            <span class="n">air_right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span>
+            <span class="n">air_bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="p">,</span> <span class="n">air_sums</span> <span class="o">=</span> <span class="n">ptsm</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">air_sums</span><span class="p">,</span> <span class="n">calc_sums_partial</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span>
+                                      <span class="n">chunksize</span><span class="p">,</span> <span class="s2">&quot;Calculating air sums&quot;</span><span class="p">)</span>
+
+        <span class="n">air_sums_partial</span> <span class="o">=</span> <span class="n">ptsm</span><span class="o">.</span><span class="n">create_partial</span><span class="p">(</span>
+            <span class="n">_divide_by_air_sum</span><span class="p">,</span> <span class="n">fwd_function</span><span class="o">=</span><span class="n">ptsm</span><span class="o">.</span><span class="n">inplace</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="p">,</span> <span class="n">air_sums</span> <span class="o">=</span> <span class="n">ptsm</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">air_sums</span><span class="p">,</span> <span class="n">air_sums_partial</span><span class="p">,</span> <span class="n">cores</span><span class="p">,</span>
+                                      <span class="n">chunksize</span><span class="p">,</span> <span class="s2">&quot;Norm by Air Sums&quot;</span><span class="p">)</span>
+
+        <span class="n">avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">air_sums</span><span class="p">)</span>
+        <span class="n">max_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">air_sums</span><span class="p">)</span> <span class="o">/</span> <span class="n">avg</span>
+        <span class="n">min_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">air_sums</span><span class="p">)</span> <span class="o">/</span> <span class="n">avg</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Normalization by air region. &quot;</span>
+                 <span class="s2">&quot;Average: </span><span class="si">{0}</span><span class="s2">, max ratio: </span><span class="si">{1}</span><span class="s2">, min ratio: </span><span class="si">{2}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">avg</span><span class="p">,</span> <span class="n">max_avg</span><span class="p">,</span> <span class="n">min_avg</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span> <span class="nf">_execute_seq</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">air_region</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="o">.</span><span class="n">ensure_instance</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span>
+                                        <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;ROI Normalisation&#39;</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="n">left</span> <span class="o">=</span> <span class="n">air_region</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="n">air_region</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="n">air_region</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">bottom</span> <span class="o">=</span> <span class="n">air_region</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Normalization by air region&quot;</span><span class="p">)</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">add_estimated_steps</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">air_sums</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">air_data_sum</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">air_sums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">air_data_sum</span><span class="p">)</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Normalization by air sums&quot;</span><span class="p">)</span>
+        <span class="n">air_sums</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">air_sums</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">air_sums</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">air_sums</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="n">avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">air_sums</span><span class="p">)</span>
+        <span class="n">max_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">air_sums</span><span class="p">)</span> <span class="o">/</span> <span class="n">avg</span>
+        <span class="n">min_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">air_sums</span><span class="p">)</span> <span class="o">/</span> <span class="n">avg</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Normalization by air region. &quot;</span>
+                 <span class="s2">&quot;Average: </span><span class="si">{0}</span><span class="s2">, max ratio: </span><span class="si">{1}</span><span class="s2">, min ratio: </span><span class="si">{2}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">avg</span><span class="p">,</span> <span class="n">max_avg</span><span class="p">,</span> <span class="n">min_avg</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Latest</a></li>
+  <li><a href="../../../../../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../../../../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="roi_normalisation.html">1.1.0</a></li>
+  <li><a href="../../../../../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../../../../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.filters.roi_normalisation.roi_normalisation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

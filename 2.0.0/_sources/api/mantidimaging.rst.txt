@@ -1,0 +1,25 @@
+mantidimaging package
+=====================
+
+.. automodule:: mantidimaging
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.helper
+   mantidimaging.ipython
+   mantidimaging.main

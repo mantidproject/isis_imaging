@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.core.io.saver module - MantidImaging 0.9.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.core.io.utility module" href="mantidimaging.core.io.utility.html" />
+    <link rel="prev" title="mantidimaging.core.io.test.utility_test module" href="mantidimaging.core.io.test.utility_test.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.utility.html" title="mantidimaging.core.io.utility module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.test.utility_test.html" title="mantidimaging.core.io.test.utility_test module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.io.html" accesskey="U">mantidimaging.core.io package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.saver module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.core.io.saver">
+<span id="mantidimaging-core-io-saver-module"></span><h1>mantidimaging.core.io.saver module<a class="headerlink" href="#module-mantidimaging.core.io.saver" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mantidimaging.core.io.saver.Saver">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.core.io.saver.</code><code class="sig-name descname">Saver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#Saver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.Saver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This class doesn’t have any try: … except: … because when called
+it’s usually at an end point, where there would be no point in recovering.</p>
+<p>However if the directory in which the output should be written out does
+not exist, it will be created on the first call of make_dirs_if_needed.</p>
+<p>This class should always fail early before any
+expensive operations have been attempted.</p>
+<dl class="py method">
+<dt id="mantidimaging.core.io.saver.Saver.get_output_path">
+<code class="sig-name descname">get_output_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#Saver.get_output_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.Saver.get_output_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.saver.Saver.save_preproc_images">
+<code class="sig-name descname">save_preproc_images</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#Saver.save_preproc_images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.Saver.save_preproc_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specialised save function to save out the pre-processed images.</p>
+<p>This will save the images out in a subdir /pre-processed/.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – The pre-processed data that will be saved</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.saver.Saver.save_recon_output">
+<code class="sig-name descname">save_recon_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#Saver.save_recon_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.Saver.save_recon_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specialised method to save out the reconstructed data
+depending on the configuration options.</p>
+<p>This will save out the data in a subdirectory /reconstructed/.
+If –save-horiz-slices is specified, the axis will be flipped and
+the result will be saved out in /reconstructed/horiz.
+^ This means that the data usage will double as
+numpy.swapaxes WILL COPY AND DOUBLE the data!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – Reconstructed data volume that will be saved out.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.saver.Saver.save_single_image">
+<code class="sig-name descname">save_single_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">subdir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'saved_image'</span></em>, <em class="sig-param"><span class="n">swap_axes</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">custom_index</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">zfill_len</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">name_postfix</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">use_preproc_folder</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#Saver.save_single_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.Saver.save_single_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a single image to a single image file.
+THIS SHOULD NOT BE USED WITH A 3D STACK OF IMAGES.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subdir</strong> – Specify an additional subdirectory
+inside the output directory</p></li>
+<li><p><strong>data</strong> – Data volume with pre-processed images</p></li>
+<li><p><strong>name</strong> – Image name to be appended</p></li>
+<li><p><strong>custom_index</strong> – Index that will be appended at the end of the
+image filename</p></li>
+<li><p><strong>zfill_len</strong> – <p>Prepend zeros to the output file names to have a
+constant file name length. Example:
+- saving out an image with zfill_len = 6:</p>
+<blockquote>
+<div><p>saved_image000001,…saved_image000201 and so on</p>
+</div></blockquote>
+<ul>
+<li><dl class="simple">
+<dt>saving out an image with zfill_len = 3:</dt><dd><p>saved_image001,…saved_image201 and so on</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+<li><p><strong>name_postfix</strong> – String to be appended after the zero fill.
+This is not recommended and might confuse
+imaging programs (including this script) as to
+the order of the images, and they could
+end up not loading all of the images.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.saver.Saver.should_save_output">
+<code class="sig-name descname">should_save_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#Saver.should_save_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.Saver.should_save_output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="mantidimaging.core.io.saver.Saver.supported_formats">
+<em class="property">static </em><code class="sig-name descname">supported_formats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#Saver.supported_formats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.Saver.supported_formats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.saver.generate_names">
+<code class="sig-prename descclassname">mantidimaging.core.io.saver.</code><code class="sig-name descname">generate_names</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_prefix</span></em>, <em class="sig-param"><span class="n">indices</span></em>, <em class="sig-param"><span class="n">num_images</span></em>, <em class="sig-param"><span class="n">custom_idx</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">zfill_len</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">name_postfix</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">out_format</span><span class="o">=</span><span class="default_value">'tif'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#generate_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.generate_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.saver.make_dirs_if_needed">
+<code class="sig-prename descclassname">mantidimaging.core.io.saver.</code><code class="sig-name descname">make_dirs_if_needed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dirname</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">overwrite_all</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#make_dirs_if_needed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.make_dirs_if_needed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes sure that the directory needed (for example to save a file)
+exists, otherwise creates it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>:</strong> (<em>dirname</em>) – (output) directory to check</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.saver.save">
+<code class="sig-prename descclassname">mantidimaging.core.io.saver.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">output_dir</span></em>, <em class="sig-param"><span class="n">name_prefix</span><span class="o">=</span><span class="default_value">'image'</span></em>, <em class="sig-param"><span class="n">swap_axes</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">out_format</span><span class="o">=</span><span class="default_value">'tif'</span></em>, <em class="sig-param"><span class="n">overwrite_all</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">custom_idx</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">zfill_len</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">name_postfix</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">indices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save image volume (3d) into a series of slices along the Z axis.
+The Z axis in the script is the ndarray.shape[0].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Data as images/slices stores in numpy array</p></li>
+<li><p><strong>output_dir</strong> – Output directory for the files</p></li>
+<li><p><strong>name_prefix</strong> – Prefix for the names of the images,
+appended before the image number</p></li>
+<li><p><strong>swap_axes</strong> – Swap the 0 and 1 axis of the images
+(convert from radiograms to sinograms on saving)</p></li>
+<li><p><strong>out_format</strong> – File format of the saved out images</p></li>
+<li><p><strong>overwrite_all</strong> – Overwrite existing images with conflicting names</p></li>
+<li><p><strong>custom_idx</strong> – Single index to be used for the file name,
+instead of incremental numbers</p></li>
+<li><p><strong>zfill_len</strong> – <p>This option is ignored if custom_idx is specified!
+Prepend zeros to the output file names to have a
+constant file name length. Example:
+- saving out an image with zfill_len = 6:</p>
+<blockquote>
+<div><p>saved_image000001,…saved_image000201 and so on</p>
+</div></blockquote>
+<ul>
+<li><dl class="simple">
+<dt>saving out an image with zfill_len = 3:</dt><dd><p>saved_image001,…saved_image201 and so on</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+<li><p><strong>name_postfix</strong> – Postfix for the name after the index</p></li>
+<li><p><strong>indices</strong> – Only works if custom_idx is not specified.
+Specify the start and end range of the indices
+which will be used for the file names.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.saver.write_fits">
+<code class="sig-prename descclassname">mantidimaging.core.io.saver.</code><code class="sig-name descname">write_fits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#write_fits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.write_fits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.saver.write_img">
+<code class="sig-prename descclassname">mantidimaging.core.io.saver.</code><code class="sig-name descname">write_img</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#write_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.write_img" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.core.io.saver.write_nxs">
+<code class="sig-prename descclassname">mantidimaging.core.io.saver.</code><code class="sig-name descname">write_nxs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">projection_angles</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/core/io/saver.html#write_nxs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.core.io.saver.write_nxs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.core.io.test.utility_test.html"
+                        title="previous chapter">mantidimaging.core.io.test.utility_test module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.core.io.utility.html"
+                        title="next chapter">mantidimaging.core.io.utility module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="mantidimaging.core.io.saver.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="../../1.1.0/index.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.utility.html" title="mantidimaging.core.io.utility module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.core.io.test.utility_test.html" title="mantidimaging.core.io.test.utility_test module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 0.9.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.core.html" >mantidimaging.core package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.core.io.html" >mantidimaging.core.io package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.core.io.saver module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

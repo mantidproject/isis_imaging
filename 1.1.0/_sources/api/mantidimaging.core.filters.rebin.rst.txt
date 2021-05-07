@@ -1,0 +1,24 @@
+mantidimaging.core.filters.rebin package
+========================================
+
+.. automodule:: mantidimaging.core.filters.rebin
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.rebin.test
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 10
+
+   mantidimaging.core.filters.rebin.rebin
+   mantidimaging.core.filters.rebin.rebin_gui

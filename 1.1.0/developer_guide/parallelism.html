@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>Parallelism in Python - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Execution Splitter" href="execution_splitter.html" />
+    <link rel="prev" title="Python &lt;=3.6 Performance Issues" href="python_3x_performance_issues.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="execution_splitter.html" title="Execution Splitter"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="python_3x_performance_issues.html" title="Python &lt;=3.6 Performance Issues"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Parallelism in Python</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="parallelism-in-python">
+<h1>Parallelism in Python<a class="headerlink" href="#parallelism-in-python" title="Permalink to this headline">¶</a></h1>
+<p>In order to process data in parallel using the Python’s built-in module
+<code class="code docutils literal notranslate"><span class="pre">multiprocessing</span></code>, the data needs to be put into a <code class="code docutils literal notranslate"><span class="pre">shared</span> <span class="pre">array</span></code>,
+which is created using the <code class="code docutils literal notranslate"><span class="pre">multiprocessing.sharedctypes</span></code> module. This is
+all abstracted away inside the <code class="code docutils literal notranslate"><span class="pre">parallel.utility</span></code> module, specifically the
+<code class="code docutils literal notranslate"><span class="pre">create_shared_array</span></code> function.</p>
+<section id="what-happens-if-we-don-t-use-a-shared-array">
+<h2>What happens if we don’t use a shared array?<a class="headerlink" href="#what-happens-if-we-don-t-use-a-shared-array" title="Permalink to this headline">¶</a></h2>
+<p>If we do not use a shared array, each image is first copied to the spawned
+process’ memory, and then processed and returned, then copied again in the main
+process’ memory. We want to avoid these copies because they waste time. The way
+to avoid them is to use a shared array, so that each child process can do the
+processing in-place.</p>
+</section>
+<section id="is-in-place-processing-safe">
+<h2>Is in-place processing safe?<a class="headerlink" href="#is-in-place-processing-safe" title="Permalink to this headline">¶</a></h2>
+<p>Yes, each process gets a whole image, and only processes that image. It does not
+try to read and change data of other processes, therefore we do not have
+race-conditions or undefined behaviour.</p>
+</section>
+<section id="how-is-parallel-processing-done-right-now">
+<h2>How is parallel processing done right now?<a class="headerlink" href="#how-is-parallel-processing-done-right-now" title="Permalink to this headline">¶</a></h2>
+<p>Parallel processing is all funnelled through the <code class="code docutils literal notranslate"><span class="pre">parallel</span></code> package. It
+uses function decorating to forward parameters, because there is no native way
+of doing that in Python 2.7. There might be a way of changing that in Python
+3.x.</p>
+<p>It all goes down to using a parallel pool with worker as much as cores the
+process has been given. We then do an <code class="code docutils literal notranslate"><span class="pre">pool.imap</span></code> and execute the function
+that’s already been decorated with the rest of the parameters, and provide the
+data as a first parameter. The reason we don’t decorate the function with the
+data reference is then the data might be copied.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">two_shared_mem</span></code> package forwards 2 parameters to the decorated
+function because some filters require the data and another array to use, for
+example doing background correction, we need a second array to subtract and then
+divide.</p>
+<p>Using <code class="code docutils literal notranslate"><span class="pre">pool.imap</span></code> means that the main thread will briefly be returned to,
+and that is when we increment the progress bar. There has been no performance
+penalty found for using <code class="code docutils literal notranslate"><span class="pre">pool.imap</span></code>, which briefly returns to the main
+thread, over <code class="code docutils literal notranslate"><span class="pre">pool.map</span></code> which doesn’t return to the main thread, thus we
+will lose the ability to increment the progress bar.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Parallelism in Python</a><ul>
+<li><a class="reference internal" href="#what-happens-if-we-don-t-use-a-shared-array">What happens if we don’t use a shared array?</a></li>
+<li><a class="reference internal" href="#is-in-place-processing-safe">Is in-place processing safe?</a></li>
+<li><a class="reference internal" href="#how-is-parallel-processing-done-right-now">How is parallel processing done right now?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="python_3x_performance_issues.html"
+                        title="previous chapter">Python &lt;=3.6 Performance Issues</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="execution_splitter.html"
+                        title="next chapter">Execution Splitter</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/developer_guide/parallelism.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/developer_guide/parallelism.html">1.0.0</a></li>
+  <li><a href="parallelism.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="execution_splitter.html" title="Execution Splitter"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="python_3x_performance_issues.html" title="Python &lt;=3.6 Performance Issues"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Guide</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Parallelism in Python</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+mantidimaging.core.utility.progress\_reporting.progress module
+==============================================================
+
+.. automodule:: mantidimaging.core.utility.progress_reporting.progress
+   :members:
+   :undoc-members:
+   :show-inheritance:

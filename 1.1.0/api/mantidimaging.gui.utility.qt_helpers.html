@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  
+    <title>mantidimaging.gui.utility.qt_helpers module - MantidImaging 1.1.0 Documentation</title>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mantidimaging.gui.widgets package" href="mantidimaging.gui.widgets.html" />
+    <link rel="prev" title="mantidimaging.gui.utility.get_auto_params_from_stack module" href="mantidimaging.gui.utility.get_auto_params_from_stack.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.widgets.html" title="mantidimaging.gui.widgets package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.utility.get_auto_params_from_stack.html" title="mantidimaging.gui.utility.get_auto_params_from_stack module"
+             accesskey="P">previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.gui.html" >mantidimaging.gui package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.gui.utility.html" accesskey="U">mantidimaging.gui.utility package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.utility.qt_helpers module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-mantidimaging.gui.utility.qt_helpers">
+<span id="mantidimaging-gui-utility-qt-helpers-module"></span><h1>mantidimaging.gui.utility.qt_helpers module<a class="headerlink" href="#module-mantidimaging.gui.utility.qt_helpers" title="Permalink to this headline">¶</a></h1>
+<p>Module containing helper functions relating to PyQt.</p>
+<dl class="py class">
+<dt id="mantidimaging.gui.utility.qt_helpers.BlockQtSignals">
+<em class="property">class </em><code class="sig-prename descclassname">mantidimaging.gui.utility.qt_helpers.</code><code class="sig-name descname">BlockQtSignals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q_objects</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/utility/qt_helpers.html#BlockQtSignals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.utility.qt_helpers.BlockQtSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Used to block Qt signals from a selection of QWidgets within a context.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.gui.utility.qt_helpers.add_property_to_form">
+<code class="sig-prename descclassname">mantidimaging.gui.utility.qt_helpers.</code><code class="sig-name descname">add_property_to_form</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">dtype</span></em>, <em class="sig-param"><span class="n">default_value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">valid_values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tooltip</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">on_change</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">form</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/utility/qt_helpers.html#add_property_to_form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.utility.qt_helpers.add_property_to_form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a property to the algorithm dialog.</p>
+<p>Handles adding basic data options to the UI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – Label that describes the option</p></li>
+<li><p><strong>dtype</strong> – Option data type (any of: file, int, float, bool, list)</p></li>
+<li><p><strong>default_value</strong> – Optionally select the default value</p></li>
+<li><p><strong>valid_values</strong> – Optionally provide the range or selection of valid
+values</p></li>
+<li><p><strong>tooltip</strong> – Optional tooltip text to show on property</p></li>
+<li><p><strong>on_change</strong> – Function to be called when the property changes</p></li>
+<li><p><strong>form</strong> – Form layout to optionally add the new widgets to</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.gui.utility.qt_helpers.compile_ui">
+<code class="sig-prename descclassname">mantidimaging.gui.utility.qt_helpers.</code><code class="sig-name descname">compile_ui</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ui_file</span></em>, <em class="sig-param"><span class="n">qt_obj</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/utility/qt_helpers.html#compile_ui"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.utility.qt_helpers.compile_ui" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.gui.utility.qt_helpers.delete_all_widgets_from_layout">
+<code class="sig-prename descclassname">mantidimaging.gui.utility.qt_helpers.</code><code class="sig-name descname">delete_all_widgets_from_layout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lo</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/utility/qt_helpers.html#delete_all_widgets_from_layout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.utility.qt_helpers.delete_all_widgets_from_layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes and deletes all child widgets form a layout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lo</strong> – Layout to clean</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.gui.utility.qt_helpers.select_directory">
+<code class="sig-prename descclassname">mantidimaging.gui.utility.qt_helpers.</code><code class="sig-name descname">select_directory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field</span></em>, <em class="sig-param"><span class="n">caption</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/utility/qt_helpers.html#select_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.utility.qt_helpers.select_directory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="mantidimaging.gui.utility.qt_helpers.select_file">
+<code class="sig-prename descclassname">mantidimaging.gui.utility.qt_helpers.</code><code class="sig-name descname">select_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field</span></em>, <em class="sig-param"><span class="n">caption</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mantidimaging/gui/utility/qt_helpers.html#select_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mantidimaging.gui.utility.qt_helpers.select_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field</strong> – The field in which the result will be saved</p></li>
+<li><p><strong>caption</strong> – Title of the file browser window that will be opened</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True: If a file has been selected, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mantidimaging.gui.utility.get_auto_params_from_stack.html"
+                        title="previous chapter">mantidimaging.gui.utility.get_auto_params_from_stack module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mantidimaging.gui.widgets.html"
+                        title="next chapter">mantidimaging.gui.widgets package</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<div class="versions">
+<h3>Versions</h3>
+<ul>
+  <li><a href="../../index.html">Latest</a></li>
+  <li><a href="../../0.9.0/index.html">0.9.0</a></li>
+  <li><a href="../../1.0.0/index.html">1.0.0</a></li>
+  <li><a href="mantidimaging.gui.utility.qt_helpers.html">1.1.0</a></li>
+  <li><a href="../../2.0.0/index.html">2.0.0</a></li>
+  <li><a href="../../2.1.0/index.html">2.1.0</a></li>
+</ul>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.widgets.html" title="mantidimaging.gui.widgets package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mantidimaging.gui.utility.get_auto_params_from_stack.html" title="mantidimaging.gui.utility.get_auto_params_from_stack module"
+             >previous</a> |</li>
+  
+        <li class="nav-item nav-item-0"><a href="../index.html">MantidImaging 1.1.0 Documentation</a> &#187;</li>
+  
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="mantidimaging.html" >mantidimaging package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="mantidimaging.gui.html" >mantidimaging.gui package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="mantidimaging.gui.utility.html" >mantidimaging.gui.utility package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">mantidimaging.gui.utility.qt_helpers module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2020, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

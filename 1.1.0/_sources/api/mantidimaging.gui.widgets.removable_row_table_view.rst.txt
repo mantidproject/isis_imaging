@@ -1,0 +1,7 @@
+mantidimaging.gui.widgets.removable\_row\_table\_view module
+============================================================
+
+.. automodule:: mantidimaging.gui.widgets.removable_row_table_view
+   :members:
+   :undoc-members:
+   :show-inheritance:
